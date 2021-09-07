@@ -1,0 +1,11 @@
+get all apps for store
+                                        local client
+get installed apps for library
+
+
+add app to database
+                                        web client
+update app in database
+
+
+need an account to perform web client actions
