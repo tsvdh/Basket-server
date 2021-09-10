@@ -5,32 +5,34 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.net.URL;
 import lombok.Data;
+import lombok.NonNull;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+
 @Data
 @Document(collection = "apps")
 public class App implements Serializable {
 
-    @Id String id;
-    @Indexed(unique = true) String name;
-    String description;
-    Version stable;
-    Version experimental;
-    URL iconAddress;
-    URL githubHome;
+    private @Id String id;
+    private @Indexed(unique = true) String name;
+    private String description;
+    private Version stable;
+    private Version experimental;
+    private URL iconAddress;
+    private URL githubHome;
 
     @Serial
     private static final long serialVersionUID = 2;
 
-    public App(@BsonProperty String name,
-               @BsonProperty String description,
-               @BsonProperty Version stable,
-               @BsonProperty Version experimental,
-               @BsonProperty URL iconAddress,
-               @BsonProperty URL githubHome) {
+    public App(@BsonProperty @NonNull String name,
+               @BsonProperty @NonNull String description,
+               @BsonProperty @NonNull Version stable,
+               @BsonProperty @NonNull Version experimental,
+               @BsonProperty @NonNull URL iconAddress,
+               @BsonProperty @NonNull URL githubHome) {
         this.name = name;
         this.description = description;
         this.stable = stable;
