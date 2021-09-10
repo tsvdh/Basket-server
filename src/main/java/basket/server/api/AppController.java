@@ -35,7 +35,7 @@ public class AppController {
         return appService.getAll();
     }
 
-    @GetMapping(path = "names")
+    @GetMapping(path = "names") 
     public List<App> get(@RequestBody @NonNull @Validated List<String> names) {
         return appService.get(names);
     }
