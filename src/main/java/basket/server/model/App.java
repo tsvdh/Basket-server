@@ -1,6 +1,5 @@
 package basket.server.model;
 
-import basket.api.util.Version;
 import java.io.Serial;
 import java.io.Serializable;
 import java.net.URL;
@@ -19,8 +18,8 @@ public class App implements Serializable {
     private @Id String id;
     private @Indexed(unique = true) String name;
     private String description;
-    private Version stable;
-    private Version experimental;
+    private String stable;
+    private String experimental;
     private URL iconAddress;
     private URL githubHome;
 
@@ -29,8 +28,8 @@ public class App implements Serializable {
 
     public App(@BsonProperty @NonNull String name,
                @BsonProperty @NonNull String description,
-               @BsonProperty @NonNull Version stable,
-               @BsonProperty @NonNull Version experimental,
+               @BsonProperty @NonNull String stable,
+               @BsonProperty @NonNull String experimental,
                @BsonProperty @NonNull URL iconAddress,
                @BsonProperty @NonNull URL githubHome) {
         this.name = name;

@@ -12,19 +12,13 @@
 
     <groupId>com.github.tsvdh</groupId>
 	<artifactId>basket-server</artifactId>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 
 	<properties>
 		<java.version>16</java.version>
 	</properties>
 
 	<dependencies>
-        <dependency>
-            <groupId>com.github.tsvdh</groupId>
-            <artifactId>basket-api</artifactId>
-            <version>0.3.3</version>
-        </dependency>
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
