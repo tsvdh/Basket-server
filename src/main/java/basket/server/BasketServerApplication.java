@@ -10,4 +10,15 @@ public class BasketServerApplication {
 		SpringApplication.run(BasketServerApplication.class, args);
 	}
 
+    // @Bean
+    // PasswordEncoder passwordEncoder() {
+    //     return new SCryptPasswordEncoder();
+    // }
+
+    // @Bean
+    // CommandLineRunner run(AppService appService) {
+    //     return args -> {
+    //
+    //     };
+    // }
 }

@@ -1,4 +1,4 @@
-package basket.server.dao;
+package basket.server.dao.app;
 
 import basket.server.model.App;
 import java.util.Collection;

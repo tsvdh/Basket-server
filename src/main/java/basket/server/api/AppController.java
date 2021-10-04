@@ -3,7 +3,9 @@ package basket.server.api;
 import basket.server.model.App;
 import basket.server.service.AppService;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,20 +17,27 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("apps")
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.ResponseEntity.badRequest;
+import static org.springframework.http.ResponseEntity.notFound;
+import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.status;
+
+@RequestMapping("api/v1/apps")
 @RestController
+@RequiredArgsConstructor
 public class AppController {
 
     private final AppService appService;
 
-    @Autowired
-    public AppController(AppService appService) {
-        this.appService = appService;
-    }
-
     @GetMapping(path = "{name}")
-    public App get(@PathVariable String name) {
-        return appService.get(name);
+    public ResponseEntity<App> get(@PathVariable String name) {
+        Optional<App> app = appService.get(name);
+        if (app.isPresent()) {
+            return ok(app.get());
+        } else {
+            return notFound().build();
+        }
     }
 
     @GetMapping
@@ -37,17 +46,29 @@ public class AppController {
     }
 
     @GetMapping(path = "names")
-    public List<App> get(@RequestHeader @NonNull @Validated List<String> names) {
+    public List<App> get(@RequestHeader @NonNull List<String> names) {
         return appService.get(names);
     }
 
     @PostMapping
-    public void add(@RequestBody @NonNull @Validated App app) {
-        appService.add(app);
+    public ResponseEntity<Void> add(@RequestBody @NonNull @Validated App app) {
+        boolean success = appService.add(app);
+
+        if (success) {
+            return ok().build();
+        } else {
+            return badRequest().build();
+        }
     }
 
-    @PutMapping(path = "{name}")
-    public void update(@PathVariable String name, @RequestBody @NonNull @Validated App newApp) {
-        appService.update(name, newApp);
+    @PutMapping
+    public ResponseEntity<Void> update(@RequestBody @NonNull @Validated App updatedApp) {
+        boolean success = appService.update(updatedApp);
+
+        if (success) {
+            return ok().build();
+        } else {
+            return status(CONFLICT).build();
+        }
     }
 }
