@@ -7,6 +7,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,7 +24,7 @@ import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
 
-@RequestMapping("api/v1/apps")
+@RequestMapping({"apps", "api/v1/apps"})
 @RestController
 @RequiredArgsConstructor
 public class AppController {
@@ -33,6 +34,7 @@ public class AppController {
     @GetMapping(path = "{name}")
     public ResponseEntity<App> get(@PathVariable String name) {
         Optional<App> app = appService.get(name);
+        //noinspection OptionalIsPresent
         if (app.isPresent()) {
             return ok(app.get());
         } else {
@@ -51,6 +53,7 @@ public class AppController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('DEVELOPER')")
     public ResponseEntity<Void> add(@RequestBody @NonNull @Validated App app) {
         boolean success = appService.add(app);
 
@@ -62,6 +65,7 @@ public class AppController {
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('DEVELOPER')")
     public ResponseEntity<Void> update(@RequestBody @NonNull @Validated App updatedApp) {
         boolean success = appService.update(updatedApp);
 

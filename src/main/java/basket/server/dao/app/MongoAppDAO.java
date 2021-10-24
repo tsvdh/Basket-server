@@ -3,18 +3,14 @@ package basket.server.dao.app;
 import basket.server.model.App;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 @Repository("mongoAppDAO")
+@RequiredArgsConstructor
 public class MongoAppDAO implements AppDAO {
 
     private final AppMongoRepository mongoRepository;
-
-    @Autowired
-    public MongoAppDAO(AppMongoRepository mongoRepository) {
-        this.mongoRepository = mongoRepository;
-    }
 
     @Override
     public Optional<App> get(String name) {

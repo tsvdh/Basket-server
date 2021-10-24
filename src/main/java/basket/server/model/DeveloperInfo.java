@@ -15,18 +15,15 @@ public class DeveloperInfo implements Serializable {
     private static final long serialVersionUID = 3;
 
     private String fullName;
-    private @Indexed(unique = true) String email;
     private @Indexed(unique = true) String phoneNumber;
     private Set<String> developerOf;
     private Set<String> adminOf;
 
     public DeveloperInfo(@BsonProperty @NonNull String fullName,
-                         @BsonProperty @NonNull String email,
                          @BsonProperty @NonNull String phoneNumber,
                          @BsonProperty @NonNull Set<String> developerOf,
                          @BsonProperty @NonNull Set<String> adminOf) {
         this.fullName = fullName;
-        this.email = email;
         this.phoneNumber = phoneNumber;
         this.developerOf = developerOf;
         this.adminOf = adminOf;

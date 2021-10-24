@@ -2,15 +2,22 @@ package basket.server.service;
 
 import basket.server.dao.user.UserDAO;
 import basket.server.model.User;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserDAO userDAO;
 
@@ -24,8 +31,13 @@ public class UserService {
         return userDAO.getById(id);
     }
 
+    public Optional<User> getByEmail(String email) {
+        log.info("Getting user with email {}", email);
+        return userDAO.getByEmail(email);
+    }
+
     public Optional<User> getByUsername(String username) {
-        log.info("Getting user {} by username", username);
+        log.info("Getting user with username {}", username);
         return userDAO.getByUsername(username);
     }
 
@@ -39,17 +51,26 @@ public class UserService {
         return userDAO.update(updatedUser);
     }
 
-    // @Override
-    // public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    //     Optional<User> optionalUser = getByUsername(username);
-    //     if (optionalUser.isEmpty()) {
-    //         throw new UsernameNotFoundException("Could not find the specified username");
-    //     }
-    //
-    //     User user = optionalUser.get();
-    //     Set<GrantedAuthority> authorities = new HashSet<>();
-    //
-    //     return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getEncodedPassword(),
-    //             authorities);
-    // }
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<User> optionalUser = getByUsername(username);
+        optionalUser = optionalUser.isEmpty() ? getByEmail(username) : optionalUser;
+
+        if (optionalUser.isEmpty()) {
+            throw new UsernameNotFoundException("Can not find specified username or email");
+        }
+
+        User user = optionalUser.get();
+        Set<GrantedAuthority> authorities = new HashSet<>();
+
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+        if (user.isDeveloper()) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_DEVELOPER"));
+        }
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(), user.getEncodedPassword(),
+                authorities);
+    }
 }

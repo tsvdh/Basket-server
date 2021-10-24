@@ -20,17 +20,20 @@ public class User implements Serializable {
     private static final long serialVersionUID = 2;
 
     private @Id String id;
+    private @Indexed(unique = true) String email;
     private @Indexed(unique = true) String username;
     private String encodedPassword;
     private Set<String> userOf;
     private boolean developer;
     private DeveloperInfo developerInfo;
 
-    public User(@BsonProperty @NonNull String username,
+    public User(@BsonProperty @NonNull String email,
+                @BsonProperty @NonNull String username,
                 @BsonProperty @NonNull String encodedPassword,
                 @BsonProperty @NonNull Set<String> userOf,
                 @BsonProperty @NonNull boolean developer,
                 @BsonProperty @Nullable @Validated DeveloperInfo developerInfo) {
+        this.email = email;
         this.username = username;
         this.encodedPassword = encodedPassword;
         this.userOf = userOf;

@@ -1,6 +1,6 @@
 package basket.server.security;
 
-public class PasswordHandler {
+public class PasswordRater {
 
     public enum Rating {
         GOOD,

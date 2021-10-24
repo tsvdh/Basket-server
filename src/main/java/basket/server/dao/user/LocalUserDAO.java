@@ -18,6 +18,13 @@ public class LocalUserDAO implements UserDAO {
     }
 
     @Override
+    public Optional<User> getByEmail(String email) {
+        return localDB.stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst();
+    }
+
+    @Override
     public Optional<User> getByUsername(String username) {
         return localDB.stream()
                 .filter(user -> user.getUsername().equals(username))
@@ -36,6 +43,11 @@ public class LocalUserDAO implements UserDAO {
 
     @Override
     public boolean update(User updatedUser) {
+        // check if unique field is already present
+        if (getByEmail(updatedUser.getEmail()).isPresent()) {
+            return false;
+        }
+
         for (int i = 0; i < localDB.size(); i++) {
             if (localDB.get(i).getId().equals(updatedUser.getId())) {
                 localDB.set(i, updatedUser);

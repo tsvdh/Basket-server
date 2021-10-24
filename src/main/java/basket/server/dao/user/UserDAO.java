@@ -7,6 +7,8 @@ public interface UserDAO {
 
     Optional<User> getById(String id);
 
+    Optional<User> getByEmail(String email);
+
     Optional<User> getByUsername(String username);
 
     boolean add(User newUser);
