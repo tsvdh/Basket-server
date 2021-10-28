@@ -24,7 +24,7 @@ public class BasketServerApplication {
             user1.setId("beadsfewfa");
             User user2 = new User("b@b.com", "b", pwd, new HashSet<>(), true, null);
             user2.setId("awefihoewh");
-            User user3 = new User("c@c.com", "c", pwd, new HashSet<>(), false, null);
+            User user3 = new User("c@c.com", "c", pwd, new HashSet<>(), true, null);
             user3.setId("fasdfeweii");
 
             userService.add(user1);

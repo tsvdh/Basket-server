@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Basket</title>
+    <link href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" rel="script">
+<!--    <script th:src="@{js/test.js}"></script>-->
+<!--    <link th:href="@{js/test.js}" rel="script">-->
+</head>
+<body id="body">
+<h2>This is the page of <span th:text="${pageUsername}">Username</span></h2>
+<p>You are welcome to look around <b th:text="${currentUsername}">Username</b></p>
+<p><span th:text="${session}"></span></p>
+<p><span th:text="${#session}"></span></p>
+<!--<div id="bla">test</div>-->
+</body>
+</html>

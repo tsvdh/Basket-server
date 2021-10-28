@@ -31,7 +31,7 @@ public class AppController {
 
     private final AppService appService;
 
-    @GetMapping(path = "{name}")
+    @GetMapping("{name}")
     public ResponseEntity<App> get(@PathVariable String name) {
         Optional<App> app = appService.get(name);
         //noinspection OptionalIsPresent
@@ -47,7 +47,7 @@ public class AppController {
         return appService.getAll();
     }
 
-    @GetMapping(path = "names")
+    @GetMapping("names")
     public List<App> get(@RequestHeader @NonNull List<String> names) {
         return appService.get(names);
     }

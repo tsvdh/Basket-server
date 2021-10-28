@@ -1,5 +1,6 @@
 package basket.server.security;
 
+import basket.server.handlers.AuthHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +31,7 @@ public class SecurityConfig {
 
         private final UserDetailsService userDetailsService;
         private final PasswordEncoder passwordEncoder;
+        private final AuthHandler authHandler;
 
         @Override
         protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -47,7 +49,7 @@ public class SecurityConfig {
                     .and()
                     .formLogin()
                     .loginPage("/login")
-                    .defaultSuccessUrl("/developers");
+                    .successHandler(authHandler);
         }
     }
 
