@@ -1,15 +1,16 @@
 package basket.server.api;
 
+import basket.server.model.User;
 import basket.server.service.UserService;
-import javax.servlet.http.HttpSession;
+import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping("/")
@@ -24,18 +25,21 @@ public class WebController {
     }
 
     @GetMapping("developers/{pageUsername}")
-    public String getDeveloperPage(@PathVariable String pageUsername, HttpSession session, Model model) {
-        if (userService.getByUsername(pageUsername).isEmpty()) {
-            
+    public ModelAndView getDeveloperPage(@PathVariable String pageUsername, HttpServletRequest request) {
+        Optional<User> optionalUser = userService.getByUsername(pageUsername);
+
+        if (optionalUser.isEmpty() || !optionalUser.get().isDeveloper()) {
+            ModelAndView errorView = new ModelAndView("error");
+            errorView.setStatus(HttpStatus.NOT_FOUND);
+            return errorView;
         }
 
-        model.addAttribute("pageUsername", pageUsername);
+        ModelAndView modelAndView = new ModelAndView("developer");
 
-        SecurityContext securityContext = (SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT");
-        User user = (User) securityContext.getAuthentication().getPrincipal();
-        model.addAttribute("currentUsername", user.getUsername());
+        modelAndView.addObject("pageUsername", pageUsername);
+        modelAndView.addObject("currentUsername", request.getRemoteUser());
 
-        return "developer";
+        return modelAndView;
     }
 
     @GetMapping("api/v1/test")
