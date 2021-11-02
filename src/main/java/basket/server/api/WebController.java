@@ -37,9 +37,13 @@ public class WebController {
         ModelAndView modelAndView = new ModelAndView("developer");
 
         modelAndView.addObject("pageUsername", pageUsername);
-        modelAndView.addObject("currentUsername", request.getRemoteUser());
 
         return modelAndView;
+    }
+
+    @GetMapping("register")
+    public String getRegistration() {
+        return "register";
     }
 
     @GetMapping("api/v1/test")

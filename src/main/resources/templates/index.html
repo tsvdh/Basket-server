@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Basket</title>
@@ -9,7 +9,8 @@
 <body>
 <div>Hello world with Thymeleaf!</div>
 
-<a href="/login" class="btn btn-secondary btn-sm">Login</a>
+<a th:href="@{/login}" class="btn btn-secondary btn-sm">Login</a>
+<a th:href="@{/register}" class="btn btn-secondary btn-sm">Register</a>
 
 </body>
 </html>
