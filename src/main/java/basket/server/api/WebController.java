@@ -45,9 +45,4 @@ public class WebController {
     public String getRegistration() {
         return "register";
     }
-
-    @GetMapping("api/v1/test")
-    public boolean available(String username) {
-        return userService.getByUsername(username).isEmpty();
-    }
 }
