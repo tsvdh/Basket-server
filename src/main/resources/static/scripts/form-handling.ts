@@ -1,11 +1,23 @@
 export {}
 
+const ROOT_ADDRESS = "http://localhost:8080";
+// const ROOT_ADDRESS = "http://basket-io.herokuapp.com
+
+const userTypeInput = <HTMLSelectElement>document.getElementById("userTypeInput");
+
+document.getElementById("nav-user").onclick = function () {
+    userTypeInput.value = "USER";
+};
+
+document.getElementById("nav-developer").onclick = function () {
+    userTypeInput.value = "DEVELOPER";
+};
 
 function getFeedbackClassName(input: HTMLInputElement): string {
     return input.id + "-feedback";
 }
 
-function removeStyle(input: HTMLInputElement): void {
+function removeStyleFromInput(input: HTMLInputElement): void {
     const feedbackClassName = getFeedbackClassName(input);
 
     /*--- Reset feedback elements and style ---*/
@@ -19,7 +31,7 @@ function removeStyle(input: HTMLInputElement): void {
     }
 }
 
-function applyStyle(input: HTMLInputElement, faults: string[]): void {
+function applyStyleToInput(input: HTMLInputElement, faults: string[]): void {
     const feedbackClassName = getFeedbackClassName(input);
 
     /*--- Add feedback elements and style ---*/
@@ -40,19 +52,17 @@ function applyStyle(input: HTMLInputElement, faults: string[]): void {
     }
 }
 
-
 const USERNAME_PROBLEMS = {
     WHITE_SPACE: "Whitespaces are not allowed"
 };
 
-const usernameInput = <HTMLInputElement> document.getElementById("usernameInput");
+const usernameInput = <HTMLInputElement>document.getElementById("usernameInput");
 
 usernameInput.oninput = async function () {
-    removeStyle(usernameInput);
-
     const username: string = usernameInput.value.trim();
 
     if (username === "") {
+        removeStyleFromInput(usernameInput);
         return;
     }
 
@@ -62,8 +72,15 @@ usernameInput.oninput = async function () {
         faults.push(USERNAME_PROBLEMS.WHITE_SPACE);
     }
 
-    let request = new Request("http://localhost:8080/api/v1/account/username");
-    request.headers.append("username", username);
+    let request = new Request(ROOT_ADDRESS + "/api/v1/account/username",
+        {
+            method: "GET",
+            headers: {
+                "username": username
+            }
+        });
+
+    //TODO: add spinner
 
     let response = await fetch(request);
     let body: string = await response.text();
@@ -72,9 +89,9 @@ usernameInput.oninput = async function () {
         faults.push("Username already taken");
     }
 
-    applyStyle(usernameInput, faults);
+    removeStyleFromInput(usernameInput);
+    applyStyleToInput(usernameInput, faults);
 };
-
 
 const PASSWORD_LENGTH = 8;
 
@@ -84,10 +101,10 @@ const PASSWORD_PROBLEMS = {
     WHITE_SPACE: "White spaces are not allowed"
 };
 
-const passwordInput = <HTMLInputElement> document.getElementById("passwordInput");
+const passwordInput = <HTMLInputElement>document.getElementById("passwordInput");
 
 passwordInput.oninput = function () {
-    removeStyle(passwordInput);
+    removeStyleFromInput(passwordInput);
 
     const password: string = passwordInput.value.trim();
 
@@ -110,5 +127,5 @@ passwordInput.oninput = function () {
         faults.push(PASSWORD_PROBLEMS.NO_NUMBER);
     }
 
-    applyStyle(passwordInput, faults);
+    applyStyleToInput(passwordInput, faults);
 };

@@ -15,6 +15,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import static java.util.Objects.requireNonNull;
+
 @Service
 @Slf4j
 public class UserService implements UserDetailsService {
@@ -66,7 +68,17 @@ public class UserService implements UserDetailsService {
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 
         if (user.isDeveloper()) {
+            requireNonNull(user.getDeveloperInfo());
+
             authorities.add(new SimpleGrantedAuthority("ROLE_DEVELOPER"));
+
+            for (String appName : user.getDeveloperInfo().getDeveloperOf()) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_DEVELOPER-" + appName));
+            }
+
+            for (String appName : user.getDeveloperInfo().getAdminOf()) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN-" + appName));
+            }
         }
 
         return new org.springframework.security.core.userdetails.User(

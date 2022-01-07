@@ -24,7 +24,7 @@ public class AuthHandler implements AuthenticationSuccessHandler {
         if (user.isDeveloper()) {
             response.sendRedirect("/developers/" + user.getUsername());
         } else {
-            response.sendRedirect("/apps");
+            response.sendRedirect("/");
         }
     }
 }

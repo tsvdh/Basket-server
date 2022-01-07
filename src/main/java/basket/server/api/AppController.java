@@ -10,7 +10,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,15 +23,20 @@ import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
 
-@RequestMapping({"apps", "api/v1/apps"})
+@RequestMapping( "api/v1/apps")
 @RestController
 @RequiredArgsConstructor
 public class AppController {
 
     private final AppService appService;
 
-    @GetMapping("{name}")
-    public ResponseEntity<App> get(@PathVariable String name) {
+    @GetMapping
+    public List<App> getAll() {
+        return appService.getAll();
+    }
+
+    @GetMapping("name")
+    public ResponseEntity<App> get(@RequestHeader String name) {
         Optional<App> app = appService.get(name);
         //noinspection OptionalIsPresent
         if (app.isPresent()) {
@@ -40,11 +44,6 @@ public class AppController {
         } else {
             return notFound().build();
         }
-    }
-
-    @GetMapping
-    public List<App> getAll() {
-        return appService.getAll();
     }
 
     @GetMapping("names")
@@ -65,7 +64,7 @@ public class AppController {
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('DEVELOPER')")
+    @PreAuthorize("hasRole('DEVELOPER-' + updatedApp.getName())")
     public ResponseEntity<Void> update(@RequestBody @NonNull @Validated App updatedApp) {
         boolean success = appService.update(updatedApp);
 
