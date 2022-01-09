@@ -52,7 +52,7 @@ public class AppController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('DEVELOPER')")
+    // @PreAuthorize("hasRole('DEVELOPER')")
     public ResponseEntity<Void> add(@RequestBody @NonNull @Validated App app) {
         boolean success = appService.add(app);
 

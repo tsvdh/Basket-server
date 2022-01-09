@@ -12,6 +12,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<String> handleException(ConstraintViolationException e) {
+        //TODO: return error view
         return badRequest().body(e.getMessage());
     }
 }

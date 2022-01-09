@@ -5,12 +5,19 @@ const ROOT_ADDRESS = "http://localhost:8080";
 
 const userTypeInput = <HTMLSelectElement>document.getElementById("userTypeInput");
 
+const optionalInputs = [
+    <HTMLInputElement>document.getElementById("fullNameInput"),
+    <HTMLInputElement>document.getElementById("phoneNumberInput"),
+];
+
 document.getElementById("nav-user").onclick = function () {
     userTypeInput.value = "USER";
+    optionalInputs.forEach(input => input.required = false);
 };
 
 document.getElementById("nav-developer").onclick = function () {
     userTypeInput.value = "DEVELOPER";
+    optionalInputs.forEach(input => input.required = true);
 };
 
 function getFeedbackClassName(input: HTMLInputElement): string {
@@ -98,6 +105,7 @@ const PASSWORD_LENGTH = 8;
 const PASSWORD_PROBLEMS = {
     TOO_SHORT: "Must be at least X characters".replace("X", PASSWORD_LENGTH.toString()),
     NO_NUMBER: "Must contain a number",
+    NO_LETTER: "Must contain a letter",
     WHITE_SPACE: "White spaces are not allowed"
 };
 
@@ -125,6 +133,10 @@ passwordInput.oninput = function () {
 
     if (password.match(/\d/) === null) {
         faults.push(PASSWORD_PROBLEMS.NO_NUMBER);
+    }
+
+    if (password.match(/[A-Za-z]/) === null) {
+        faults.push(PASSWORD_PROBLEMS.NO_LETTER);
     }
 
     applyStyleToInput(passwordInput, faults);

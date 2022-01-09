@@ -11,6 +11,9 @@ import lombok.Data;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import static basket.server.security.CredentialsValidation.ratePassword;
+import static basket.server.security.CredentialsValidation.rateUsername;
+
 @Data
 @Component
 public class FormUser {
@@ -19,9 +22,6 @@ public class FormUser {
         USER,
         DEVELOPER
     }
-
-    private final PasswordEncoder passwordEncoder;
-    private final Validator validator;
 
     private Type userType;
 
@@ -35,7 +35,14 @@ public class FormUser {
     private String emailCode;
     private String phoneCode;
 
-    public User toValidUser() throws ConstraintViolationException {
+    public User toValidUser(PasswordEncoder passwordEncoder, Validator validator) throws ConstraintViolationException {
+        if (!rateUsername(password).isEmpty()) {
+            throw new ConstraintViolationException("Invalid username", null);
+        }
+        if (!ratePassword(password).isEmpty()) {
+            throw new ConstraintViolationException("Invalid password", null);
+        }
+
         boolean developer = userType.equals(Type.DEVELOPER);
 
         User user = new User(
@@ -61,8 +68,6 @@ public class FormUser {
                 throw new ConstraintViolationException(developerViolations);
             }
         }
-
-        //TODO: validate username and password
 
         Set<ConstraintViolation<User>> userViolations = validator.validate(user);
         if (userViolations.isEmpty()) {
