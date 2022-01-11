@@ -12,7 +12,7 @@
 
     <groupId>com.github.tsvdh</groupId>
 	<artifactId>basket-server</artifactId>
-	<version>0.1.2</version>
+	<version>0.2.0</version>
 
 	<properties>
 		<java.version>16</java.version>
@@ -60,7 +60,14 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-		<dependency>
+        <dependency>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot-starter</artifactId>
+            <version>3.0.4</version>
+        </dependency>
+
+
+        <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
@@ -80,6 +87,12 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.ulisesbocchio</groupId>
+                <artifactId>jasypt-maven-plugin</artifactId>
+                <version>3.0.4</version>
             </plugin>
         </plugins>
 	</build>

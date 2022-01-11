@@ -1,5 +1,6 @@
 package basket.server.api;
 
+import basket.server.messaging.mail.MailUtils;
 import basket.server.model.User;
 import basket.server.model.input.FormUser;
 import basket.server.service.UserService;
@@ -20,7 +21,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,16 +38,16 @@ public class AccountController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final Validator validator;
+    private final MailUtils mailUtils;
 
-    @GetMapping("api/v1/account/username")
+    @GetMapping("api/v1/account/username") //TODO: change to param
     public ResponseEntity<Boolean> availableUsername(@RequestHeader @NotBlank String username) {
         return ok(userService.getByUsername(username).isEmpty());
     }
 
-    @PutMapping("api/v1/account/email")
-    public ResponseEntity<Void> verifyEmail(@RequestHeader @NotNull @Email String email) {
-
-
+    @GetMapping("api/v1/account/email")
+    public ResponseEntity<Void> verifyEmail(@RequestParam @NotNull @Email String emailAddress) {
+        mailUtils.sendVerificationEmail(emailAddress);
         return ok().build();
     }
 
