@@ -1,7 +1,9 @@
 package basket.server.dao.user;
 
 import basket.server.model.User;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
@@ -11,7 +13,7 @@ import static java.util.Objects.requireNonNull;
 @Repository("localUserDAO")
 public class LocalUserDAO implements UserDAO {
 
-    private static final ArrayList<User> localDB = new ArrayList<>();
+    private static final List<User> localDB = new ArrayList<>();
 
     @Override
     public Optional<User> getById(String id) {
@@ -35,7 +37,7 @@ public class LocalUserDAO implements UserDAO {
     }
 
     @Override
-    public Optional<User> getByPhoneNumber(String phoneNumber) {
+    public Optional<User> getByPhoneNumber(PhoneNumber phoneNumber) {
         return localDB.stream()
             .filter(User::isDeveloper)
             .filter(user -> {

@@ -1,6 +1,7 @@
 package basket.server.dao.user;
 
 import basket.server.model.User;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.util.Optional;
 
 public interface UserDAO {
@@ -11,7 +12,7 @@ public interface UserDAO {
 
     Optional<User> getByUsername(String username);
 
-    Optional<User> getByPhoneNumber(String phoneNumber);
+    Optional<User> getByPhoneNumber(PhoneNumber phoneNumber);
 
     default boolean isUnique(User user) {
         boolean uniqueId = user.getId() == null || getById(user.getId()).isEmpty();

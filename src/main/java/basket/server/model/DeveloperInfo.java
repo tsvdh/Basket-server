@@ -1,10 +1,9 @@
 package basket.server.model;
 
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -15,20 +14,17 @@ public class DeveloperInfo implements Serializable {
     @Serial
     private static final long serialVersionUID = 3;
 
-    @NotBlank
     private String fullName;
 
-    @NotBlank @Indexed(unique = true)
-    private String phoneNumber;
+    @Indexed(unique = true)
+    private PhoneNumber phoneNumber;
 
-    @NotNull
     private Set<String> developerOf;
 
-    @NotNull
     private Set<String> adminOf;
 
     public DeveloperInfo(@BsonProperty String fullName,
-                         @BsonProperty String phoneNumber,
+                         @BsonProperty PhoneNumber phoneNumber,
                          @BsonProperty Set<String> developerOf,
                          @BsonProperty Set<String> adminOf) {
         this.fullName = fullName;

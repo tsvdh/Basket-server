@@ -2,6 +2,7 @@ package basket.server.service;
 
 import basket.server.dao.user.UserDAO;
 import basket.server.model.User;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -41,6 +42,11 @@ public class UserService implements UserDetailsService {
     public Optional<User> getByUsername(String username) {
         log.info("Getting user with username {}", username);
         return userDAO.getByUsername(username);
+    }
+
+    public Optional<User> getByPhoneNumber(PhoneNumber phoneNumber) {
+        log.info("Getting user with phone number {}", phoneNumber);
+        return userDAO.getByPhoneNumber(phoneNumber);
     }
 
     public boolean add(User newUser) {

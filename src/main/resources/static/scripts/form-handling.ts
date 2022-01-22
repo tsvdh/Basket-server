@@ -6,8 +6,11 @@ const ROOT_ADDRESS = "http://localhost:8080";
 const userTypeInput = <HTMLSelectElement>document.getElementById("userTypeInput");
 
 const optionalInputs = [
-    <HTMLInputElement>document.getElementById("fullNameInput"),
+    <HTMLInputElement>document.getElementById("firstNameInput"),
+    <HTMLInputElement>document.getElementById("lastNameInput"),
+    <HTMLInputElement>document.getElementById("countryCodeInput"),
     <HTMLInputElement>document.getElementById("phoneNumberInput"),
+    <HTMLInputElement>document.getElementById("phoneNumberCodeInput")
 ];
 
 document.getElementById("nav-user").onclick = function () {

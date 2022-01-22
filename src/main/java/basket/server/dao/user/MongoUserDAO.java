@@ -1,6 +1,7 @@
 package basket.server.dao.user;
 
 import basket.server.model.User;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -27,7 +28,7 @@ public class MongoUserDAO implements UserDAO {
     }
 
     @Override
-    public Optional<User> getByPhoneNumber(String phoneNumber) {
+    public Optional<User> getByPhoneNumber(PhoneNumber phoneNumber) {
         return userMongoRepository.findUserByDeveloperInfoPhoneNumber(phoneNumber);
     }
 

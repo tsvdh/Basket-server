@@ -3,16 +3,11 @@ package basket.server.model;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
-import javax.validation.Valid;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.lang.Nullable;
 
 @Data
 @Document(collection = "users")
@@ -24,22 +19,18 @@ public class User implements Serializable {
     @Id
     private String id;
 
-    @NotNull @Email @Indexed(unique = true)
+    @Indexed(unique = true)
     private String email;
 
-    @NotBlank @Indexed(unique = true)
+    @Indexed(unique = true)
     private String username;
 
-    @NotBlank
     private String encodedPassword;
 
-    @NotNull
     private Set<String> userOf;
 
-    @NotNull
     private boolean developer;
 
-    @Nullable @Valid
     private DeveloperInfo developerInfo;
 
     public User(@BsonProperty String email,

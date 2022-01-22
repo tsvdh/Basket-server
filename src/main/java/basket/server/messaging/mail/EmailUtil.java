@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class MailUtils {
+public class EmailUtil {
 
     private final static String SEND_ADDRESS = "basket.noreply@gmail.com";
 
