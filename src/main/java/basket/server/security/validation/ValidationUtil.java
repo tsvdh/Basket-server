@@ -1,4 +1,4 @@
-package basket.server.security.validation.validators;
+package basket.server.security.validation;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;

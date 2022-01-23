@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import static basket.server.security.validation.validators.ValidationUtil.validate;
+import static basket.server.security.validation.ValidationUtil.validate;
 import static com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberType.MOBILE;
 
 @Data
@@ -32,15 +32,19 @@ public class FormPhoneNumber {
 
         PhoneNumber phoneNumber;
         try {
-            phoneNumber = util.parse(regionCode, number);
+            phoneNumber = util.parse(number, regionCode);
         } catch (NumberParseException e) {
             throw new ValidationException("Phone number cannot be parsed");
         }
 
-        if (util.isValidNumber(phoneNumber) || util.isPossibleNumberForType(phoneNumber, MOBILE)) {
+        if (!util.isValidNumber(phoneNumber) || !util.isPossibleNumberForType(phoneNumber, MOBILE)) {
             throw new ValidationException("Phone number is not a valid mobile number");
         }
 
         return phoneNumber;
+    }
+
+    public static PhoneNumber toValidPhoneNumber(Validator validator, String regionCode, String number) {
+        return new FormPhoneNumber(regionCode, number).toValidPhoneNumber(validator);
     }
 }

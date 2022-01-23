@@ -1,6 +1,6 @@
 package basket.server;
 
-import basket.server.messaging.mail.EmailUtil;
+import basket.server.messaging.mail.EmailService;
 import basket.server.model.DeveloperInfo;
 import basket.server.model.User;
 import basket.server.service.UserService;
@@ -28,7 +28,7 @@ public class BasketServerApplication {
     }
 
     @Bean
-    CommandLineRunner run(UserService userService, PasswordEncoder passwordEncoder, EmailUtil EMailUtil) {
+    CommandLineRunner run(UserService userService, PasswordEncoder passwordEncoder, EmailService EMailService) {
         return args -> {
             String pwd = passwordEncoder.encode("1");
             User user1 = new User("a@a.com", "a", pwd, new HashSet<>(), false, null);

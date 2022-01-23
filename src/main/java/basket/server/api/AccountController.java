@@ -1,14 +1,15 @@
 package basket.server.api;
 
-import basket.server.messaging.mail.EmailUtil;
+import basket.server.messaging.mail.EmailService;
+import basket.server.messaging.phone.PhoneService;
 import basket.server.model.User;
-import basket.server.model.input.FormPhoneNumber;
 import basket.server.model.input.FormUser;
 import basket.server.security.validation.annotations.Username;
 import basket.server.service.UserService;
 import basket.server.service.VerificationCodeService;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,7 +29,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import static basket.server.security.validation.validators.ValidationUtil.validate;
+import static basket.server.messaging.phone.PhoneService.phoneToString;
+import static basket.server.model.VerificationCode.generateVerificationCode;
+import static basket.server.model.input.FormPhoneNumber.toValidPhoneNumber;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -43,7 +46,8 @@ public class AccountController {
     private final VerificationCodeService verificationCodeService;
     private final PasswordEncoder passwordEncoder;
     private final Validator validator;
-    private final EmailUtil EMailUtil;
+    private final EmailService emailService;
+    private final PhoneService phoneService;
 
     @GetMapping("api/v1/account/available/username")
     public ResponseEntity<Boolean> availableUsername(@RequestParam @NotBlank @Username String username) {
@@ -58,17 +62,34 @@ public class AccountController {
     @GetMapping("api/v1/account/available/phone")
     public ResponseEntity<Boolean> availablePhoneNumber(@RequestParam @NotBlank String regionCode,
                                                         @RequestParam @NotBlank String number) {
-        var formPhoneNumber = new FormPhoneNumber(regionCode, number);
-        validate(formPhoneNumber, validator);
+        PhoneNumber phoneNumber = toValidPhoneNumber(validator, regionCode, number);
+        String formattedNumber = phoneToString(phoneNumber);
 
-        var phoneNumber = formPhoneNumber.toValidPhoneNumber(validator);
-
-        return ok(verificationCodeService.get(phoneNumber).isEmpty());
+        return ok(verificationCodeService.get(formattedNumber).isEmpty());
     }
 
-    @GetMapping("api/v1/account/email")
+    @GetMapping("api/v1/account/verify/email")
     public ResponseEntity<Void> verifyEmail(@RequestParam @NotBlank @Email String emailAddress) {
-        EMailUtil.sendVerificationEmail(emailAddress);
+        var verificationCode = generateVerificationCode(emailAddress);
+
+        verificationCodeService.add(verificationCode);
+
+        emailService.sendVerificationEmail(verificationCode);
+
+        return ok().build();
+    }
+
+    @GetMapping("api/v1/account/verify/phone")
+    public ResponseEntity<Void> verifyPhone(@RequestParam @NotBlank String regionCode,
+                                            @RequestParam @NotBlank String number) {
+        PhoneNumber phoneNumber = toValidPhoneNumber(validator, regionCode, number);
+        String formattedNumber = phoneToString(phoneNumber);
+        var verificationCode = generateVerificationCode(formattedNumber);
+
+        verificationCodeService.add(verificationCode);
+
+        phoneService.sendVerificationSMS(phoneNumber);
+
         return ok().build();
     }
 

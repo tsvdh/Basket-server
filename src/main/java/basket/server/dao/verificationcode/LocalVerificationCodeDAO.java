@@ -45,7 +45,7 @@ public class LocalVerificationCodeDAO implements VerificationCodeDAO {
      * Mimic automatic database clean-up
      */
     @Scheduled(fixedRate = 15, timeUnit = MINUTES)
-    private void removeExpired() {
+    void removeExpired() {
         var now = LocalDateTime.now();
         localDB.removeIf(verificationCode -> verificationCode.getCreatedAt().plusMinutes(15).isAfter(now));
     }

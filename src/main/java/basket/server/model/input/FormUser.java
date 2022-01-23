@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static basket.server.security.validation.validators.ValidationUtil.validate;
+import static basket.server.security.validation.ValidationUtil.validate;
 
 @Data
 public class FormUser {

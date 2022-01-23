@@ -4,6 +4,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Data;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -32,5 +33,13 @@ public class VerificationCode implements Serializable {
         this.address = address;
         this.code = code;
         this.createdAt = createdAt;
+    }
+
+    public static VerificationCode generateVerificationCode(String address) {
+        return new VerificationCode(
+                address,
+                RandomStringUtils.randomAlphabetic(4),
+                LocalDateTime.now()
+        );
     }
 }

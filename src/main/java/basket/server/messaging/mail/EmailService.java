@@ -1,21 +1,24 @@
 package basket.server.messaging.mail;
 
+import basket.server.model.VerificationCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 @RequiredArgsConstructor
-public class EmailUtil {
-
-    private final static String SEND_ADDRESS = "basket.noreply@gmail.com";
+public class EmailService {
 
     private final MailSender mailSender;
 
-    public void sendVerificationEmail(String emailAddress) {
+    @Value("${spring.mail.properties.address}")
+    private String sendEmailAddress;
+
+    public void sendVerificationEmail(VerificationCode verificationCode) {
         SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setFrom(SEND_ADDRESS);
+        mail.setFrom(sendEmailAddress);
         mail.setTo(emailAddress);
         mail.setSubject("Verification code");
         mail.setText("Hello world!");
