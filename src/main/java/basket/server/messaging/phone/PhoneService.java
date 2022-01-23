@@ -19,10 +19,6 @@ public class PhoneService {
         return PhoneNumberUtil.getInstance().format(phoneNumber, PhoneNumberFormat.E164);
     }
 
-    private static com.twilio.type.PhoneNumber phoneToPhone(PhoneNumber phoneNumber) {
-        return new com.twilio.type.PhoneNumber(phoneToString(phoneNumber));
-    }
-
     @Value("#{twilioProperties.accountSid}")
     private String accountSid;
 
@@ -35,7 +31,7 @@ public class PhoneService {
     private com.twilio.type.PhoneNumber getSendPhoneNumber() {
         try {
             PhoneNumber phoneNumber = PhoneNumberUtil.getInstance().parse(sendPhoneNumber, "US");
-            return phoneToPhone(phoneNumber);
+            return new com.twilio.type.PhoneNumber(phoneToString(phoneNumber));
         }
         catch (NumberParseException e) {
             log.error("Unexpected error", e);
@@ -45,6 +41,10 @@ public class PhoneService {
 
     public void sendVerificationSMS(VerificationCode verificationCode) {
         Twilio.init(accountSid, authToken);
-        Message.creator(phoneToPhone(phoneNumber), getSendPhoneNumber(), "Hello world!").createAsync();
+        Message.creator(
+                new com.twilio.type.PhoneNumber(verificationCode.getAddress()),
+                getSendPhoneNumber(),
+                "Your verification code for Basket is " + verificationCode.getCode()
+        ).createAsync();
     }
 }

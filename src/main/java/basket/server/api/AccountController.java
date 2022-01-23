@@ -4,6 +4,7 @@ import basket.server.messaging.mail.EmailService;
 import basket.server.messaging.phone.PhoneService;
 import basket.server.model.User;
 import basket.server.model.input.FormUser;
+import basket.server.security.validation.ValidationService;
 import basket.server.security.validation.annotations.Username;
 import basket.server.service.UserService;
 import basket.server.service.VerificationCodeService;
@@ -13,13 +14,11 @@ import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Validator;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import static basket.server.messaging.phone.PhoneService.phoneToString;
 import static basket.server.model.VerificationCode.generateVerificationCode;
-import static basket.server.model.input.FormPhoneNumber.toValidPhoneNumber;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -44,8 +42,7 @@ public class AccountController {
 
     private final UserService userService;
     private final VerificationCodeService verificationCodeService;
-    private final PasswordEncoder passwordEncoder;
-    private final Validator validator;
+    private final ValidationService validationService;
     private final EmailService emailService;
     private final PhoneService phoneService;
 
@@ -62,7 +59,7 @@ public class AccountController {
     @GetMapping("api/v1/account/available/phone")
     public ResponseEntity<Boolean> availablePhoneNumber(@RequestParam @NotBlank String regionCode,
                                                         @RequestParam @NotBlank String number) {
-        PhoneNumber phoneNumber = toValidPhoneNumber(validator, regionCode, number);
+        PhoneNumber phoneNumber = validationService.validateFormPhoneNumber(regionCode, number);
         String formattedNumber = phoneToString(phoneNumber);
 
         return ok(verificationCodeService.get(formattedNumber).isEmpty());
@@ -82,13 +79,13 @@ public class AccountController {
     @GetMapping("api/v1/account/verify/phone")
     public ResponseEntity<Void> verifyPhone(@RequestParam @NotBlank String regionCode,
                                             @RequestParam @NotBlank String number) {
-        PhoneNumber phoneNumber = toValidPhoneNumber(validator, regionCode, number);
+        PhoneNumber phoneNumber = validationService.validateFormPhoneNumber(regionCode, number);
         String formattedNumber = phoneToString(phoneNumber);
         var verificationCode = generateVerificationCode(formattedNumber);
 
         verificationCodeService.add(verificationCode);
 
-        phoneService.sendVerificationSMS(phoneNumber);
+        phoneService.sendVerificationSMS(verificationCode);
 
         return ok().build();
     }
@@ -109,10 +106,7 @@ public class AccountController {
     @PostMapping("register")
     public ResponseEntity<Void> register(@ModelAttribute FormUser formUser,
                                          HttpServletResponse response) throws IOException {
-
-        //TODO: verify email and phone
-
-        User user = formUser.toValidUser(passwordEncoder, validator);
+        User user = validationService.validateFormUser(formUser);
 
         boolean success = userService.add(user);
 

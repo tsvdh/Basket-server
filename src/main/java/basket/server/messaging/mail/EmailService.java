@@ -19,9 +19,9 @@ public class EmailService {
     public void sendVerificationEmail(VerificationCode verificationCode) {
         SimpleMailMessage mail = new SimpleMailMessage();
         mail.setFrom(sendEmailAddress);
-        mail.setTo(emailAddress);
+        mail.setTo(verificationCode.getAddress());
         mail.setSubject("Verification code");
-        mail.setText("Hello world!");
+        mail.setText("Your verification code for Basket is " + verificationCode.getCode());
         mailSender.send(mail);
     }
 }

@@ -14,7 +14,9 @@ public class DeveloperInfo implements Serializable {
     @Serial
     private static final long serialVersionUID = 3;
 
-    private String fullName;
+    private String firstName;
+
+    private String lastName;
 
     @Indexed(unique = true)
     private PhoneNumber phoneNumber;
@@ -23,11 +25,13 @@ public class DeveloperInfo implements Serializable {
 
     private Set<String> adminOf;
 
-    public DeveloperInfo(@BsonProperty String fullName,
+    public DeveloperInfo(@BsonProperty String firstName,
+                         @BsonProperty String lastName,
                          @BsonProperty PhoneNumber phoneNumber,
                          @BsonProperty Set<String> developerOf,
                          @BsonProperty Set<String> adminOf) {
-        this.fullName = fullName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.phoneNumber = phoneNumber;
         this.developerOf = developerOf;
         this.adminOf = adminOf;
