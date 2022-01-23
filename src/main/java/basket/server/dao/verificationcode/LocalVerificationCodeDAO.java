@@ -24,7 +24,7 @@ public class LocalVerificationCodeDAO implements VerificationCodeDAO {
     }
 
     @Override
-    public boolean add(VerificationCode newCode) {
+    public boolean submit(VerificationCode newCode) {
         newCode.setId(UUID.randomUUID().toString());
 
         if (get(newCode.getAddress()).isEmpty()) {

@@ -9,7 +9,6 @@ import basket.server.security.validation.annotations.Username;
 import basket.server.service.UserService;
 import basket.server.service.VerificationCodeService;
 import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
@@ -65,29 +64,53 @@ public class AccountController {
         return ok(verificationCodeService.get(formattedNumber).isEmpty());
     }
 
-    @GetMapping("api/v1/account/verify/email")
-    public ResponseEntity<Void> verifyEmail(@RequestParam @NotBlank @Email String emailAddress) {
+    @GetMapping("api/v1/account/submit/email")
+    public ResponseEntity<Void> submitEmail(@RequestParam @NotBlank @Email String emailAddress) {
         var verificationCode = generateVerificationCode(emailAddress);
 
-        verificationCodeService.add(verificationCode);
+        boolean success = verificationCodeService.submit(verificationCode);
+
+        if (!success) {
+            return badRequest().build();
+        }
 
         emailService.sendVerificationEmail(verificationCode);
 
         return ok().build();
     }
 
-    @GetMapping("api/v1/account/verify/phone")
-    public ResponseEntity<Void> verifyPhone(@RequestParam @NotBlank String regionCode,
+    @GetMapping("api/v1/account/submit/phone")
+    public ResponseEntity<Void> submitPhone(@RequestParam @NotBlank String regionCode,
                                             @RequestParam @NotBlank String number) {
         PhoneNumber phoneNumber = validationService.validateFormPhoneNumber(regionCode, number);
         String formattedNumber = phoneToString(phoneNumber);
         var verificationCode = generateVerificationCode(formattedNumber);
 
-        verificationCodeService.add(verificationCode);
+        boolean success = verificationCodeService.submit(verificationCode);
+
+        if (!success) {
+            return badRequest().build();
+        }
 
         phoneService.sendVerificationSMS(verificationCode);
 
         return ok().build();
+    }
+
+    @GetMapping("api/v1/account/verify/email")
+    public ResponseEntity<Boolean> verifyEmail(@RequestParam @NotBlank @Email String emailAddress,
+                                               @RequestParam @NotBlank String code) {
+        return ok(verificationCodeService.verify(emailAddress, code));
+    }
+
+    @GetMapping("api/v1/account/verify/phone")
+    public ResponseEntity<Boolean> verifyPhone(@RequestParam @NotBlank String regionCode,
+                                               @RequestParam @NotBlank String number,
+                                               @RequestParam @NotBlank String code) {
+        PhoneNumber phoneNumber = validationService.validateFormPhoneNumber(regionCode, number);
+        String formattedNumber = phoneToString(phoneNumber);
+
+        return ok(verificationCodeService.verify(formattedNumber, code));
     }
 
     @GetMapping("login")
@@ -137,11 +160,10 @@ public class AccountController {
     }
 
     @GetMapping("api/v1/test")
-    public ResponseEntity<Void> test(@RequestParam String countryCode, @RequestParam String phoneNumber) throws NumberParseException {
-        // log.info("method executed");
+    public ResponseEntity<Void> test(HttpServletRequest request) throws NumberParseException {
+        log.info("method executed");
 
-        var phone = PhoneNumberUtil.getInstance().parse(phoneNumber, countryCode);
-        System.out.println(phone);
+
 
         return ok().build();
     }

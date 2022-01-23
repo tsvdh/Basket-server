@@ -25,9 +25,9 @@ public class VerificationCodeService {
         return verificationCodeDAO.get(address);
     }
 
-    public boolean add(VerificationCode verificationCode) {
+    public boolean submit(VerificationCode verificationCode) {
         log.info("Adding new verification code of address {}", verificationCode.getAddress());
-        return verificationCodeDAO.add(verificationCode);
+        return verificationCodeDAO.submit(verificationCode);
     }
 
     public boolean verify(String address, String code) {

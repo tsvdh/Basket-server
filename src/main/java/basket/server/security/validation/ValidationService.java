@@ -6,6 +6,7 @@ import basket.server.model.input.FormDeveloperInfo;
 import basket.server.model.input.FormPhoneNumber;
 import basket.server.model.input.FormUser;
 import basket.server.model.input.FormUser.Type;
+import basket.server.service.VerificationCodeService;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import static basket.server.messaging.phone.PhoneService.phoneToString;
 import static com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberType.MOBILE;
 
 @Service
@@ -27,6 +29,7 @@ public class ValidationService {
 
     private final Validator validator;
     private final PasswordEncoder passwordEncoder;
+    private final VerificationCodeService verificationCodeService;
 
     public <T> void validate(T object) throws ConstraintViolationException {
         Set<ConstraintViolation<T>> violations = validator.validate(object);
@@ -37,6 +40,11 @@ public class ValidationService {
 
     public User validateFormUser(FormUser formUser) throws ConstraintViolationException {
         validate(formUser);
+
+        boolean emailVerified = verificationCodeService.verify(formUser.getEmail(), formUser.getEmailCode());
+        if (!emailVerified) {
+            throw new ValidationException("Email is not verified");
+        }
 
         boolean developer = formUser.getUserType().equals(Type.DEVELOPER);
 
@@ -60,10 +68,21 @@ public class ValidationService {
     public DeveloperInfo validateFormDeveloperInfo(FormDeveloperInfo formDeveloperInfo) throws ConstraintViolationException {
         validate(formDeveloperInfo);
 
+        var phoneNumber = validateFormPhoneNumber(formDeveloperInfo.getFormPhoneNumber());
+
+        boolean phoneVerified = verificationCodeService.verify(
+                phoneToString(phoneNumber),
+                formDeveloperInfo.getPhoneCode()
+        );
+
+        if (!phoneVerified) {
+            throw new ValidationException("Phone number is not verified");
+        }
+
         return new DeveloperInfo(
                 formDeveloperInfo.getFirstName(),
                 formDeveloperInfo.getLastName(),
-                validateFormPhoneNumber(formDeveloperInfo.getFormPhoneNumber()),
+                phoneNumber,
                 new HashSet<>(),
                 new HashSet<>()
         );
