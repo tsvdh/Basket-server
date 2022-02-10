@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<!--suppress HtmlFormInputWithoutLabel -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Input fragments</title>
+</head>
+<body>
+<form th:object="${formUser}">
+
+    <div th:fragment="username" id="usernameFragment">
+        <label for="usernameInput" class="form-label">Username</label>
+        <input type="text" spellcheck="false" class="form-control" id="usernameInput" th:field="*{username}" required
+
+               hx-get="/api/v1/account/html/valid/username"
+               hx-trigger="input delay:500ms"
+               hx-target="#usernameFragment" hx-swap="outerHTML"
+        >
+    </div>
+
+    <div th:fragment="password" id="passwordFragment">
+        <label for="passwordInput" class="form-label">Password</label>
+        <input type="password" spellcheck="false" class="form-control" id="passwordInput" th:field="*{password}" required
+
+               hx-get="/api/v1/account/html/valid/password"
+               hx-trigger="input delay:500ms"
+               hx-target="#passwordFragment" hx-swap="outerHTML"
+        >
+    </div>
+
+    <div th:fragment="email" id="emailFragment">
+        <div class="input-group">
+            <input type="text" spellcheck="false" class="form-control" id="emailInput" th:field="*{email}" required
+
+                   hx-get="/api/v1/account/html/valid/email"
+                   hx-trigger="input delay:500ms"
+                   hx-target="#emailFragment" hx-swap="outerHTML"
+            >
+            <button class="btn btn-secondary" id="emailButton" type="button"
+
+                    hx-get="/api/v1/account/submit/email"
+                    hx-trigger="click delay:100ms"
+                    hx-include="[name='email']"
+                    hx-swap="none"
+
+            >Verify</button>
+        </div>
+    </div>
+
+    <div th:fragment="emailCode" id="emailCodeFragment">
+        <input type="text" spellcheck="false" class="form-control" id="emailCodeInput" placeholder="Code" th:field="*{emailCode}" required
+
+               hx-get="/api/v1/account/html/verify-code/email"
+               hx-include="[name='email']"
+               hx-trigger="input delay:500ms"
+               hx-target="#emailCodeFragment" hx-swap="outerHTML"
+        >
+    </div>
+
+<!-- TODO: refine delay time   -->
+<!-- TODO: show email sent message   -->
+
+</form>
+</body>
+</html>

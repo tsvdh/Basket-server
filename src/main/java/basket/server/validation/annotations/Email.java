@@ -1,6 +1,6 @@
-package basket.server.security.validation.annotations;
+package basket.server.validation.annotations;
 
-import basket.server.security.validation.validators.UsernameValidator;
+import basket.server.validation.validators.EmailValidator;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -16,12 +16,12 @@ import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Documented
-@Constraint(validatedBy = UsernameValidator.class)
+@Constraint(validatedBy = EmailValidator.class)
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 @Retention(RUNTIME)
-public @interface Username {
+public @interface Email {
 
-    String message() default "Invalid username";
+    String message() default "Invalid email";
 
     Class<?>[] groups() default { };
 

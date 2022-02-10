@@ -24,15 +24,14 @@ public class LocalVerificationCodeDAO implements VerificationCodeDAO {
     }
 
     @Override
-    public boolean submit(VerificationCode newCode) {
+    public VerificationCode submit(String address) {
+        var newCode = new VerificationCode(address);
         newCode.setId(UUID.randomUUID().toString());
 
-        if (get(newCode.getAddress()).isEmpty()) {
-            localDB.add(newCode);
-            return true;
-        } else {
-            return false;
-        }
+        get(address).ifPresent(localDB::remove);
+
+        localDB.add(newCode);
+        return newCode;
     }
 
     @Override

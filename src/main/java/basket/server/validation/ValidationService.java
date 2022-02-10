@@ -1,4 +1,4 @@
-package basket.server.security.validation;
+package basket.server.validation;
 
 import basket.server.model.DeveloperInfo;
 import basket.server.model.User;

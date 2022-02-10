@@ -7,7 +7,7 @@ public interface VerificationCodeDAO {
 
     Optional<VerificationCode> get(String address);
 
-    boolean submit(VerificationCode newCode);
+    VerificationCode submit(String address);
 
     boolean verify(String address, String code);
 }

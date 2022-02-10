@@ -1,4 +1,4 @@
-package basket.server.api;
+package basket.server.controller.api;
 
 import basket.server.model.App;
 import basket.server.service.AppService;

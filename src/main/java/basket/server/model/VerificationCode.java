@@ -27,19 +27,19 @@ public class VerificationCode implements Serializable {
 
     private final LocalDateTime createdAt;
 
+    public VerificationCode(String address) {
+        this(
+                address,
+                RandomStringUtils.randomAlphabetic(4),
+                LocalDateTime.now()
+        );
+    }
+
     public VerificationCode(@BsonProperty String address,
                             @BsonProperty String code,
                             @BsonProperty LocalDateTime createdAt) {
         this.address = address;
         this.code = code;
         this.createdAt = createdAt;
-    }
-
-    public static VerificationCode generateVerificationCode(String address) {
-        return new VerificationCode(
-                address,
-                RandomStringUtils.randomAlphabetic(4),
-                LocalDateTime.now()
-        );
     }
 }

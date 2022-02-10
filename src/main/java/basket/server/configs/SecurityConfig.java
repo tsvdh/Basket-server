@@ -1,4 +1,4 @@
-package basket.server.security;
+package basket.server.configs;
 
 import basket.server.handlers.AuthHandler;
 import lombok.RequiredArgsConstructor;

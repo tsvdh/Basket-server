@@ -15,8 +15,8 @@ public class VerificationCodeService {
     private final VerificationCodeDAO verificationCodeDAO;
 
     @Autowired
-    public VerificationCodeService(@Qualifier("localVerificationCodeDAO")
-                                               VerificationCodeDAO verificationCodeDAO) {
+    public VerificationCodeService(
+            @Qualifier("localVerificationCodeDAO") VerificationCodeDAO verificationCodeDAO) {
         this.verificationCodeDAO = verificationCodeDAO;
     }
 
@@ -25,9 +25,9 @@ public class VerificationCodeService {
         return verificationCodeDAO.get(address);
     }
 
-    public boolean submit(VerificationCode verificationCode) {
-        log.info("Adding new verification code of address {}", verificationCode.getAddress());
-        return verificationCodeDAO.submit(verificationCode);
+    public VerificationCode submit(String address) {
+        log.info("Submitting new address {}", address);
+        return verificationCodeDAO.submit(address);
     }
 
     public boolean verify(String address, String code) {

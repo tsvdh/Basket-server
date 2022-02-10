@@ -1,7 +1,7 @@
 package basket.server.model.input;
 
-import basket.server.security.validation.annotations.Password;
-import basket.server.security.validation.annotations.Username;
+import basket.server.validation.annotations.Password;
+import basket.server.validation.annotations.Username;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
