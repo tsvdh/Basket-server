@@ -39,9 +39,9 @@
             <button class="btn btn-secondary" id="emailButton" type="button"
 
                     hx-get="/api/v1/account/submit/email"
-                    hx-trigger="click delay:100ms"
                     hx-include="[name='email']"
                     hx-swap="none"
+                    hx-preserve="true"
 
             >Verify</button>
         </div>
@@ -56,9 +56,6 @@
                hx-target="#emailCodeFragment" hx-swap="outerHTML"
         >
     </div>
-
-<!-- TODO: refine delay time   -->
-<!-- TODO: show email sent message   -->
 
 </form>
 </body>

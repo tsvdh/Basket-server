@@ -1,5 +1,5 @@
 export {}
-import {makeDangerAlert} from "./alert.js";
+import {makeDangerAlert, makePrimaryAlert, makeSuccessAlert} from "./alert.js";
 
 /*--- Helper methods ---*/
 
@@ -29,14 +29,17 @@ document.getElementById("form").onsubmit = function (ev) {
 document.getElementById("emailButton").addEventListener("htmx:beforeRequest", function (ev) {
     let emailInput = document.getElementById("emailInput");
 
+    let alert: HTMLElement;
+
     if (emailInput.classList.contains("is-valid")) {
-        return;
+        alert = makePrimaryAlert("Email sent!");
+    } else {
+        ev.preventDefault();
+        ev.stopImmediatePropagation();
+
+        alert = makeDangerAlert("Email must be valid!");
     }
 
-    ev.preventDefault();
-    ev.stopImmediatePropagation();
-
-    let alert = makeDangerAlert("Email must be valid!");
     insertAlert(alert);
 });
 
