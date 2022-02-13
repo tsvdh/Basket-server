@@ -1,10 +1,12 @@
 package basket.server.controller.api;
 
 import basket.server.messaging.email.EmailService;
+import basket.server.messaging.phone.PhoneService;
 import basket.server.model.input.FormUser;
 import basket.server.service.UserService;
 import basket.server.service.VerificationCodeService;
 import basket.server.util.HTMLUtil;
+import basket.server.validation.ValidationService;
 import basket.server.validation.annotations.Email;
 import basket.server.validation.validators.EmailValidator;
 import basket.server.validation.validators.PasswordValidator;
@@ -13,8 +15,10 @@ import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import static basket.server.messaging.phone.PhoneService.phoneToString;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
@@ -32,13 +37,22 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequestMapping("/api/v1/account")
 @RequiredArgsConstructor
 @Validated
+@Slf4j
 public class AccountController {
 
     private final UserService userService;
     private final VerificationCodeService verificationCodeService;
     private final HTMLUtil htmlUtil;
     private final EmailService emailService;
+    private final PhoneService phoneService;
+    private final ValidationService validationService;
 
+    @GetMapping("X")
+    private String intelliSenseHelper(Model model){
+        model.addAttribute("formUser", new FormUser());
+        model.addAttribute("countryCodeList", HTMLUtil.getCountryList());
+        return "fragments/input";
+    }
 
     // @GetMapping("api/v1/account/available/username")
     // public ResponseEntity<Boolean> availableUsername(@RequestParam @NotBlank @Username String username) {
@@ -107,8 +121,34 @@ public class AccountController {
     }
 
     @ResponseBody
+    @GetMapping(path = "/html/valid/phone", produces = TEXT_HTML_VALUE)
+    public String getPhoneHTMLResponse(@RequestParam(name = "formDeveloperInfo.formPhoneNumber.regionCode") String regionCode,
+                                       @RequestParam(name = "formDeveloperInfo.formPhoneNumber.number") String number,
+                                       HttpServletRequest request, HttpServletResponse response) {
+        List<String> faults;
+        if (regionCode.equals("") || number.equals("")) {
+            faults = null;
+        } else {
+            try {
+                validationService.validateFormPhoneNumber(regionCode, number);
+                faults = Collections.emptyList();
+            }
+            catch (ValidationException e) {
+                faults = List.of(e.getMessage());
+            }
+        }
+
+        return htmlUtil.getRegisterInputFragment(
+                request, response,
+                "phoneNumber",
+                number,
+                faults
+        );
+    }
+
+    @ResponseBody
     @GetMapping(path = "/html/verify-code/email", produces = TEXT_HTML_VALUE)
-    public String getEmailCodeHTMLResponse(@RequestParam String emailCode, @RequestParam String email,
+    public String getEmailCodeHTMLResponse(@RequestParam String emailCode, @RequestParam @Email String email,
                                            HttpServletRequest request, HttpServletResponse response) {
         List<String> faults;
         if (emailCode.equals("")) {
@@ -126,6 +166,34 @@ public class AccountController {
                 "emailCode",
                 emailCode,
                 faults);
+    }
+
+    @ResponseBody
+    @GetMapping(path = "/html/verify-code/phone", produces = TEXT_HTML_VALUE)
+    public String getPhoneCodeHTMLResponse(@RequestParam(name = "formDeveloperInfo.formPhoneNumber.regionCode") String regionCode,
+                                           @RequestParam(name = "formDeveloperInfo.formPhoneNumber.number") String number,
+                                           @RequestParam(name = "formDeveloperInfo.phoneCode") String phoneCode,
+                                           HttpServletRequest request, HttpServletResponse response) {
+        var phoneNumber = validationService.validateFormPhoneNumber(regionCode, number);
+        String formattedNumber = phoneToString(phoneNumber);
+
+        List<String> faults;
+        if (phoneCode.equals("")) {
+            faults = null;
+        } else {
+            if (!verificationCodeService.verify(formattedNumber, phoneCode)) {
+                faults = List.of("Wrong code");
+            } else {
+                faults = Collections.emptyList();
+            }
+        }
+
+        return htmlUtil.getRegisterInputFragment(
+                request, response,
+                "phoneNumberCode",
+                phoneCode,
+                faults
+        );
     }
 
     // @GetMapping("api/v1/account/available/email")
@@ -153,6 +221,26 @@ public class AccountController {
         var newCode = verificationCodeService.submit(email);
 
         emailService.sendVerificationEmail(newCode);
+
+        return ok().build();
+    }
+
+    @GetMapping("/submit/phone")
+    public ResponseEntity<Void> submitPhone(@RequestParam(name = "formDeveloperInfo.formPhoneNumber.regionCode") String regionCode,
+                                            @RequestParam(name = "formDeveloperInfo.formPhoneNumber.number") String number) {
+        var phoneNumber = validationService.validateFormPhoneNumber(regionCode, number);
+
+        boolean available = userService.getByPhoneNumber(phoneNumber).isEmpty();
+
+        if (!available) {
+            return badRequest().build();
+        }
+
+        String formattedNumber = phoneToString(phoneNumber);
+        var newCode = verificationCodeService.submit(formattedNumber);
+
+        // phoneService.sendVerificationSMS(newCode);
+        log.info("Code {} for {}", newCode.getCode(), newCode.getAddress());
 
         return ok().build();
     }
@@ -191,14 +279,6 @@ public class AccountController {
     //
     //     return ok(verificationCodeService.verify(formattedNumber, code));
     // }
-
-
-
-    @GetMapping("X")
-    private String intelliSenseHelper(Model model){
-        model.addAttribute("formUser", new FormUser());
-        return "fragments/input";
-    }
 
     //TODO: forward non-api requests
 }

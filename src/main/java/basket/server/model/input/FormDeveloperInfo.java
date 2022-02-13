@@ -18,4 +18,8 @@ public class FormDeveloperInfo {
 
     @NotBlank
     private String phoneCode;
+
+    public FormDeveloperInfo() {
+        this.formPhoneNumber = new FormPhoneNumber();
+    }
 }

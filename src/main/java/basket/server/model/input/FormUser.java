@@ -32,4 +32,8 @@ public class FormUser {
     private String emailCode;
 
     private FormDeveloperInfo formDeveloperInfo;
+
+    public FormUser() {
+        this.formDeveloperInfo = new FormDeveloperInfo();
+    }
 }

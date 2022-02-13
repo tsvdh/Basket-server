@@ -97,11 +97,15 @@ public class ValidationService {
         try {
             phoneNumber = util.parse(formPhoneNumber.getNumber(), formPhoneNumber.getRegionCode());
         } catch (NumberParseException e) {
-            throw new ValidationException("Phone number cannot be parsed");
+            throw new ValidationException("Cannot be parsed");
         }
 
-        if (!util.isValidNumber(phoneNumber) || !util.isPossibleNumberForType(phoneNumber, MOBILE)) {
-            throw new ValidationException("Phone number is not a valid mobile number");
+        if (!util.isValidNumber(phoneNumber)) {
+            throw new ValidationException("Is not a valid number");
+        }
+
+        if (!util.isPossibleNumberForType(phoneNumber, MOBILE)) {
+            throw new ValidationException("Must be a mobile number");
         }
 
         return phoneNumber;

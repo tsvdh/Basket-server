@@ -1,6 +1,7 @@
 package basket.server.util;
 
 import basket.server.model.input.FormUser;
+import com.neovisionaries.i18n.CountryCode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,12 +19,21 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.context.webmvc.SpringWebMvcThymeleafRequestContext;
 import org.thymeleaf.spring5.naming.SpringContextVariableNames;
 
+import static java.util.Arrays.stream;
+import static java.util.Comparator.comparing;
+
 @Component
 @RequiredArgsConstructor
 public class HTMLUtil {
 
     private final ServletContext servletContext;
     private final SpringTemplateEngine templateEngine;
+
+    public static List<CountryCode> getCountryList() {
+        return stream(CountryCode.values())
+                .sorted(comparing(CountryCode::getName))
+                .toList();
+    }
 
     public String process(HttpServletRequest request, HttpServletResponse response,
                           String viewName, Map<String, Object> model) {
@@ -76,6 +86,7 @@ public class HTMLUtil {
                                            @Nullable List<String> faults) {
         var map = new HashMap<String, Object>();
         map.put("formUser", new FormUser());
+        map.put("countryCodeList", HTMLUtil.getCountryList());
         String html = process(request, response, "fragments/input", map);
 
         return getInputFragment(html,

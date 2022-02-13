@@ -5,8 +5,8 @@ import basket.server.model.User;
 import basket.server.model.input.FormUser;
 import basket.server.service.AppService;
 import basket.server.service.UserService;
+import basket.server.util.HTMLUtil;
 import basket.server.validation.ValidationService;
-import com.neovisionaries.i18n.CountryCode;
 import java.io.IOException;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
@@ -25,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import static java.util.Arrays.stream;
-import static java.util.Comparator.comparing;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
@@ -48,12 +46,7 @@ public class WebController {
     @GetMapping("register")
     public String getRegistration(Model model) {
         model.addAttribute("formUser", new FormUser());
-        model.addAttribute("countryCodeList",
-                stream(CountryCode.values())
-                        .sorted(comparing(CountryCode::getName))
-                        .toList()
-        );
-
+        model.addAttribute("countryCodeList", HTMLUtil.getCountryList());
         return "register";
     }
 

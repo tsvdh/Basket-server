@@ -57,6 +57,44 @@
         >
     </div>
 
+    <div th:fragment="phoneNumber" id="phoneNumberFragment">
+        <div class="input-group">
+            <select class="form-select" id="countryCodeInput" th:field="*{formDeveloperInfo.formPhoneNumber.regionCode}"
+                    hx-preserve="true"
+            >
+                <option value="" selected>Select country</option>
+                <option th:each="countryCode : ${countryCodeList}"
+                        th:value="${countryCode.getAlpha2()}"
+                        th:text="${countryCode.getName()}"></option>
+            </select>
+            <input type="text" class="form-control" id="phoneNumberInput" placeholder="Number" th:field="*{formDeveloperInfo.formPhoneNumber.number}"
+
+                   hx-get="/api/v1/account/html/valid/phone"
+                   hx-include="[name='formDeveloperInfo.formPhoneNumber.regionCode']"
+                   hx-trigger="input delay:500ms"
+                   hx-target="#phoneNumberFragment" hx-swap="outerHTML"
+            >
+            <button class="btn btn-secondary" id="phoneNumberButton" type="button"
+
+                    hx-get="/api/v1/account/submit/phone"
+                    hx-include="[name='formDeveloperInfo.formPhoneNumber.regionCode'], [name='formDeveloperInfo.formPhoneNumber.number']"
+                    hx-swap="none"
+                    hx-preserve="true"
+
+            >Verify</button>
+        </div>
+    </div>
+
+    <div th:fragment="phoneNumberCode" id="phoneNumberCodeFragment">
+        <input type="text" class="form-control" id="phoneNumberCodeInput" placeholder="Code" th:field="*{formDeveloperInfo.phoneCode}"
+
+               hx-get="/api/v1/account/html/verify-code/phone"
+               hx-include="[name='formDeveloperInfo.formPhoneNumber.regionCode'], [name='formDeveloperInfo.formPhoneNumber.number']"
+               hx-trigger="input delay:500ms"
+               hx-target="#phoneNumberCodeFragment" hx-swap="outerHTML"
+        >
+    </div>
+
 </form>
 </body>
 </html>
