@@ -54,11 +54,6 @@ public class AccountController {
         return "fragments/input";
     }
 
-    // @GetMapping("api/v1/account/available/username")
-    // public ResponseEntity<Boolean> availableUsername(@RequestParam @NotBlank @Username String username) {
-    //     return ok(userService.getByUsername(username).isEmpty());
-    // }
-
     @ResponseBody
     @GetMapping(path = "/html/valid/username", produces = TEXT_HTML_VALUE)
     public String getUsernameHTMLResponse(@RequestParam String username, UsernameValidator validator,
@@ -196,20 +191,6 @@ public class AccountController {
         );
     }
 
-    // @GetMapping("api/v1/account/available/email")
-    // public ResponseEntity<Boolean> availableEmail(@RequestParam @NotBlank @Email String emailAddress) {
-    //     return ok(verificationCodeService.get(emailAddress).isEmpty());
-    // }
-
-    // @GetMapping("api/v1/account/available/phone")
-    // public ResponseEntity<Boolean> availablePhoneNumber(@RequestParam @NotBlank String regionCode,
-    //                                                     @RequestParam @NotBlank String number) {
-    //     PhoneNumber phoneNumber = validationService.validateFormPhoneNumber(regionCode, number);
-    //     String formattedNumber = phoneToString(phoneNumber);
-    //
-    //     return ok(verificationCodeService.get(formattedNumber).isEmpty());
-    // }
-
     @GetMapping("/submit/email")
     public ResponseEntity<Void> submitEmail(@RequestParam @NotNull @Email String email) {
         boolean available = userService.getByEmail(email).isEmpty();
@@ -244,41 +225,6 @@ public class AccountController {
 
         return ok().build();
     }
-
-    // @GetMapping("api/v1/account/submit/phone")
-    // public ResponseEntity<Void> submitPhone(@RequestParam @NotBlank String regionCode,
-    //                                         @RequestParam @NotBlank String number,
-    //                                         PhoneService phoneService) {
-    //     PhoneNumber phoneNumber = validationService.validateFormPhoneNumber(regionCode, number);
-    //     String formattedNumber = phoneToString(phoneNumber);
-    //     var verificationCode = generateVerificationCode(formattedNumber);
-    //
-    //     boolean success = verificationCodeService.submit(verificationCode);
-    //
-    //     if (!success) {
-    //         return badRequest().build();
-    //     }
-    //
-    //     phoneService.sendVerificationSMS(verificationCode);
-    //
-    //     return ok().build();
-    // }
-
-    // @GetMapping("api/v1/account/verify/email")
-    // public ResponseEntity<Boolean> verifyEmail(@RequestParam @NotBlank @Email String emailAddress,
-    //                                            @RequestParam @NotBlank String code) {
-    //     return ok(verificationCodeService.verify(emailAddress, code));
-    // }
-    //
-    // @GetMapping("api/v1/account/verify/phone")
-    // public ResponseEntity<Boolean> verifyPhone(@RequestParam @NotBlank String regionCode,
-    //                                            @RequestParam @NotBlank String number,
-    //                                            @RequestParam @NotBlank String code) {
-    //     PhoneNumber phoneNumber = validationService.validateFormPhoneNumber(regionCode, number);
-    //     String formattedNumber = phoneToString(phoneNumber);
-    //
-    //     return ok(verificationCodeService.verify(formattedNumber, code));
-    // }
 
     //TODO: forward non-api requests
 }

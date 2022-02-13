@@ -9,6 +9,7 @@ import basket.server.util.HTMLUtil;
 import basket.server.validation.ValidationService;
 import java.io.IOException;
 import java.util.Optional;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
@@ -52,21 +53,24 @@ public class WebController {
 
     @PostMapping("register")
     public ResponseEntity<Void> register(@ModelAttribute FormUser formUser,
-                                         HttpServletResponse response) throws IOException {
+                                         HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         User user = validationService.validateFormUser(formUser);
 
         boolean success = userService.add(user);
-
-        if (success) {
-            if (user.isDeveloper()) {
-                response.sendRedirect("/developers/" + user.getUsername());
-            } else {
-                response.sendRedirect("/");
-            }
-            return ok().build();
-        } else {
+        if (!success) {
             return badRequest().build();
         }
+
+        request.logout();
+        request.login(formUser.getUsername(), formUser.getPassword());
+
+        if (user.isDeveloper()) {
+            response.sendRedirect("/developers/" + user.getUsername());
+        } else {
+            response.sendRedirect("/");
+        }
+
+        return ok().build();
     }
 
     @PostMapping("register/developer/existing")
