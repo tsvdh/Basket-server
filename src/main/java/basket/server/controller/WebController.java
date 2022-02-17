@@ -64,11 +64,11 @@ public class WebController {
         request.logout();
         request.login(formUser.getUsername(), formUser.getPassword());
 
-        if (user.isDeveloper()) {
-            response.sendRedirect("/developers/" + user.getUsername());
-        } else {
-            response.sendRedirect("/");
-        }
+        // if (user.isDeveloper()) {
+        //     response.sendRedirect("/developers/" + user.getUsername());
+        // } else {
+        //     response.sendRedirect("/");
+        // }
 
         return ok().build();
     }

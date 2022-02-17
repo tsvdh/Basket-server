@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Components</title>
+</head>
+<body>
+
+<header th:fragment="header" class="p-3">
+    <div class="container d-flex flex-wrap align-items-center justify-content-between">
+        <a href="/" class="me-2">
+            <img th:src="@{/images/icon.ico}" alt="Basket icon" height="35">
+        </a>
+
+        <div sec:authorize="!isAuthenticated()" class="d-flex">
+            <a th:href="@{/login}" class="btn btn-outline-primary me-3">Login</a>
+            <a th:href="@{/register}" class="btn btn-primary">Register</a>
+        </div>
+
+        <div sec:authorize="isAuthenticated()" th:with="name = ${#authentication.getName()}" class="d-flex align-items-center">
+            <a th:href="@{/developers/__${name}__}" th:text="${name}" class="text-dark text-decoration-none fs-5 align-top me-3"></a>
+            <a th:href="@{/logout}" class="btn btn-outline-dark">Logout</a>
+        </div>
+
+<!--        <div sec:authorize="isAuthenticated()" th:with="name = ${#authentication.getName()}"-->
+<!--             class="dropdown">-->
+<!--            <a th:text="${name}" class="link-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"></a>-->
+<!--            <ul class="dropdown-menu">-->
+<!--                <li><a th:href="@{/developers/__${name}__}" class="dropdown-item">Profile</a></li>-->
+<!--                <li><hr class="dropdown-divider"></li>-->
+<!--                <li><a th:href="@{/logout}">Logout</a></li>-->
+<!--            </ul>-->
+<!--        </div>-->
+    </div>
+</header>
+
+</body>
+</html>

@@ -33,7 +33,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .formLogin()
                 .loginPage("/login")
-                .successHandler(authHandler);
+                .successHandler(authHandler)
+                .and()
+                .logout()
+                .logoutSuccessUrl("/");
 
         // http
         //         .antMatcher("/api/**")

@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!--suppress HtmlFormInputWithoutLabel -->
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -23,15 +22,18 @@
         import 'bootstrap'
         import 'htmx'
     </script>
-    <link rel="stylesheet" th:href="@{/style/registration.css}">
+    <link rel="stylesheet" th:href="@{/style/base.css}">
     <script type="module" th:src="@{/scripts/register.js}"></script>
 </head>
 <body>
 
-<main class="form-registration">
+<div th:replace="fragments/component :: header"></div>
 
-    <h2 style="margin-bottom: 0">Register to Basket <!--suppress RequiredAttributes -->
-        <img th:src="@{/images/icon.ico}" alt="Basket icon" height="50" style="margin-bottom: 25px; margin-left: 5px"></h2>
+<main class="form-registration p-4 pt-3 m-auto w-100">
+
+    <h2 class="mb-2 mt-2">Register to Basket
+        <img th:src="@{/images/icon.ico}" alt="Basket icon" height="50" class="mb-3 ms-1">
+    </h2>
 
     <nav class="nav nav-tabs mb-3" th:name="userType">
         <button class="nav-link active" id="nav-user" data-bs-toggle="tab" data-bs-target="#tab-user" type="button">User</button>
@@ -40,6 +42,7 @@
 
     <form id="form" method="post" th:action="@{/register}" th:object="${formUser}">
 
+        <!--suppress HtmlFormInputWithoutLabel -->
         <select class="visually-hidden" id="userTypeInput" th:field="*{userType}">
             <option selected th:value="USER"></option>
             <option th:value="DEVELOPER"></option>
@@ -93,7 +96,9 @@
             </div>
         </div>
 
-        <button class="btn btn-primary btn-lg w-auto float-end mt-3" type="submit">Register</button>
+        <div class="container mt-3 p-0 d-flex justify-content-end">
+            <button class="btn btn-primary btn-lg w-auto" type="submit">Register</button>
+        </div>
     </form>
 
 </main>

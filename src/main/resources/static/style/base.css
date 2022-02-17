@@ -1,0 +1,11 @@
+header {
+    background-color: var(--bs-gray-200);
+}
+
+main {
+    background-color: var(--bs-white);
+}
+
+.form-registration {
+    max-width: 800px;
+}
