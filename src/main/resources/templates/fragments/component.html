@@ -7,8 +7,8 @@
 </head>
 <body>
 
-<header th:fragment="header" class="p-3">
-    <div class="container d-flex flex-wrap align-items-center justify-content-between">
+<header th:fragment="header" class="fixed-top">
+    <div class="container d-flex flex-wrap align-items-center justify-content-between p-3">
         <a href="/" class="me-2">
             <img th:src="@{/images/icon.ico}" alt="Basket icon" height="35">
         </a>
@@ -22,18 +22,32 @@
             <a th:href="@{/developers/__${name}__}" th:text="${name}" class="text-dark text-decoration-none fs-5 align-top me-3"></a>
             <a th:href="@{/logout}" class="btn btn-outline-dark">Logout</a>
         </div>
-
-<!--        <div sec:authorize="isAuthenticated()" th:with="name = ${#authentication.getName()}"-->
-<!--             class="dropdown">-->
-<!--            <a th:text="${name}" class="link-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"></a>-->
-<!--            <ul class="dropdown-menu">-->
-<!--                <li><a th:href="@{/developers/__${name}__}" class="dropdown-item">Profile</a></li>-->
-<!--                <li><hr class="dropdown-divider"></li>-->
-<!--                <li><a th:href="@{/logout}">Logout</a></li>-->
-<!--            </ul>-->
-<!--        </div>-->
     </div>
 </header>
+
+<!--/*@thymesVar id="pageUri" type="java.lang.String"*/-->
+<aside th:fragment="user-sidebar" class="fixed-top"
+       th:with="pageUri = ${#request.getRequestURI()}, baseUri = ${pageUri.substring(0, pageUri.lastIndexOf('/'))}">
+    <nav class="nav nav-pills d-flex flex-column flex-shrink-0 p-3" style="margin-top: 50px; margin-left: 50px">
+        <a th:with="linkUri = ${baseUri} + '/home'" th:href="@{__${linkUri}__}" class="nav-link"
+           th:classappend="${pageUri.equals(linkUri)} ? active : ''">
+            Home
+        </a>
+        <a  th:with="linkUri = ${baseUri} + '/profile'" th:href="@{__${linkUri}__}" class="nav-link"
+            th:classappend="${pageUri.equals(linkUri)} ? active : ''">
+            Profile
+        </a>
+        <a sec:authorize="hasRole('DEVELOPER')"
+           th:with="linkUri = ${baseUri} + '/projects'" th:href="@{__${linkUri}__}" class="nav-link"
+           th:classappend="${pageUri.equals(linkUri)} ? active : ''">
+            Projects
+        </a>
+        <a th:with="linkUri = ${baseUri} + '/settings'" th:href="@{__${linkUri}__}" class="nav-link"
+           th:classappend="${pageUri.equals(linkUri)} ? active : ''">
+            Settings
+        </a>
+    </nav>
+</aside>
 
 </body>
 </html>

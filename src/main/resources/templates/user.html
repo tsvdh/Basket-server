@@ -10,8 +10,7 @@
     <script type="importmap">
 	{
 		"imports": {
-			"bootstrap": "/webjars/bootstrap/dist/js/bootstrap.esm.min.js",
-			"@popperjs/core": "/webjars/popperjs__core/lib/index.js"
+			"bootstrap": "/webjars/bootstrap/dist/js/bootstrap.esm.min.js"
 		}
 	}
     </script>
@@ -26,7 +25,10 @@
 
 <div th:replace="fragments/component :: header"></div>
 
-<main>
+<main class="">
+
+
+
     <h2>This is the page of <span th:text="${pageUsername}">Username</span></h2>
     <p>You are welcome to look around <b th:text="${#request.getRemoteUser()}">Username</b></p>
 </main>

@@ -48,7 +48,7 @@ public class AccountController {
     private final ValidationService validationService;
 
     @GetMapping("X")
-    private String intelliSenseHelper(Model model){
+    private String intelliSenseHelper(Model model) {
         model.addAttribute("formUser", new FormUser());
         model.addAttribute("countryCodeList", HTMLUtil.getCountryList());
         return "fragments/input";

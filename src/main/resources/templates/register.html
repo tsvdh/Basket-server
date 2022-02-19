@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="icon" th:href="@{/images/icon.ico}">
     <meta name="author" content="Tobias van den Hurk">
-    <title>Register</title>
+    <title>Register · Basket</title>
 
     <script type="importmap">
 	{
@@ -17,7 +17,7 @@
     </script>
 
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/dist/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{webjars/bootstrap-icons/font/bootstrap-icons.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/font/bootstrap-icons.css}">
     <script type="module">
         import 'bootstrap'
         import 'htmx'
@@ -29,7 +29,7 @@
 
 <div th:replace="fragments/component :: header"></div>
 
-<main class="form-registration p-4 pt-3 m-auto w-100">
+<main class="container-lg p-4 pt-3 m-auto" style="width: 800px;">
 
     <h2 class="mb-2 mt-2">Register to Basket
         <img th:src="@{/images/icon.ico}" alt="Basket icon" height="50" class="mb-3 ms-1">

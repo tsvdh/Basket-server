@@ -45,7 +45,7 @@ public class WebController {
     }
 
     @GetMapping("register")
-    public String getRegistration(Model model) {
+    public String getRegistration(Model model, HttpServletRequest request) {
         model.addAttribute("formUser", new FormUser());
         model.addAttribute("countryCodeList", HTMLUtil.getCountryList());
         return "register";
@@ -98,17 +98,25 @@ public class WebController {
         }
     }
 
-    @GetMapping("developers/{pageUsername}")
-    public ModelAndView getDeveloperPage(@PathVariable String pageUsername) {
+    @GetMapping("users/{pageUsername}")
+    public ResponseEntity<Void> getUserPage(@PathVariable String pageUsername,
+                                            HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.sendRedirect(request.getRequestURI() + "/home");
+
+        return ok().build();
+    }
+
+    @GetMapping("users/{pageUsername}/home")
+    public ModelAndView getUserHomePage(@PathVariable String pageUsername) {
         Optional<User> optionalUser = userService.getByUsername(pageUsername);
 
-        if (optionalUser.isEmpty() || !optionalUser.get().isDeveloper()) {
+        if (optionalUser.isEmpty()) {
             ModelAndView errorView = new ModelAndView("error");
             errorView.setStatus(HttpStatus.NOT_FOUND);
             return errorView;
         }
 
-        var modelAndView = new ModelAndView("developer");
+        var modelAndView = new ModelAndView("user/home");
 
         modelAndView.addObject("pageUsername", pageUsername);
 

@@ -1,11 +1,23 @@
+:root {
+    --header-height: 70px;
+    --aside-width: 250px;
+}
+
+body {
+    padding-top: var(--header-height);
+    padding-left: var(--aside-width);
+}
+
 header {
     background-color: var(--bs-gray-200);
+    height: var(--header-height);
+}
+
+aside {
+    width: var(--aside-width);
+    padding-top: var(--header-height);
 }
 
 main {
     background-color: var(--bs-white);
-}
-
-.form-registration {
-    max-width: 800px;
 }
