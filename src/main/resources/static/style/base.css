@@ -15,6 +15,7 @@ header {
 
 aside {
     width: var(--aside-width);
+    height: 100%;
     padding-top: var(--header-height);
 }
 

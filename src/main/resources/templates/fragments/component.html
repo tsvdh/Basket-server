@@ -26,27 +26,32 @@
 </header>
 
 <!--/*@thymesVar id="pageUri" type="java.lang.String"*/-->
-<aside th:fragment="user-sidebar" class="fixed-top"
+<aside th:fragment="user-sidebar" class="fixed-top d-flex justify-content-evenly"
        th:with="pageUri = ${#request.getRequestURI()}, baseUri = ${pageUri.substring(0, pageUri.lastIndexOf('/'))}">
-    <nav class="nav nav-pills d-flex flex-column flex-shrink-0 p-3" style="margin-top: 50px; margin-left: 50px">
+    <nav class="nav nav-pills d-flex flex-column p-3 mt-5">
         <a th:with="linkUri = ${baseUri} + '/home'" th:href="@{__${linkUri}__}" class="nav-link"
            th:classappend="${pageUri.equals(linkUri)} ? active : ''">
+            <i class="bi-house-door-fill"></i>
             Home
         </a>
         <a  th:with="linkUri = ${baseUri} + '/profile'" th:href="@{__${linkUri}__}" class="nav-link"
             th:classappend="${pageUri.equals(linkUri)} ? active : ''">
+            <i class="bi-person-fill"></i>
             Profile
         </a>
         <a sec:authorize="hasRole('DEVELOPER')"
            th:with="linkUri = ${baseUri} + '/projects'" th:href="@{__${linkUri}__}" class="nav-link"
            th:classappend="${pageUri.equals(linkUri)} ? active : ''">
+            <i class="bi-list-ul"></i>
             Projects
         </a>
         <a th:with="linkUri = ${baseUri} + '/settings'" th:href="@{__${linkUri}__}" class="nav-link"
            th:classappend="${pageUri.equals(linkUri)} ? active : ''">
+            <i class="bi-gear-fill"></i>
             Settings
         </a>
     </nav>
+    <div class="vr"></div>
 </aside>
 
 </body>
