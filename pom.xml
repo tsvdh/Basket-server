@@ -112,6 +112,18 @@
             <version>3.0.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-drive</artifactId>
+            <version>v3-rev20220110-1.32.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.auth</groupId>
+            <artifactId>google-auth-library-oauth2-http</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.webjars</groupId>

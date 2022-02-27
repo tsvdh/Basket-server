@@ -1,4 +1,4 @@
-package basket.server.messaging.email;
+package basket.server.service.messaging.email;
 
 import basket.server.model.VerificationCode;
 import lombok.RequiredArgsConstructor;

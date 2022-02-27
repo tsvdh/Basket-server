@@ -30,7 +30,17 @@
 <div th:replace="fragments/component :: header"></div>
 
 <main class="p-4 m-auto" style="height: 2000px; width: 1000px;">
-    <h3>Hello world!</h3>
+    <h2 th:text="${pageUser.getUsername()}">Username</h2>
+    <div sec:authorize="hasRole('DEVELOPER')">
+        <h4>Recent projects</h4>
+        <ul>
+            <li>Lorem ipsum</li>
+            <li>Lorem ipsum</li>
+        </ul>
+    </div>
+    <div sec:authorize="!hasRole('DEVELOPER')">
+        <h4>Nothing to see here yet!</h4>
+    </div>
 </main>
 
 </body>

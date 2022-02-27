@@ -1,4 +1,4 @@
-package basket.server.service;
+package basket.server.service.database;
 
 import basket.server.dao.user.UserDAO;
 import basket.server.model.User;

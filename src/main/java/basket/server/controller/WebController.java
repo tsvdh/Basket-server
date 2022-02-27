@@ -3,8 +3,8 @@ package basket.server.controller;
 import basket.server.model.App;
 import basket.server.model.User;
 import basket.server.model.input.FormUser;
-import basket.server.service.AppService;
-import basket.server.service.UserService;
+import basket.server.service.database.AppService;
+import basket.server.service.database.UserService;
 import basket.server.util.HTMLUtil;
 import basket.server.validation.ValidationService;
 import java.io.IOException;
@@ -118,7 +118,7 @@ public class WebController {
 
         var modelAndView = new ModelAndView("user/home");
 
-        modelAndView.addObject("pageUsername", pageUsername);
+        modelAndView.addObject("pageUser", optionalUser.get());
 
         return modelAndView;
     }

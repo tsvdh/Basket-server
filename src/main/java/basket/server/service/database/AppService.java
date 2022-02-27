@@ -1,4 +1,4 @@
-package basket.server.service;
+package basket.server.service.database;
 
 import basket.server.dao.app.AppDAO;
 import basket.server.model.App;
@@ -16,7 +16,7 @@ public class AppService {
     private final AppDAO appDAO;
 
     @Autowired
-    public AppService(@Qualifier("mongoAppDAO") AppDAO appDAO) {
+    public AppService(@Qualifier("localAppDAO") AppDAO appDAO) {
         this.appDAO = appDAO;
     }
 

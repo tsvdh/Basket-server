@@ -1,4 +1,4 @@
-package basket.server.messaging.phone;
+package basket.server.service.messaging.phone;
 
 import basket.server.model.VerificationCode;
 import com.google.i18n.phonenumbers.NumberParseException;
@@ -7,6 +7,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,12 +27,17 @@ public class PhoneService {
     private String authToken;
 
     @Value("#{twilioProperties.sendPhoneNumber}")
-    private String sendPhoneNumber;
+    private String sendPhoneNumberString;
 
-    private com.twilio.type.PhoneNumber getSendPhoneNumber() {
+    private com.twilio.type.PhoneNumber sendPhoneNumber;
+
+    @PostConstruct
+    public void init() {
+        Twilio.init(accountSid, authToken);
+
         try {
-            PhoneNumber phoneNumber = PhoneNumberUtil.getInstance().parse(sendPhoneNumber, "US");
-            return new com.twilio.type.PhoneNumber(phoneToString(phoneNumber));
+            PhoneNumber phoneNumber = PhoneNumberUtil.getInstance().parse(sendPhoneNumberString, "US");
+            this.sendPhoneNumber = new com.twilio.type.PhoneNumber(phoneToString(phoneNumber));
         }
         catch (NumberParseException e) {
             log.error("Unexpected error", e);
@@ -40,10 +46,9 @@ public class PhoneService {
     }
 
     public void sendVerificationSMS(VerificationCode verificationCode) {
-        Twilio.init(accountSid, authToken);
         Message.creator(
                 new com.twilio.type.PhoneNumber(verificationCode.getAddress()),
-                getSendPhoneNumber(),
+                sendPhoneNumber,
                 "Your verification code for Basket is " + verificationCode.getCode()
         ).createAsync();
     }

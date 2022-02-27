@@ -1,10 +1,14 @@
 package basket.server;
 
+import basket.server.model.App;
 import basket.server.model.DeveloperInfo;
 import basket.server.model.User;
-import basket.server.service.UserService;
+import basket.server.service.database.AppService;
+import basket.server.service.database.UserService;
+import basket.server.service.storage.StorageService;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import java.util.HashSet;
+import java.util.Set;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,7 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableScheduling
 public class BasketServerApplication {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		SpringApplication.run(BasketServerApplication.class, args);
 	}
 
@@ -27,7 +31,7 @@ public class BasketServerApplication {
     }
 
     @Bean
-    CommandLineRunner run(UserService userService, PasswordEncoder passwordEncoder) {
+    CommandLineRunner run(UserService userService, PasswordEncoder passwordEncoder, AppService appService, StorageService storageService) {
         return args -> {
             String pwd = passwordEncoder.encode("1");
             User user1 = new User("a@a.com", "userA", pwd, new HashSet<>(), false, null);
@@ -39,6 +43,16 @@ public class BasketServerApplication {
 
             userService.add(user1);
             userService.add(user2);
+
+            App app1 = new App("app1", "an app1", "1.0.0", "1.0.1", "userB", Set.of("userB"));
+            app1.setId("sbdasdfa");
+            App app2 = new App("app2", "an app2", "2.0.0", "2.0.2", "userB", Set.of("userB"));
+            app2.setId("bdfefwfgew");
+
+            appService.add(app1);
+            appService.add(app2);
+
+            System.out.println(storageService.getDrive().files().list().execute());
         };
     }
 }
