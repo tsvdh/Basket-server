@@ -1,6 +1,6 @@
-package basket.server.service.database;
+package basket.server.service;
 
-import basket.server.dao.app.AppDAO;
+import basket.server.dao.database.app.AppDAO;
 import basket.server.model.App;
 import java.util.List;
 import java.util.Optional;

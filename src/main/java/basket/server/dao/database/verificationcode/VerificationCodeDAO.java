@@ -1,4 +1,4 @@
-package basket.server.dao.verificationcode;
+package basket.server.dao.database.verificationcode;
 
 import basket.server.model.VerificationCode;
 import java.util.Optional;

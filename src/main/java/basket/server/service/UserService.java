@@ -1,7 +1,8 @@
-package basket.server.service.database;
+package basket.server.service;
 
-import basket.server.dao.user.UserDAO;
+import basket.server.dao.database.user.UserDAO;
 import basket.server.model.User;
+import basket.server.model.input.FormUser;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.util.HashSet;
 import java.util.Optional;
@@ -23,10 +24,13 @@ import static java.util.Objects.requireNonNull;
 public class UserService implements UserDetailsService {
 
     private final UserDAO userDAO;
+    private final ValidationService validationService;
 
     @Autowired
-    public UserService(@Qualifier("localUserDAO") UserDAO userDAO) {
+    public UserService(@Qualifier("localUserDAO") UserDAO userDAO,
+                       ValidationService validationService) {
         this.userDAO = userDAO;
+        this.validationService = validationService;
     }
 
     public Optional<User> getById(String id) {
@@ -49,9 +53,21 @@ public class UserService implements UserDetailsService {
         return userDAO.getByPhoneNumber(phoneNumber);
     }
 
+    public boolean add(FormUser formUser) {
+        log.info("Validating new user");
+        User newUser = validationService.validateFormUser(formUser);
+        return add(newUser);
+    }
+
     public boolean add(User newUser) {
         log.info("Adding new user {}", newUser.getUsername());
         return userDAO.add(newUser);
+    }
+
+    public boolean update(FormUser formUser) {
+        log.info("Validating updated user");
+        User updatedUser = validationService.validateFormUser(formUser);
+        return update(updatedUser);
     }
 
     public boolean update(User updatedUser) {

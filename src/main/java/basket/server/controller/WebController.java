@@ -3,10 +3,10 @@ package basket.server.controller;
 import basket.server.model.App;
 import basket.server.model.User;
 import basket.server.model.input.FormUser;
-import basket.server.service.database.AppService;
-import basket.server.service.database.UserService;
+import basket.server.service.AppService;
+import basket.server.service.UserService;
 import basket.server.util.HTMLUtil;
-import basket.server.validation.ValidationService;
+import basket.server.service.ValidationService;
 import java.io.IOException;
 import java.util.Optional;
 import javax.servlet.ServletException;
@@ -54,9 +54,7 @@ public class WebController {
     @PostMapping("register")
     public ResponseEntity<Void> register(@ModelAttribute FormUser formUser,
                                          HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        User user = validationService.validateFormUser(formUser);
-
-        boolean success = userService.add(user);
+        boolean success = userService.add(formUser);
         if (!success) {
             return badRequest().build();
         }

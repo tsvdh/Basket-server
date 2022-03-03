@@ -1,13 +1,13 @@
 package basket.server.controller.api;
 
 import basket.server.model.input.FormUser;
-import basket.server.service.database.UserService;
-import basket.server.service.database.VerificationCodeService;
-import basket.server.service.messaging.email.EmailService;
-import basket.server.service.messaging.phone.PhoneService;
-import basket.server.service.storage.StorageService;
+import basket.server.service.UserService;
+import basket.server.service.VerificationCodeService;
+import basket.server.service.EmailService;
+import basket.server.service.PhoneService;
+import basket.server.service.StorageService;
 import basket.server.util.HTMLUtil;
-import basket.server.validation.ValidationService;
+import basket.server.service.ValidationService;
 import basket.server.validation.annotations.Email;
 import basket.server.validation.validators.EmailValidator;
 import basket.server.validation.validators.PasswordValidator;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import static basket.server.service.messaging.phone.PhoneService.phoneToString;
+import static basket.server.service.PhoneService.phoneToString;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;

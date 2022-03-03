@@ -1,4 +1,4 @@
-package basket.server.service.messaging.phone;
+package basket.server.util;
 
 import lombok.Getter;
 import lombok.Setter;

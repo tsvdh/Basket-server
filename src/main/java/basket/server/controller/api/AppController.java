@@ -1,7 +1,7 @@
 package basket.server.controller.api;
 
 import basket.server.model.App;
-import basket.server.service.database.AppService;
+import basket.server.service.AppService;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;

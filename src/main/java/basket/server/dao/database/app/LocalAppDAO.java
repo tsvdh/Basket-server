@@ -1,4 +1,4 @@
-package basket.server.dao.app;
+package basket.server.dao.database.app;
 
 import basket.server.model.App;
 import java.util.ArrayList;

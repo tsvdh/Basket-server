@@ -1,4 +1,4 @@
-package basket.server.dao.user;
+package basket.server.dao.database.user;
 
 import basket.server.model.User;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;

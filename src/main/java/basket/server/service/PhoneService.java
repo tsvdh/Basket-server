@@ -1,4 +1,4 @@
-package basket.server.service.messaging.phone;
+package basket.server.service;
 
 import basket.server.model.VerificationCode;
 import com.google.i18n.phonenumbers.NumberParseException;

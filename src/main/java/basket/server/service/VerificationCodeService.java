@@ -1,6 +1,6 @@
-package basket.server.service.database;
+package basket.server.service;
 
-import basket.server.dao.verificationcode.VerificationCodeDAO;
+import basket.server.dao.database.verificationcode.VerificationCodeDAO;
 import basket.server.model.VerificationCode;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;

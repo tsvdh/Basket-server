@@ -1,11 +1,11 @@
 package basket.server;
 
+import basket.server.dao.storage.DriveStorageDAO;
 import basket.server.model.App;
 import basket.server.model.DeveloperInfo;
 import basket.server.model.User;
-import basket.server.service.database.AppService;
-import basket.server.service.database.UserService;
-import basket.server.service.storage.StorageService;
+import basket.server.service.AppService;
+import basket.server.service.UserService;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,7 +31,7 @@ public class BasketServerApplication {
     }
 
     @Bean
-    CommandLineRunner run(UserService userService, PasswordEncoder passwordEncoder, AppService appService, StorageService storageService) {
+    CommandLineRunner run(UserService userService, PasswordEncoder passwordEncoder, AppService appService, DriveStorageDAO storageDAO) {
         return args -> {
             String pwd = passwordEncoder.encode("1");
             User user1 = new User("a@a.com", "userA", pwd, new HashSet<>(), false, null);
@@ -52,7 +52,17 @@ public class BasketServerApplication {
             appService.add(app1);
             appService.add(app2);
 
-            System.out.println(storageService.getDrive().files().list().execute());
+            System.out.println(storageDAO.getDrive().files().list().execute());
+            System.out.println(storageDAO.getDrive().about().get().setFields("storageQuota").execute().getStorageQuota());
+
+            // var metadata = new File();
+            // metadata.setName("test.txt");
+            // var content = new FileContent("text/plain", new ClassPathResource("test.txt").getFile());
+            //
+            // storageDAO.getDrive().files().create(metadata, content).execute();
+            //
+            // System.out.println(storageDAO.getDrive().files().list().execute());
+            // System.out.println(storageDAO.getDrive().about().get().setFields("storageQuota").execute().getStorageQuota());
         };
     }
 }

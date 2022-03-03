@@ -1,4 +1,4 @@
-package basket.server.service.storage;
+package basket.server.util;
 
 import lombok.Getter;
 import lombok.Setter;

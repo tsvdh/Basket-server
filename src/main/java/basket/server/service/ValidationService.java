@@ -1,4 +1,4 @@
-package basket.server.validation;
+package basket.server.service;
 
 import basket.server.model.DeveloperInfo;
 import basket.server.model.User;
@@ -6,7 +6,6 @@ import basket.server.model.input.FormDeveloperInfo;
 import basket.server.model.input.FormPhoneNumber;
 import basket.server.model.input.FormUser;
 import basket.server.model.input.FormUser.Type;
-import basket.server.service.database.VerificationCodeService;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
@@ -20,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import static basket.server.service.messaging.phone.PhoneService.phoneToString;
+import static basket.server.service.PhoneService.phoneToString;
 import static com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberType.MOBILE;
 
 @Service
