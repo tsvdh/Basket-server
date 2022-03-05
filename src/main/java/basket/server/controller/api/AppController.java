@@ -17,11 +17,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
-import static org.springframework.http.ResponseEntity.status;
 
 @RequestMapping( "api/v1/apps")
 @RestController
@@ -52,26 +49,18 @@ public class AppController {
     }
 
     @PostMapping
-    // @PreAuthorize("hasRole('DEVELOPER')")
+    @PreAuthorize("hasRole('DEVELOPER')")
     public ResponseEntity<Void> add(@RequestBody @NonNull @Validated App app) {
-        boolean success = appService.add(app);
+        appService.add(app);
 
-        if (success) {
-            return ok().build();
-        } else {
-            return badRequest().build();
-        }
+        return ok().build();
     }
 
     @PutMapping
     @PreAuthorize("hasRole('DEVELOPER-' + updatedApp.getName())")
     public ResponseEntity<Void> update(@RequestBody @NonNull @Validated App updatedApp) {
-        boolean success = appService.update(updatedApp);
+        appService.update(updatedApp);
 
-        if (success) {
-            return ok().build();
-        } else {
-            return status(CONFLICT).build();
-        }
+        return ok().build();
     }
 }

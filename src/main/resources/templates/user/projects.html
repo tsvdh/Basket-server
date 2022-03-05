@@ -1,10 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Basket</title>
+    <link rel="icon" th:href="@{/images/icon.ico}">
+    <meta name="author" content="Tobias van den Hurk">
+    <title>Projects · Basket</title>
+
+    <script type="importmap">
+	{
+		"imports": {
+			"bootstrap": "/webjars/bootstrap/dist/js/bootstrap.esm.min.js",
+			"@popperjs/core": "/webjars/popperjs__core/lib/index.js"
+		}
+	}
+    </script>
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/dist/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/font/bootstrap-icons.css}">
+    <script type="module">
+        import 'bootstrap'
+    </script>
+    <link rel="stylesheet" th:href="@{/style/base.css}">
+    <script type="module" th:src="@{/scripts/upload.js}"></script>
 </head>
 <body>
+
+<div th:replace="fragments/component :: user-sidebar"></div>
+
+<div th:replace="fragments/component :: header"></div>
+
+<main class="p-4 m-auto" style="height: 2000px; width: 1000px;">
+    <h2 th:text="${pageUser.getUsername()}">Username</h2>
+
+    <input type="file" id="fileInput" class="form-control">
+    <button type="button" id="fileButton" class="btn btn-secondary">Upload</button>
+</main>
 
 </body>
 </html>

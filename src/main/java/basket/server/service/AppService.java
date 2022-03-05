@@ -2,6 +2,7 @@ package basket.server.service;
 
 import basket.server.dao.database.app.AppDAO;
 import basket.server.model.App;
+import basket.server.util.BadRequestException;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -35,13 +36,21 @@ public class AppService {
         return appDAO.get(names);
     }
 
-    public boolean add(App app) {
+    public void add(App app) {
         log.info("Adding new app {}", app.getName());
-        return appDAO.add(app);
+
+        boolean success = appDAO.add(app);
+        if (!success) {
+            throw new BadRequestException("App already exists");
+        }
     }
 
-    public boolean update(App updatedApp) {
+    public void update(App updatedApp) {
         log.info("Updating app {}", updatedApp.getName());
-        return appDAO.update(updatedApp);
+
+        boolean success = appDAO.update(updatedApp);
+        if (!success) {
+            throw new BadRequestException("Some of the updated values are already taken");
+        }
     }
 }

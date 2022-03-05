@@ -3,6 +3,7 @@ package basket.server.service;
 import basket.server.dao.database.user.UserDAO;
 import basket.server.model.User;
 import basket.server.model.input.FormUser;
+import basket.server.util.BadRequestException;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.util.HashSet;
 import java.util.Optional;
@@ -53,26 +54,36 @@ public class UserService implements UserDetailsService {
         return userDAO.getByPhoneNumber(phoneNumber);
     }
 
-    public boolean add(FormUser formUser) {
+    public void add(FormUser formUser) {
         log.info("Validating new user");
+
         User newUser = validationService.validateFormUser(formUser);
-        return add(newUser);
+        add(newUser);
     }
 
-    public boolean add(User newUser) {
+    public void add(User newUser) {
         log.info("Adding new user {}", newUser.getUsername());
-        return userDAO.add(newUser);
+
+        boolean success = userDAO.add(newUser);
+        if (!success) {
+            throw new BadRequestException("User already exists");
+        }
     }
 
-    public boolean update(FormUser formUser) {
+    public void update(FormUser formUser) {
         log.info("Validating updated user");
+
         User updatedUser = validationService.validateFormUser(formUser);
-        return update(updatedUser);
+        update(updatedUser);
     }
 
-    public boolean update(User updatedUser) {
+    public void update(User updatedUser) {
         log.info("Updating user {}", updatedUser.getUsername());
-        return userDAO.update(updatedUser);
+
+        boolean success = userDAO.update(updatedUser);
+        if (!success) {
+            throw new BadRequestException("Some of the updated values are already taken");
+        }
     }
 
     @Override

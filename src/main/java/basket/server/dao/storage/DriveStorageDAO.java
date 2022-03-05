@@ -1,5 +1,6 @@
 package basket.server.dao.storage;
 
+import basket.server.service.StorageService;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.InputStreamContent;
 import com.google.api.client.json.gson.GsonFactory;
@@ -17,6 +18,7 @@ import java.security.KeyFactory;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.PostConstruct;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,25 +76,25 @@ public class DriveStorageDAO implements StorageDAO {
                 .build();
     }
 
-    private String getFolderId(String appName) throws IOException {
-        String query = "name = %s, mimeType = %s".formatted(appName, TYPE_FOLDER);
+    private Optional<String> getFolderId(String appName) throws IOException {
+        String query = "name = '%s' and mimeType = '%s'".formatted(appName, StorageService.TYPE_FOLDER);
 
         return drive.files().list()
                 .setQ(query)
                 .execute()
 
                 .getFiles()
-                .get(0)
-                .getId();
+                .stream().findFirst()
+                .map(File::getId);
     }
 
     @Override
     public boolean create(String appName) throws IOException {
         var metadata = new File();
         metadata.setName(appName);
-        metadata.setMimeType(TYPE_FOLDER);
+        metadata.setMimeType(StorageService.TYPE_FOLDER);
 
-        String query = "mimeType = %s".formatted(TYPE_FOLDER);
+        String query = "mimeType = '%s'".formatted(StorageService.TYPE_FOLDER);
 
         FileList fileList = drive.files().list()
                 .setQ(query)
@@ -109,8 +111,17 @@ public class DriveStorageDAO implements StorageDAO {
         return true;
     }
 
-    public void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IOException {
-        String query = "%s in parents, name = %s, mimeType = %s".formatted(getFolderId(appName), fileName, fileType);
+    public boolean upload(String appName, InputStream inputStream, String fileName, String fileType) throws IOException {
+        Optional<String> optionalFolderId = getFolderId(appName);
+        String folderId;
+
+        if (optionalFolderId.isPresent()) {
+            folderId = optionalFolderId.get();
+        } else {
+            return false;
+        }
+
+        String query = "'%s' in parents and name = '%s' and mimeType = '%s'".formatted(folderId, fileName, fileType);
 
         List<File> result = drive.files().list()
                 .setQ(query)
@@ -118,28 +129,44 @@ public class DriveStorageDAO implements StorageDAO {
                 .getFiles();
 
         var metadata = new File();
-        metadata.setName("stable_image.zip");
+        metadata.setName(fileName);
+        metadata.setParents(List.of(folderId));
 
         var content = new InputStreamContent(fileType, inputStream);
 
         if (result.isEmpty()) {
-            drive.files().create(metadata, content);
+            drive.files().create(metadata, content).execute();
         } else {
             drive.files().update(result.get(0).getId(), metadata, content).execute();
         }
+
+        return true;
     }
 
-    public InputStream download(String appName, String fileName, String fileType) throws IOException {
-        String query = "%s in parents, name = %s, mimeType = %s".formatted(getFolderId(appName), fileName, fileType);
+    public Optional<InputStream> download(String appName, String fileName, String fileType) throws IOException {
+        Optional<String> optionalFolderId = getFolderId(appName);
+        String folderId;
 
-        String id = drive.files().list()
+        if (optionalFolderId.isPresent()) {
+            folderId = optionalFolderId.get();
+        } else {
+            return Optional.empty();
+        }
+
+        String query = "'%s' in parents and name = '%s' and mimeType = '%s'".formatted(folderId, fileName, fileType);
+
+        Optional<File> optionalFile = drive.files().list()
                 .setQ(query)
                 .execute()
 
                 .getFiles()
-                .get(0)
-                .getId();
+                .stream().findFirst();
 
-        return drive.files().get(id).executeMediaAsInputStream();
+        if (optionalFile.isPresent()) {
+            String id = optionalFile.get().getId();
+            return Optional.of(drive.files().get(id).executeMediaAsInputStream());
+        } else {
+            return Optional.empty();
+        }
     }
 }

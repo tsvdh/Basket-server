@@ -54,10 +54,7 @@ public class WebController {
     @PostMapping("register")
     public ResponseEntity<Void> register(@ModelAttribute FormUser formUser,
                                          HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        boolean success = userService.add(formUser);
-        if (!success) {
-            return badRequest().build();
-        }
+        userService.add(formUser);
 
         request.logout();
         request.login(formUser.getUsername(), formUser.getPassword());
@@ -104,8 +101,7 @@ public class WebController {
         return ok().build();
     }
 
-    @GetMapping("users/{pageUsername}/home")
-    public ModelAndView getUserHomePage(@PathVariable String pageUsername) {
+    private ModelAndView getUserPage(String pageUsername, String pageName) {
         Optional<User> optionalUser = userService.getByUsername(pageUsername);
 
         if (optionalUser.isEmpty()) {
@@ -114,10 +110,20 @@ public class WebController {
             return errorView;
         }
 
-        var modelAndView = new ModelAndView("user/home");
+        var modelAndView = new ModelAndView("user/" + pageName);
 
         modelAndView.addObject("pageUser", optionalUser.get());
 
         return modelAndView;
+    }
+
+    @GetMapping("users/{pageUsername}/home")
+    public ModelAndView getUserHomePage(@PathVariable String pageUsername) {
+        return getUserPage(pageUsername, "home");
+    }
+
+    @GetMapping("users/{pageUsername}/projects")
+    public ModelAndView getUserProjectsPage(@PathVariable String pageUsername) {
+        return getUserPage(pageUsername, "projects");
     }
 }

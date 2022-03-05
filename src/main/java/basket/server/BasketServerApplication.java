@@ -6,6 +6,7 @@ import basket.server.model.DeveloperInfo;
 import basket.server.model.User;
 import basket.server.service.AppService;
 import basket.server.service.UserService;
+import com.google.api.services.drive.model.File;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,9 +22,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableScheduling
 public class BasketServerApplication {
 
-	public static void main(String[] args) throws Exception {
-		SpringApplication.run(BasketServerApplication.class, args);
-	}
+    public static void main(String[] args) throws Exception {
+        SpringApplication.run(BasketServerApplication.class, args);
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -52,8 +53,11 @@ public class BasketServerApplication {
             appService.add(app1);
             appService.add(app2);
 
-            System.out.println(storageDAO.getDrive().files().list().execute());
-            System.out.println(storageDAO.getDrive().about().get().setFields("storageQuota").execute().getStorageQuota());
+            for (File file : storageDAO.getDrive().files().list().execute().getFiles()) {
+                storageDAO.getDrive().files().delete(file.getId()).execute();
+            }
+
+            storageDAO.create("test");
 
             // var metadata = new File();
             // metadata.setName("test.txt");
@@ -61,7 +65,7 @@ public class BasketServerApplication {
             //
             // storageDAO.getDrive().files().create(metadata, content).execute();
             //
-            // System.out.println(storageDAO.getDrive().files().list().execute());
+            System.out.println(storageDAO.getDrive().files().list().execute());
             // System.out.println(storageDAO.getDrive().about().get().setFields("storageQuota").execute().getStorageQuota());
         };
     }

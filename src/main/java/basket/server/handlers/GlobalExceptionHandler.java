@@ -1,25 +1,32 @@
 package basket.server.handlers;
 
-import javax.validation.ConstraintViolationException;
+import basket.server.util.BadRequestException;
 import javax.validation.ValidationException;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import static org.springframework.http.ResponseEntity.badRequest;
+import org.springframework.web.servlet.ModelAndView;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<String> handleException(ValidationException e) {
-        // TODO: return error view
-        return badRequest().body(e.getMessage());
+    public ModelAndView handleException(ValidationException e) {
+        log.warn("Invalid request", e);
+
+        ModelAndView errorView = new ModelAndView("error");
+        errorView.setStatus(HttpStatus.BAD_REQUEST);
+        return errorView;
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<String> handleException(ConstraintViolationException e) {
-        // TODO: return error view
-        return badRequest().body(e.getMessage());
+    @ExceptionHandler(BadRequestException.class)
+    public ModelAndView handleException(BadRequestException e) {
+        log.warn("Bad request", e);
+
+        ModelAndView errorView = new ModelAndView("error");
+        errorView.setStatus(HttpStatus.BAD_REQUEST);
+        return errorView;
     }
 }
