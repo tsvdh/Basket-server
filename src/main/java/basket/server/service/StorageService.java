@@ -1,14 +1,15 @@
 package basket.server.service;
 
 import basket.server.dao.storage.StorageDAO;
-import basket.server.util.BadRequestException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 @Service
 @Slf4j
@@ -31,7 +32,8 @@ public class StorageService {
 
         boolean success = storageDAO.create(appName);
         if (!success) {
-            throw new BadRequestException("Storage creation failed, app already exists");
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                    "Storage creation failed, app already exists");
         }
     }
 
@@ -40,7 +42,8 @@ public class StorageService {
 
         boolean success = storageDAO.upload(appName, inputStream, fileName, fileType);
         if (!success) {
-            throw new BadRequestException("Could not upload the file, app does not exist");
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                    "Could not upload the file, app does not exist");
         }
     }
 
@@ -51,7 +54,8 @@ public class StorageService {
         if (optionalStream.isPresent()) {
             return optionalStream.get();
         } else {
-            throw new BadRequestException("App or file does not exist");
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                    "App or file does not exist");
         }
     }
 }

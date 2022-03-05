@@ -1,11 +1,11 @@
 package basket.server.handlers;
 
-import basket.server.util.BadRequestException;
 import javax.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.ModelAndView;
 
 @ControllerAdvice
@@ -21,12 +21,11 @@ public class GlobalExceptionHandler {
         return errorView;
     }
 
-    @ExceptionHandler(BadRequestException.class)
-    public ModelAndView handleException(BadRequestException e) {
-        log.warn("Bad request", e);
-
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ModelAndView handleException(HttpClientErrorException e) {
         ModelAndView errorView = new ModelAndView("error");
-        errorView.setStatus(HttpStatus.BAD_REQUEST);
+        errorView.setStatus(e.getStatusCode());
+        errorView.addObject("details", e.getStatusText());
         return errorView;
     }
 }

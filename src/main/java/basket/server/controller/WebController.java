@@ -5,8 +5,8 @@ import basket.server.model.User;
 import basket.server.model.input.FormUser;
 import basket.server.service.AppService;
 import basket.server.service.UserService;
-import basket.server.util.HTMLUtil;
 import basket.server.service.ValidationService;
+import basket.server.util.HTMLUtil;
 import java.io.IOException;
 import java.util.Optional;
 import javax.servlet.ServletException;
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.ModelAndView;
 
 import static org.springframework.http.ResponseEntity.badRequest;
@@ -101,29 +102,32 @@ public class WebController {
         return ok().build();
     }
 
-    private ModelAndView getUserPage(String pageUsername, String pageName) {
-        Optional<User> optionalUser = userService.getByUsername(pageUsername);
+    private User getUser(String userName) {
+        Optional<User> optionalUser = userService.getByUsername(userName);
 
         if (optionalUser.isEmpty()) {
-            ModelAndView errorView = new ModelAndView("error");
-            errorView.setStatus(HttpStatus.NOT_FOUND);
-            return errorView;
+            throw new HttpClientErrorException(HttpStatus.NOT_FOUND,
+                    "User %s does not exist".formatted(userName));
+        } else {
+            return optionalUser.get();
         }
-
-        var modelAndView = new ModelAndView("user/" + pageName);
-
-        modelAndView.addObject("pageUser", optionalUser.get());
-
-        return modelAndView;
     }
 
     @GetMapping("users/{pageUsername}/home")
     public ModelAndView getUserHomePage(@PathVariable String pageUsername) {
-        return getUserPage(pageUsername, "home");
+        var modelAndView = new ModelAndView("user/home");
+
+        modelAndView.addObject("pageUser", getUser(pageUsername));
+
+        return modelAndView;
     }
 
     @GetMapping("users/{pageUsername}/projects")
     public ModelAndView getUserProjectsPage(@PathVariable String pageUsername) {
-        return getUserPage(pageUsername, "projects");
+        var modelAndView = new ModelAndView("user/projects");
+
+        modelAndView.addObject("pageUser", getUser(pageUsername));
+
+        return modelAndView;
     }
 }

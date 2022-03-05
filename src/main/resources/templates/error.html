@@ -26,7 +26,7 @@
     <i class="bi bi-emoji-frown" aria-label="Frown emoji" style="font-size: 4rem"></i>
     <h2 class="mb-3">Something went wrong</h2>
     <p th:with="status=${T(org.springframework.http.HttpStatus).valueOf(#response.status)}">
-        Error: <th:block th:text="${status.reasonPhrase}"/> (<th:block th:text="${status.value}"/>)
+        Error <th:block th:text="${status.value}"/>: <th:block th:text="${status.reasonPhrase}"/><th:block th:if="${details!=null}" th:text="'. ' + ${details}"/>
     </p>
     <div>
         <button onclick="window.history.back();" class="btn btn-primary">
