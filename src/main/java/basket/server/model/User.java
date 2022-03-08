@@ -4,12 +4,14 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Set;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
+@NoArgsConstructor
 @Document(collection = "users")
 public class User implements Serializable {
 

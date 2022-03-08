@@ -1,13 +1,12 @@
 package basket.server.controller.api;
 
-import basket.server.model.input.FormUser;
-import basket.server.service.UserService;
-import basket.server.service.VerificationCodeService;
 import basket.server.service.EmailService;
 import basket.server.service.PhoneService;
 import basket.server.service.StorageService;
-import basket.server.util.HTMLUtil;
+import basket.server.service.UserService;
 import basket.server.service.ValidationService;
+import basket.server.service.VerificationCodeService;
+import basket.server.util.HTMLUtil;
 import basket.server.validation.annotations.Email;
 import basket.server.validation.validators.EmailValidator;
 import basket.server.validation.validators.PasswordValidator;
@@ -22,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +37,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequiredArgsConstructor
 @Validated
 @Slf4j
-public class AccountController {
+public class UserController {
 
     private final UserService userService;
     private final VerificationCodeService verificationCodeService;
@@ -48,13 +46,6 @@ public class AccountController {
     private final PhoneService phoneService;
     private final StorageService storageService;
     private final ValidationService validationService;
-
-    @GetMapping("X")
-    private String intelliSenseHelper(Model model) {
-        model.addAttribute("formUser", new FormUser());
-        model.addAttribute("countryCodeList", HTMLUtil.getCountryList());
-        return "fragments/input";
-    }
 
     @ResponseBody
     @GetMapping(path = "/html/valid/username", produces = TEXT_HTML_VALUE)
@@ -227,6 +218,4 @@ public class AccountController {
 
         return ok().build();
     }
-
-    //TODO: forward non-api requests
 }

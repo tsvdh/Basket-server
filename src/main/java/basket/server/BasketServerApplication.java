@@ -39,7 +39,7 @@ public class BasketServerApplication {
             user1.setId("beadsfewfa");
             User user2 = new User("b@b.com", "userB", pwd, new HashSet<>(), true,
                     new DeveloperInfo("B", "B", PhoneNumberUtil.getInstance().getExampleNumberForType("NL", PhoneNumberUtil.PhoneNumberType.MOBILE),
-                            new HashSet<>(), new HashSet<>()));
+                            Set.of("app1", "app2"), Set.of("app1")));
             user2.setId("awefihoewh");
 
             userService.add(user1);
@@ -66,7 +66,7 @@ public class BasketServerApplication {
             // storageDAO.getDrive().files().create(metadata, content).execute();
             //
             System.out.println(storageDAO.getDrive().files().list().execute());
-            // System.out.println(storageDAO.getDrive().about().get().setFields("storageQuota").execute().getStorageQuota());
+            System.out.println(storageDAO.getDrive().about().get().setFields("storageQuota").execute().getStorageQuota());
         };
     }
 }

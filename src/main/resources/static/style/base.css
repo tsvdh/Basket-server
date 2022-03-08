@@ -3,8 +3,11 @@
     --aside-width: 250px;
 }
 
-body {
+body.with-header {
     padding-top: var(--header-height);
+}
+
+body.with-sidebar {
     padding-left: var(--aside-width);
 }
 
