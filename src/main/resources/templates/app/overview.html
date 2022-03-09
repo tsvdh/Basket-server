@@ -27,18 +27,51 @@
 </head>
 <body class="with-header with-sidebar">
 
-<div th:replace="fragments/component :: app-sidebar"></div>
+<div th:replace="fragments/components :: app-sidebar"></div>
 
-<div th:replace="fragments/component :: header"></div>
+<div th:replace="fragments/components :: header"></div>
 
-<main class="p-4 m-auto" style="height: 2000px; width: 1000px;">
-    <h2 th:text="${app.getName()}">App name</h2>
-    <div sec:authorize="hasRole('DEVELOPER-' + #vars.app.getName())">
-        You are developing this app
+<main class="p-4 m-auto" style="width: 1000px;">
+    <div class="display-3 mb-5" th:text="${app.getName()}">App name</div>
+
+    <div class="d-flex ms-4 me-4 mb-5 align-items-center justify-content-evenly border border-2 border-primary rounded-pill">
+        <div class="p-2">
+            <b>Downloads</b>
+            <div th:text="${app.getAppStats().getUsers().size()}">Amount of users</div>
+        </div>
+        <div class="p-2">
+            <b>Rating</b>
+            <div th:with="grade = ${app.getAppStats().getRating().getGrade()}, amount = ${app.getAppStats().getRating().getAmount()}">
+                <th:block th:text="${grade}"/> <span th:text="${amount}" class="badge bg-secondary rounded-pill"></span>
+            </div>
+        </div>
     </div>
-    <div sec:authorize="!hasRole('DEVELOPER-' + #vars.app.getName())">
-        You have no power here!
-    </div>
+
+    <h3>Releases</h3>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">Version</th>
+            <th scope="col">Date</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr>
+            <th scope="row">Stable</th>
+            <td th:text="${app.getStable().getVersion()}">Version</td>
+            <td th:text="${{app.getStable().getDate()}}">Date</td>
+        </tr>
+
+        <tr>
+            <th scope="row">Experimental</th>
+            <td th:text="${app.getExperimental().getVersion()}">Version</td>
+            <td th:text="${{app.getExperimental().getDate()}}">Date</td>
+        </tr>
+        </tbody>
+    </table>
 </main>
 
 </body>

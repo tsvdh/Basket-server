@@ -25,15 +25,18 @@
 </head>
 <body class="with-header with-sidebar">
 
-<div th:replace="fragments/component :: user-sidebar"></div>
+<div th:replace="fragments/components :: user-sidebar"></div>
 
-<div th:replace="fragments/component :: header"></div>
+<div th:replace="fragments/components :: header"></div>
 
-<main class="p-4 m-auto" style="height: 2000px; width: 1000px;">
-    <h2 th:text="${pageUser.getUsername()}">Username</h2>
+<main class="p-4 m-auto" style="width: 1000px;">
+    <div class="display-3 mb-3" th:text="${pageUser.getUsername()}">Username</div>
+    <h2>Projects</h2>
 
-    <div>
-
+    <div class="list-group w-50">
+        <a class="list-group-item list-group-item-action"
+           th:each="appName : ${pageUser.getDeveloperInfo().getDeveloperOf()}"
+           th:href="@{'/apps/' + ${appName}}" th:text="${appName}">App name</a>
     </div>
 </main>
 

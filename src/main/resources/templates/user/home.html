@@ -25,21 +25,21 @@
 </head>
 <body class="with-header with-sidebar">
 
-<div th:replace="fragments/component :: user-sidebar"></div>
+<div th:replace="fragments/components :: user-sidebar"></div>
 
-<div th:replace="fragments/component :: header"></div>
+<div th:replace="fragments/components :: header"></div>
 
-<main class="p-4 m-auto" style="height: 2000px; width: 1000px;">
-    <h2 th:text="${pageUser.getUsername()}">Username</h2>
+<main class="p-4 m-auto" style="width: 1000px;">
+    <div class="display-3 mb-3" th:text="${pageUser.getUsername()}">Username</div>
     <div sec:authorize="hasRole('DEVELOPER')">
-        <h4>Recent projects</h4>
+        <h2>Recent projects</h2>
         <ul>
             <li>Lorem ipsum</li>
             <li>Lorem ipsum</li>
         </ul>
     </div>
     <div sec:authorize="!hasRole('DEVELOPER')">
-        <h4>Nothing to see here yet!</h4>
+        <h2>Nothing to see here yet!</h2>
     </div>
 </main>
 

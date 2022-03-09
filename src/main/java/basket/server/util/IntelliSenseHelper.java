@@ -13,12 +13,12 @@ public class IntelliSenseHelper {
     private String method1(Model model) {
         model.addAttribute("formUser", new FormUser());
         model.addAttribute("countryCodeList", HTMLUtil.getCountryList());
-        return "fragments/input";
+        return "fragments/inputs";
     }
 
     @GetMapping("2")
     private String method2(Model model) {
         model.addAttribute("pageUser", new User());
-        return "fragments/component";
+        return "fragments/components";
     }
 }

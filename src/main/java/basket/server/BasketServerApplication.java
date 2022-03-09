@@ -2,12 +2,16 @@ package basket.server;
 
 import basket.server.dao.storage.DriveStorageDAO;
 import basket.server.model.App;
+import basket.server.model.AppStats;
 import basket.server.model.DeveloperInfo;
+import basket.server.model.Rating;
+import basket.server.model.Release;
 import basket.server.model.User;
 import basket.server.service.AppService;
 import basket.server.service.UserService;
 import com.google.api.services.drive.model.File;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import org.springframework.boot.CommandLineRunner;
@@ -45,9 +49,25 @@ public class BasketServerApplication {
             userService.add(user1);
             userService.add(user2);
 
-            App app1 = new App("app1", "an app1", "1.0.0", "1.0.1", "userB", Set.of("userB"));
+            App app1 = new App(
+                    "app1",
+                    "an app1",
+                    new Release("1.0.0", LocalDate.EPOCH),
+                    new Release("1.0.1", LocalDate.of(2018, 5, 2)),
+                    "userB", Set.of("userB"),
+                    new AppStats(Set.of("userA"), new Rating(42, 3))
+            );
             app1.setId("sbdasdfa");
-            App app2 = new App("app2", "an app2", "2.0.0", "2.0.2", "userB", Set.of("userB"));
+
+            App app2 = new App(
+                    "app2",
+                    "an app2",
+                    new Release("2.0.0", LocalDate.ofEpochDay(10000)),
+                    new Release("2.0.2", LocalDate.of(2019, 9, 24)),
+                    "userB",
+                    Set.of("userB"),
+                    new AppStats(Set.of("userA"), new Rating(69, 4.2f))
+            );
             app2.setId("bdfefwfgew");
 
             appService.add(app1);

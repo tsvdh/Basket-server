@@ -25,25 +25,29 @@ public class App implements Serializable {
 
     private String description;
 
-    private String stable;
+    private Release stable;
 
-    private String experimental;
+    private Release experimental;
 
     private String admin;
 
     private Set<String> developers;
 
+    private AppStats appStats;
+
     public App(@BsonProperty String name,
                @BsonProperty String description,
-               @BsonProperty String stable,
-               @BsonProperty String experimental,
+               @BsonProperty Release stable,
+               @BsonProperty Release experimental,
                @BsonProperty String admin,
-               @BsonProperty Set<String> developers) {
+               @BsonProperty Set<String> developers,
+               @BsonProperty AppStats appStats) {
         this.name = name;
         this.description = description;
         this.stable = stable;
         this.experimental = experimental;
         this.admin = admin;
         this.developers = developers;
+        this.appStats = appStats;
     }
 }
