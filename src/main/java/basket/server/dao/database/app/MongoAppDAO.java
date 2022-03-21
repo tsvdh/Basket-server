@@ -1,6 +1,7 @@
 package basket.server.dao.database.app;
 
 import basket.server.model.App;
+import basket.server.util.IllegalActionException;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -28,31 +29,29 @@ public class MongoAppDAO implements AppDAO {
     }
 
     @Override
-    public boolean add(App newApp) {
+    public void add(App newApp) throws IllegalActionException {
         if (get(newApp.getName()).isEmpty()) {
             mongoRepository.save(newApp);
-            return true;
         } else {
-            return false;
+            throw new IllegalActionException("App name already exists");
         }
     }
 
     @Override
-    public boolean update(App updatedApp) {
+    public void update(App updatedApp) throws IllegalActionException {
         Optional<App> optionalApp = get(updatedApp.getName());
 
         if (optionalApp.isEmpty()) {
-            return false;
+            throw new IllegalActionException("No app with the same name to update");
         }
 
         App oldApp = optionalApp.get();
 
         if (!oldApp.getId().equals(updatedApp.getId())) {
-            return false;
+            throw new IllegalActionException("Old and new ids do not match");
         }
 
         mongoRepository.delete(oldApp);
         mongoRepository.save(updatedApp);
-        return true;
     }
 }

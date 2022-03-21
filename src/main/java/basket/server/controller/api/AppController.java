@@ -7,12 +7,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,21 +41,5 @@ public class AppController {
     @GetMapping("names")
     public List<App> get(@RequestHeader @NonNull List<String> names) {
         return appService.get(names);
-    }
-
-    @PostMapping
-    @PreAuthorize("hasRole('DEVELOPER')")
-    public ResponseEntity<Void> add(@RequestBody @NonNull @Validated App app) {
-        appService.add(app);
-
-        return ok().build();
-    }
-
-    @PutMapping
-    @PreAuthorize("hasRole('DEVELOPER-' + updatedApp.getName())")
-    public ResponseEntity<Void> update(@RequestBody @NonNull @Validated App updatedApp) {
-        appService.update(updatedApp);
-
-        return ok().build();
     }
 }

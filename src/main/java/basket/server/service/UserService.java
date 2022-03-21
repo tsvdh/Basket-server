@@ -3,6 +3,7 @@ package basket.server.service;
 import basket.server.dao.database.user.UserDAO;
 import basket.server.model.User;
 import basket.server.model.input.FormUser;
+import basket.server.util.IllegalActionException;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.util.HashSet;
 import java.util.Optional;
@@ -10,14 +11,12 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 import static java.util.Objects.requireNonNull;
 
@@ -55,37 +54,28 @@ public class UserService implements UserDetailsService {
         return userDAO.getByPhoneNumber(phoneNumber);
     }
 
-    public void add(FormUser formUser) {
+    public void add(FormUser formUser) throws IllegalActionException {
         log.info("Validating new user");
 
         User newUser = validationService.validateFormUser(formUser);
         add(newUser);
     }
 
-    public void add(User newUser) {
+    public void add(User newUser) throws IllegalActionException {
         log.info("Adding new user {}", newUser.getUsername());
-
-        boolean success = userDAO.add(newUser);
-        if (!success) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "User already exists");
-        }
+        userDAO.add(newUser);
     }
 
-    public void update(FormUser formUser) {
+    public void update(FormUser formUser) throws IllegalActionException {
         log.info("Validating updated user");
 
         User updatedUser = validationService.validateFormUser(formUser);
         update(updatedUser);
     }
 
-    public void update(User updatedUser) {
+    public void update(User updatedUser) throws IllegalActionException {
         log.info("Updating user {}", updatedUser.getUsername());
-
-        boolean success = userDAO.update(updatedUser);
-        if (!success) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Some of the updated values are already taken");
-        }
+        userDAO.update(updatedUser);
     }
 
     @Override
@@ -108,11 +98,11 @@ public class UserService implements UserDetailsService {
             authorities.add(new SimpleGrantedAuthority("ROLE_DEVELOPER"));
 
             for (String appName : user.getDeveloperInfo().getDeveloperOf()) {
-                authorities.add(new SimpleGrantedAuthority("ROLE_DEVELOPER-" + appName));
+                authorities.add(new SimpleGrantedAuthority("ROLE_DEVELOPER/" + appName));
             }
 
             for (String appName : user.getDeveloperInfo().getAdminOf()) {
-                authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN-" + appName));
+                authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN/" + appName));
             }
         }
 

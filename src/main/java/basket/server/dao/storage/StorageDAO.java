@@ -1,14 +1,22 @@
 package basket.server.dao.storage;
 
+import basket.server.util.IllegalActionException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Optional;
 
 public interface StorageDAO {
 
-    boolean create(String appName) throws IOException;
+    InputStream download(String appName, String fileName) throws IOException, IllegalActionException;
 
-    boolean upload(String appName, InputStream inputStream, String fileName, String fileType) throws IOException;
+    void create(String appName) throws IOException, IllegalActionException;
 
-    Optional<InputStream> download(String appName, String fileName, String fileType) throws IOException;
+    void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IOException, IllegalActionException;
+
+    void rename(String appName, String oldName, String newName) throws IOException, IllegalActionException;
+
+    void delete(String appName, String fileName) throws IOException, IllegalActionException;
+
+    void delete(String appName) throws IOException, IllegalActionException;
+
+    boolean exists(String appName, String fileName) throws IOException;
 }

@@ -28,7 +28,7 @@
 <!--/*@thymesVar id="pageUri" type="java.lang.String"*/-->
 <aside th:fragment="app-sidebar" class="fixed-top d-flex justify-content-evenly"
        th:with="pageUri = ${#request.getRequestURI()}, baseUri = ${pageUri.substring(0, pageUri.lastIndexOf('/'))},
-                developsThis = ${#authorization.expr('hasRole(''DEVELOPER-'' + #vars.app.getName())')}">
+                developsThis = ${#authorization.expr('hasRole(''DEVELOPER/'' + #vars.app.getName())')}">
     <nav class="nav nav-pills d-flex flex-column p-3 mt-5">
         <a th:with="linkUri = ${baseUri} + '/overview'" th:href="@{__${linkUri}__}" class="nav-link"
            th:classappend="${pageUri.equals(linkUri)} ? active : ''">

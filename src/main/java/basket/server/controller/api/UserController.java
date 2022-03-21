@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -184,7 +185,7 @@ public class UserController {
         );
     }
 
-    @GetMapping("/submit/email")
+    @PostMapping("/submit/email")
     public ResponseEntity<Void> submitEmail(@RequestParam @NotNull @Email String email) {
         boolean available = userService.getByEmail(email).isEmpty();
 
@@ -199,7 +200,7 @@ public class UserController {
         return ok().build();
     }
 
-    @GetMapping("/submit/phone")
+    @PostMapping("/submit/phone")
     public ResponseEntity<Void> submitPhone(@RequestParam(name = "formDeveloperInfo.formPhoneNumber.regionCode") String regionCode,
                                             @RequestParam(name = "formDeveloperInfo.formPhoneNumber.number") String number) {
         var phoneNumber = validationService.validateFormPhoneNumber(regionCode, number);

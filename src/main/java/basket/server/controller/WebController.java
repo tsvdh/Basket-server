@@ -6,6 +6,7 @@ import basket.server.model.input.FormUser;
 import basket.server.service.AppService;
 import basket.server.service.UserService;
 import basket.server.util.HTMLUtil;
+import basket.server.util.IllegalActionException;
 import java.io.IOException;
 import java.util.Optional;
 import javax.servlet.ServletException;
@@ -14,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -51,13 +51,33 @@ public class WebController {
     @PostMapping("register")
     public ResponseEntity<Void> register(@ModelAttribute FormUser formUser,
                                          HttpServletRequest request) throws ServletException {
-        userService.add(formUser);
+        try {
+            userService.add(formUser);
+        } catch (IllegalActionException e) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
 
         request.logout();
         request.login(formUser.getUsername(), formUser.getPassword());
 
         return ok().build();
     }
+
+    // @PostMapping
+    // @PreAuthorize("hasRole('DEVELOPER')")
+    // public ResponseEntity<Void> addApp(@RequestBody @NonNull @Validated App app) {
+    //     appService.add(app);
+    //
+    //     return ok().build();
+    // }
+
+    // @PutMapping
+    // @PreAuthorize("hasRole('DEVELOPER-' + updatedApp.getName())")
+    // public ResponseEntity<Void> updateApp(@RequestBody @NonNull @Validated App updatedApp) {
+    //     appService.update(updatedApp);
+    //
+    //     return ok().build();
+    // }
 
     @GetMapping("apps/{appName}")
     public ResponseEntity<Void> getAppPage(@PathVariable String appName,
@@ -88,7 +108,7 @@ public class WebController {
         return modelAndView;
     }
 
-    @PostAuthorize("hasRole('DEVELOPER-' + #appName)")
+    @PreAuthorize("hasRole('DEVELOPER/' + #appName)")
     @GetMapping("apps/{appName}/manage")
     public ModelAndView getAppManagePage(@PathVariable String appName) {
         var modelAndView = new ModelAndView("app/manage");
@@ -98,7 +118,7 @@ public class WebController {
         return modelAndView;
     }
 
-    @PreAuthorize("hasRole('DEVELOPER-' + #appName)")
+    @PreAuthorize("hasRole('DEVELOPER/' + #appName)")
     @GetMapping("apps/{appName}/releases")
     public ModelAndView getAppReleasesPage(@PathVariable String appName) {
         var modelAndView = new ModelAndView("app/releases");

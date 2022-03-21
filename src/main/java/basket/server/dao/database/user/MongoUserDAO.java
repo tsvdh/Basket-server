@@ -1,6 +1,7 @@
 package basket.server.dao.database.user;
 
 import basket.server.model.User;
+import basket.server.util.IllegalActionException;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -33,22 +34,20 @@ public class MongoUserDAO implements UserDAO {
     }
 
     @Override
-    public boolean add(User newUser) {
+    public void add(User newUser) throws IllegalActionException {
         if (isUnique(newUser)) {
             userMongoRepository.save(newUser);
-            return true;
         } else {
-            return false;
+            throw new IllegalActionException("Some of the values are already taken");
         }
     }
 
     @Override
-    public boolean update(User updatedUser) {
+    public void update(User updatedUser) throws IllegalActionException {
         if (validUpdate(updatedUser)) {
             userMongoRepository.save(updatedUser);
-            return true;
         } else {
-            return false;
+            throw new IllegalActionException("Could not find user to update or some the new values are already taken");
         }
     }
 }

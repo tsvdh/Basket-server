@@ -2,14 +2,13 @@ package basket.server.service;
 
 import basket.server.dao.database.app.AppDAO;
 import basket.server.model.App;
+import basket.server.util.IllegalActionException;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 @Service
 @Slf4j
@@ -37,21 +36,13 @@ public class AppService {
         return appDAO.get(names);
     }
 
-    public void add(App app) {
+    public void add(App app) throws IllegalActionException {
         log.info("Adding new app {}", app.getName());
-
-        boolean success = appDAO.add(app);
-        if (!success) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "App already exists");
-        }
+        appDAO.add(app);
     }
 
-    public void update(App updatedApp) {
+    public void update(App updatedApp) throws IllegalActionException {
         log.info("Updating app {}", updatedApp.getName());
-
-        boolean success = appDAO.update(updatedApp);
-        if (!success) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Some of the updated values are already taken");
-        }
+        appDAO.update(updatedApp);
     }
 }

@@ -1,6 +1,7 @@
 package basket.server.dao.database.app;
 
 import basket.server.model.App;
+import basket.server.util.IllegalActionException;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,7 +13,7 @@ public interface AppDAO {
 
     List<App> get(List<String> names);
 
-    boolean add(App newApp);
+    void add(App newApp) throws IllegalActionException;
 
-    boolean update(App updatedApp);
+    void update(App updatedApp) throws IllegalActionException;
 }

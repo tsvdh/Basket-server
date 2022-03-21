@@ -1,61 +1,119 @@
 package basket.server.service;
 
 import basket.server.dao.storage.StorageDAO;
+import basket.server.util.IllegalActionException;
+import basket.server.util.storage.FileName;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 @Service
 @Slf4j
 public class StorageService {
 
-    public static final String TYPE_FOLDER = "application/vnd.google-apps.folder";
-    public static final String TYPE_ZIP = "application/zip";
-    public static final String TYPE_PNG = "application/png";
-    public static final String TYPE_TEXT = "text/plain";
-
     private final StorageDAO storageDAO;
+
+    private final Map<String, Integer> busyMap;
+    private final Set<String> pendingSet;
 
     @Autowired
     public StorageService(@Qualifier("driveStorageDAO") StorageDAO storageDAO) {
         this.storageDAO = storageDAO;
+        this.busyMap = new HashMap<>();
+        this.pendingSet = new HashSet<>();
     }
 
-    public void create(String appName) throws IOException {
-        log.info("Creating storage for {}", appName);
-
-        boolean success = storageDAO.create(appName);
-        if (!success) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Storage creation failed, app already exists");
-        }
+    private static String toFullName(String appName, String fileName) {
+        return appName + "/" + fileName;
     }
 
-    public void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IOException {
+    public static String toTempFileName(String fileName) {
+        return "temp_" + fileName;
+    }
+
+    public void create(String appName) throws IllegalActionException, IOException {
+        log.info("Creating and initializing storage for app {}", appName);
+        storageDAO.create(appName);
+    }
+
+    public void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IllegalActionException, IOException {
         log.info("Uploading {} for app {}", fileName, appName);
 
-        boolean success = storageDAO.upload(appName, inputStream, fileName, fileType);
-        if (!success) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "Could not upload the file, app does not exist");
+        String fullName = toFullName(appName, fileName);
+        String tempFileName = toTempFileName(fileName);
+
+        // initial upload
+        if (!storageDAO.exists(appName, fileName)) {
+            storageDAO.upload(appName, inputStream, fileName, fileType);
+
+            busyMap.put(fullName, 0);
+            return;
+        }
+
+        // delete pending temp file
+        if (storageDAO.exists(appName, tempFileName)) {
+            storageDAO.delete(appName, tempFileName);
+        }
+
+        // upload temp file
+        storageDAO.upload(appName, inputStream, tempFileName, fileType);
+
+        // if file is in use, wait. else, execute update
+        if (busyMap.get(fullName) > 0) {
+            pendingSet.add(fullName);
+        } else {
+            storageDAO.delete(appName, fileName);
+            storageDAO.rename(appName, tempFileName, fileName);
         }
     }
 
-    public InputStream download(String appName, String fileName, String fileType) throws IOException {
-        log.info("Downloading {} for app {}", fileName, appName);
+    public boolean isComplete(String appName) throws IOException {
+        log.info("Checking if {} is complete", appName);
 
-        Optional<InputStream> optionalStream = storageDAO.download(appName, fileName, fileType);
-        if (optionalStream.isPresent()) {
-            return optionalStream.get();
+        return storageDAO.exists(appName, FileName.STABLE)
+                && storageDAO.exists(appName, FileName.EXPERIMENTAL)
+                && storageDAO.exists(appName, FileName.ICON);
+    }
+
+    public Optional<InputStream> download(String appName, String fileName) throws IllegalActionException, IOException {
+        log.info("Downloading {} of app {}", fileName, appName);
+
+        InputStream inputStream = storageDAO.download(appName, fileName);
+
+        String fullName = toFullName(appName, fileName);
+
+        if (pendingSet.contains(fullName)) {
+            return Optional.empty();
         } else {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
-                    "App or file does not exist");
+            busyMap.replace(fullName, busyMap.get(fullName) + 1);
+        }
+
+        return Optional.of(inputStream);
+    }
+
+    public void endDownload(String appName, String fileName) throws IOException {
+        log.info("Handling end of {} download of app {}", fileName, appName);
+
+        String fullName = toFullName(appName, fileName);
+
+        busyMap.replace(fullName, busyMap.get(fullName) - 1);
+
+        if (busyMap.get(fullName) == 0 && pendingSet.contains(fullName)) {
+            try {
+                storageDAO.delete(appName, fileName);
+                storageDAO.rename(appName, toTempFileName(fileName), fileName);
+
+                pendingSet.remove(fullName);
+            }
+            catch (IllegalActionException ignored) {}
         }
     }
 }

@@ -1,6 +1,7 @@
 package basket.server.dao.database.app;
 
 import basket.server.model.App;
+import basket.server.util.IllegalActionException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,26 +32,26 @@ public class LocalAppDAO implements AppDAO {
     }
 
     @Override
-    public boolean add(App newApp) {
+    public void add(App newApp) throws IllegalActionException {
         if (get(newApp.getName()).isEmpty()) {
             localDB.add(newApp);
-            return true;
         } else {
-            return false;
+            throw new IllegalActionException("App name already exists");
         }
     }
 
     @Override
-    public boolean update(App updatedApp) {
+    public void update(App updatedApp) throws IllegalActionException {
         for (int i = 0; i < localDB.size(); i++) {
             String curId = localDB.get(i).getId();
             String curName = localDB.get(i).getName();
 
             if (curId.equals(updatedApp.getId()) && curName.equals(updatedApp.getName())) {
                 localDB.set(i, updatedApp);
-                return true;
+                return;
             }
         }
-        return false;
+
+        throw new IllegalActionException("Could not find app to update");
     }
 }

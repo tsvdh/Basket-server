@@ -1,6 +1,7 @@
 package basket.server.dao.database.user;
 
 import basket.server.model.User;
+import basket.server.util.IllegalActionException;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.util.Optional;
 
@@ -27,7 +28,7 @@ public interface UserDAO {
         return uniqueId && uniqueUsername && uniqueEmail && uniquePhoneNumber;
     }
 
-    boolean add(User newUser);
+    void add(User newUser) throws IllegalActionException;
 
     default boolean validUpdate(User updatedUser) {
         String id = updatedUser.getId();
@@ -39,5 +40,5 @@ public interface UserDAO {
         return validUpdate;
     }
 
-    boolean update(User updatedUser);
+    void update(User updatedUser) throws IllegalActionException;
 }

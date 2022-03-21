@@ -1,13 +1,13 @@
 package basket.server.dao.storage;
 
-import basket.server.service.StorageService;
+import basket.server.util.IllegalActionException;
+import basket.server.util.storage.FileType;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.InputStreamContent;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import java.io.IOException;
@@ -76,97 +76,141 @@ public class DriveStorageDAO implements StorageDAO {
                 .build();
     }
 
-    private Optional<String> getFolderId(String appName) throws IOException {
-        String query = "name = '%s' and mimeType = '%s'".formatted(appName, StorageService.TYPE_FOLDER);
+    private Optional<File> getFolder(String appName) throws IOException {
+        String query = "name = '%s' and mimeType = '%s'".formatted(appName, FileType.FOLDER);
 
         return drive.files().list()
                 .setQ(query)
                 .execute()
 
                 .getFiles()
-                .stream().findFirst()
-                .map(File::getId);
+                .stream().findFirst();
     }
 
-    @Override
-    public boolean create(String appName) throws IOException {
-        var metadata = new File();
-        metadata.setName(appName);
-        metadata.setMimeType(StorageService.TYPE_FOLDER);
-
-        String query = "mimeType = '%s'".formatted(StorageService.TYPE_FOLDER);
-
-        FileList fileList = drive.files().list()
-                .setQ(query)
-                .execute();
-
-        for (File file : fileList.getFiles()) {
-            if (file.getName().equals(appName)) {
-                return false;
-            }
-        }
-
-        drive.files().create(metadata).execute();
-
-        return true;
-    }
-
-    public boolean upload(String appName, InputStream inputStream, String fileName, String fileType) throws IOException {
-        Optional<String> optionalFolderId = getFolderId(appName);
+    private Optional<File> getFile(String appName, String fileName) throws IOException {
+        Optional<File> optionalFolder = getFolder(appName);
         String folderId;
 
-        if (optionalFolderId.isPresent()) {
-            folderId = optionalFolderId.get();
-        } else {
-            return false;
-        }
-
-        String query = "'%s' in parents and name = '%s' and mimeType = '%s'".formatted(folderId, fileName, fileType);
-
-        List<File> result = drive.files().list()
-                .setQ(query)
-                .execute()
-                .getFiles();
-
-        var metadata = new File();
-        metadata.setName(fileName);
-        metadata.setParents(List.of(folderId));
-
-        var content = new InputStreamContent(fileType, inputStream);
-
-        if (result.isEmpty()) {
-            drive.files().create(metadata, content).execute();
-        } else {
-            drive.files().update(result.get(0).getId(), metadata, content).execute();
-        }
-
-        return true;
-    }
-
-    public Optional<InputStream> download(String appName, String fileName, String fileType) throws IOException {
-        Optional<String> optionalFolderId = getFolderId(appName);
-        String folderId;
-
-        if (optionalFolderId.isPresent()) {
-            folderId = optionalFolderId.get();
+        if (optionalFolder.isPresent()) {
+            folderId = optionalFolder.get().getId();
         } else {
             return Optional.empty();
         }
 
-        String query = "'%s' in parents and name = '%s' and mimeType = '%s'".formatted(folderId, fileName, fileType);
+        String query = "'%s' in parents and name = '%s'".formatted(folderId, fileName);
 
-        Optional<File> optionalFile = drive.files().list()
+        return drive.files().list()
                 .setQ(query)
                 .execute()
 
                 .getFiles()
                 .stream().findFirst();
+    }
 
-        if (optionalFile.isPresent()) {
-            String id = optionalFile.get().getId();
-            return Optional.of(drive.files().get(id).executeMediaAsInputStream());
-        } else {
-            return Optional.empty();
+    @Override
+    public InputStream download(String appName, String fileName) throws IOException, IllegalActionException {
+        Optional<File> optionalFile = getFile(appName, fileName);
+
+        if (optionalFile.isEmpty()) {
+            throw new IllegalActionException("File does not exist");
         }
+
+        String id = optionalFile.get().getId();
+        return drive.files().get(id).executeMediaAsInputStream();
+    }
+
+    @Override
+    public void create(String appName) throws IOException, IllegalActionException {
+        var newFolder = new File()
+                .setName(appName)
+                .setMimeType(FileType.FOLDER);
+
+        Optional<File> optionalFolder = getFolder(appName);
+
+        if (optionalFolder.isPresent()) {
+            throw new IllegalActionException("App already exists");
+        } else {
+            drive.files().create(newFolder).execute();
+        }
+    }
+
+    @Override
+    public void delete(String appName) throws IOException, IllegalActionException {
+        Optional<File> optionalFolder = getFolder(appName);
+
+        if (optionalFolder.isEmpty()) {
+            throw new IllegalActionException("App does not exist");
+        }
+
+        String folderId = optionalFolder.get().getId();
+
+        String query = "'%s' in parents".formatted(folderId);
+
+        List<File> files = drive.files().list()
+                .setQ(query)
+                .execute()
+                .getFiles();
+
+        for (File file : files) {
+            drive.files().delete(file.getId()).execute();
+        }
+
+        drive.files().delete(folderId).execute();
+    }
+
+    @Override
+    public void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IOException, IllegalActionException {
+        if (getFile(appName, fileName).isPresent()) {
+            throw new IllegalActionException("File already exists");
+        }
+
+        Optional<File> optionalFolder = getFolder(appName);
+        String folderId;
+
+        if (optionalFolder.isPresent()) {
+            folderId = optionalFolder.get().getId();
+        } else {
+            throw new IllegalActionException("App does not exist");
+        }
+
+        var newFile = new File()
+            .setName(fileName)
+            .setParents(List.of(folderId));
+
+        var content = new InputStreamContent(fileType, inputStream);
+
+        drive.files().create(newFile, content).execute();
+    }
+
+    @Override
+    public void rename(String appName, String oldName, String newName) throws IOException, IllegalActionException {
+        Optional<File> optionalFile = getFile(appName, oldName);
+
+        if (optionalFile.isEmpty()) {
+            throw new IllegalActionException("File does not exist");
+        }
+
+        File file = optionalFile.get();
+
+        String id = file.getId();
+        var newFile = file.setName(newName);
+
+        drive.files().update(id, newFile).execute();
+    }
+
+    @Override
+    public void delete(String appName, String fileName) throws IOException, IllegalActionException {
+        Optional<File> optionalFile = getFile(appName, fileName);
+
+        if (optionalFile.isEmpty()) {
+            throw new IllegalActionException("File does not exist");
+        }
+
+        drive.files().delete(optionalFile.get().getId()).execute();
+    }
+
+    @Override
+    public boolean exists(String appName, String fileName) throws IOException {
+        return getFile(appName, fileName).isPresent();
     }
 }
