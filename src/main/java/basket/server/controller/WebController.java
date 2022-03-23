@@ -2,6 +2,7 @@ package basket.server.controller;
 
 import basket.server.model.App;
 import basket.server.model.User;
+import basket.server.model.input.FormApp;
 import basket.server.model.input.FormUser;
 import basket.server.service.AppService;
 import basket.server.service.UserService;
@@ -42,7 +43,7 @@ public class WebController {
     }
 
     @GetMapping("register")
-    public String getRegistration(Model model) {
+    public String getRegistrationPage(Model model) {
         model.addAttribute("formUser", new FormUser());
         model.addAttribute("countryCodeList", HTMLUtil.getCountryList());
         return "register";
@@ -59,6 +60,27 @@ public class WebController {
 
         request.logout();
         request.login(formUser.getUsername(), formUser.getPassword());
+
+        return ok().build();
+    }
+
+    @GetMapping("create")
+    public String getNewPage(Model model) {
+        model.addAttribute("formApp", new FormApp());
+        return "create";
+    }
+
+    @PostMapping("create")
+    @PreAuthorize("hasRole('DEVELOPER')")
+    public ResponseEntity<Void> addApp(@ModelAttribute FormApp formApp,
+                                       HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            appService.add(formApp, request.getRemoteUser());
+        } catch (IllegalActionException e) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+
+        response.sendRedirect("apps/%s/releases".formatted(formApp.getAppName()));
 
         return ok().build();
     }

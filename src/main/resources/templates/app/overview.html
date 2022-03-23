@@ -31,7 +31,8 @@
 <main class="p-4 m-auto" style="width: 1000px;">
     <div class="display-3 mb-5" th:text="${app.getName()}">App name</div>
 
-    <div class="d-flex ms-4 me-4 mb-5 align-items-center justify-content-evenly border border-2 border-primary rounded-pill">
+    <div class="d-flex ms-4 me-4 mb-5 align-items-center justify-content-evenly
+            border border-2 border-primary rounded-pill">
         <div class="p-2">
             <b>Downloads</b>
             <div th:text="${app.getAppStats().getAmountOfUsers()}">Amount of users</div>
@@ -39,7 +40,7 @@
         <div class="p-2">
             <b>Rating</b>
             <div th:with="grade = ${app.getAppStats().getRating().getGrade()}, amount = ${app.getAppStats().getRating().getReviews().keySet().size()}">
-                <th:block th:text="${grade}"/> <span th:text="${amount}" class="badge bg-secondary rounded-pill"></span>
+                <th:block th:text="${grade == null ? '-' : grade}"/> <span th:text="${amount}" class="badge bg-secondary rounded-pill"></span>
             </div>
         </div>
     </div>
@@ -55,18 +56,30 @@
         </tr>
         </thead>
 
-        <tbody>
-        <tr>
+        <tbody th:with="hasStable = ${app.getStable() != null}, hasExperimental = ${app.getExperimental() != null}">
+
+        <tr th:if="${hasStable}">
             <th scope="row">Stable</th>
             <td th:text="${app.getStable().getVersion()}">Version</td>
             <td th:text="${{app.getStable().getDate()}}">Date</td>
         </tr>
+        <tr th:if="${!hasStable}">
+            <th scope="row">Stable</th>
+            <td>-</td>
+            <td>-</td>
+        </tr>
 
-        <tr>
+        <tr th:if="${!hasExperimental}">
             <th scope="row">Experimental</th>
             <td th:text="${app.getExperimental().getVersion()}">Version</td>
             <td th:text="${{app.getExperimental().getDate()}}">Date</td>
         </tr>
+        <tr th:if="${hasExperimental}">
+            <th scope="row">Experimental</th>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+
         </tbody>
     </table>
 </main>

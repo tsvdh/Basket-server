@@ -29,12 +29,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import static basket.server.service.PhoneService.phoneToString;
+import static basket.server.util.HTMLUtil.USER_INPUT_MODEL;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
 
 @Controller
-@RequestMapping("/api/v1/account")
+@RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
 @Validated
 @Slf4j
@@ -49,7 +50,7 @@ public class UserController {
     private final ValidationService validationService;
 
     @ResponseBody
-    @GetMapping(path = "/html/valid/username", produces = TEXT_HTML_VALUE)
+    @GetMapping(path = "html/valid/username", produces = TEXT_HTML_VALUE)
     public String getUsernameHTMLResponse(@RequestParam String username, UsernameValidator validator,
                                           HttpServletRequest request, HttpServletResponse response) {
         List<String> faults;
@@ -62,16 +63,17 @@ public class UserController {
             }
         }
 
-        return htmlUtil.getRegisterInputFragment(
+        return htmlUtil.getInputFragment(
                 request, response,
                 "username",
                 username,
-                faults
+                faults,
+                USER_INPUT_MODEL
         );
     }
 
     @ResponseBody
-    @GetMapping(path = "/html/valid/email", produces = TEXT_HTML_VALUE)
+    @GetMapping(path = "html/valid/email", produces = TEXT_HTML_VALUE)
     public String getEmailHTMLResponse(@RequestParam String email, EmailValidator emailValidator,
                                        HttpServletRequest request, HttpServletResponse response) {
         List<String> faults;
@@ -84,15 +86,17 @@ public class UserController {
             }
         }
 
-        return htmlUtil.getRegisterInputFragment(
+        return htmlUtil.getInputFragment(
                 request, response,
                 "email",
                 email,
-                faults);
+                faults,
+                USER_INPUT_MODEL
+        );
     }
 
     @ResponseBody
-    @GetMapping(path = "/html/valid/password", produces = TEXT_HTML_VALUE)
+    @GetMapping(path = "html/valid/password", produces = TEXT_HTML_VALUE)
     public String getPasswordHTMLResponse(@RequestParam String password, PasswordValidator passwordValidator,
                                           HttpServletRequest request, HttpServletResponse response) {
         List<String> faults;
@@ -102,15 +106,17 @@ public class UserController {
             faults = passwordValidator.getFaults(password);
         }
 
-        return htmlUtil.getRegisterInputFragment(
+        return htmlUtil.getInputFragment(
                 request, response,
                 "password",
                 password,
-                faults);
+                faults,
+                USER_INPUT_MODEL
+        );
     }
 
     @ResponseBody
-    @GetMapping(path = "/html/valid/phone", produces = TEXT_HTML_VALUE)
+    @GetMapping(path = "html/valid/phone", produces = TEXT_HTML_VALUE)
     public String getPhoneHTMLResponse(@RequestParam(name = "formDeveloperInfo.formPhoneNumber.regionCode") String regionCode,
                                        @RequestParam(name = "formDeveloperInfo.formPhoneNumber.number") String number,
                                        HttpServletRequest request, HttpServletResponse response) {
@@ -127,16 +133,17 @@ public class UserController {
             }
         }
 
-        return htmlUtil.getRegisterInputFragment(
+        return htmlUtil.getInputFragment(
                 request, response,
                 "phoneNumber",
                 number,
-                faults
+                faults,
+                USER_INPUT_MODEL
         );
     }
 
     @ResponseBody
-    @GetMapping(path = "/html/verify-code/email", produces = TEXT_HTML_VALUE)
+    @GetMapping(path = "html/verify-code/email", produces = TEXT_HTML_VALUE)
     public String getEmailCodeHTMLResponse(@RequestParam String emailCode, @RequestParam @Email String email,
                                            HttpServletRequest request, HttpServletResponse response) {
         List<String> faults;
@@ -150,15 +157,17 @@ public class UserController {
             }
         }
 
-        return htmlUtil.getRegisterInputFragment(
+        return htmlUtil.getInputFragment(
                 request, response,
                 "emailCode",
                 emailCode,
-                faults);
+                faults,
+                USER_INPUT_MODEL
+        );
     }
 
     @ResponseBody
-    @GetMapping(path = "/html/verify-code/phone", produces = TEXT_HTML_VALUE)
+    @GetMapping(path = "html/verify-code/phone", produces = TEXT_HTML_VALUE)
     public String getPhoneCodeHTMLResponse(@RequestParam(name = "formDeveloperInfo.formPhoneNumber.regionCode") String regionCode,
                                            @RequestParam(name = "formDeveloperInfo.formPhoneNumber.number") String number,
                                            @RequestParam(name = "formDeveloperInfo.phoneCode") String phoneCode,
@@ -177,15 +186,16 @@ public class UserController {
             }
         }
 
-        return htmlUtil.getRegisterInputFragment(
+        return htmlUtil.getInputFragment(
                 request, response,
                 "phoneNumberCode",
                 phoneCode,
-                faults
+                faults,
+                USER_INPUT_MODEL
         );
     }
 
-    @PostMapping("/submit/email")
+    @PostMapping("submit/email")
     public ResponseEntity<Void> submitEmail(@RequestParam @NotNull @Email String email) {
         boolean available = userService.getByEmail(email).isEmpty();
 
@@ -200,7 +210,7 @@ public class UserController {
         return ok().build();
     }
 
-    @PostMapping("/submit/phone")
+    @PostMapping("submit/phone")
     public ResponseEntity<Void> submitPhone(@RequestParam(name = "formDeveloperInfo.formPhoneNumber.regionCode") String regionCode,
                                             @RequestParam(name = "formDeveloperInfo.formPhoneNumber.number") String number) {
         var phoneNumber = validationService.validateFormPhoneNumber(regionCode, number);

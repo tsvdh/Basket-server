@@ -1,5 +1,6 @@
 package basket.server.util;
 
+import basket.server.model.input.FormApp;
 import basket.server.model.input.FormUser;
 import com.neovisionaries.i18n.CountryCode;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ public class HTMLUtil {
                 .toList();
     }
 
-    public String process(HttpServletRequest request, HttpServletResponse response,
+    private String process(HttpServletRequest request, HttpServletResponse response,
                           String viewName, Map<String, Object> model) {
 
         var requestContext = new SpringWebMvcThymeleafRequestContext(
@@ -50,18 +51,18 @@ public class HTMLUtil {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public String getInputFragment(String html, String fragmentAttribute,
+    private String getInputFragment(String html, String fragmentAttribute,
                                    String inputValue, @Nullable List<String> faults) {
         var document = Jsoup.parse(html);
 
         Element fragment = document.getElementById(fragmentAttribute + "Fragment");
 
-        Element inputElement = fragment.getElementById(fragmentAttribute + "Input");
-        inputElement.val(inputValue);
-
         if (inputValue.equals("")) {
             return fragment.outerHtml();
         }
+
+        Element inputElement = fragment.getElementById(fragmentAttribute + "Input");
+        inputElement.val(inputValue);
 
         if (faults.isEmpty()) {
             inputElement.addClass("is-valid");
@@ -81,17 +82,28 @@ public class HTMLUtil {
         return fragment.outerHtml();
     }
 
-    public String getRegisterInputFragment(HttpServletRequest request, HttpServletResponse response,
-                                           String fragmentAttribute, String inputValue,
-                                           @Nullable List<String> faults) {
-        var map = new HashMap<String, Object>();
-        map.put("formUser", new FormUser());
-        map.put("countryCodeList", HTMLUtil.getCountryList());
-        String html = process(request, response, "fragments/input", map);
+    public static final Map<String, Object> USER_INPUT_MODEL = getUserInputModel();
+    public static final Map<String, Object> APP_INPUT_MODEL = getAppInputModel();
 
-        return getInputFragment(html,
-                fragmentAttribute,
-                inputValue,
-                faults);
+    private static Map<String, Object> getUserInputModel() {
+        var model = new HashMap<String, Object>();
+        model.put("formUser", new FormUser());
+        model.put("countryCodeList", HTMLUtil.getCountryList());
+        return model;
+    }
+
+    private static Map<String, Object> getAppInputModel() {
+        var model = new HashMap<String, Object>();
+        model.put("formApp", new FormApp());
+        return model;
+    }
+
+    public String getInputFragment(HttpServletRequest request, HttpServletResponse response,
+                                    String fragmentAttribute, String inputValue,
+                                    @Nullable List<String> faults, Map<String, Object> model) {
+
+        String html = process(request, response, "fragments/input", model);
+
+        return getInputFragment(html, fragmentAttribute, inputValue, faults);
     }
 }

@@ -12,11 +12,11 @@ public class Rating implements Serializable {
     @Serial
     private static final long serialVersionUID = 5;
 
-    private float grade;
+    private Float grade;
 
     private Map<String, Integer> reviews;
 
-    public Rating(@BsonProperty float grade,
+    public Rating(@BsonProperty Float grade,
                   @BsonProperty Map<String, Integer> reviews) {
         this.grade = grade;
         this.reviews = reviews;

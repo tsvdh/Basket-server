@@ -31,7 +31,7 @@ public class StorageController {
 
     private final StorageService storageService;
 
-    @PostMapping("/create")
+    @PostMapping("create")
     public ResponseEntity<Void> create(@RequestParam String appName) throws IOException {
         try {
             storageService.create(appName);
@@ -42,7 +42,7 @@ public class StorageController {
         return ok().build();
     }
 
-    @PatchMapping("/upload")
+    @PatchMapping("upload")
     public ResponseEntity<Void> upload(@RequestParam String appName, HttpServletRequest request) throws IOException {
         try {
             storageService.upload(appName, request.getInputStream(), FileName.STABLE, FileType.ZIP);
@@ -52,7 +52,7 @@ public class StorageController {
         return ok().build();
     }
 
-    @GetMapping("/download")
+    @GetMapping("download")
     public ResponseEntity<Resource> download(@RequestParam String appName, @RequestParam String fileName) throws IOException {
         Optional<InputStream> optionalStream;
         try {
@@ -80,7 +80,7 @@ public class StorageController {
     }
 
     // TODO: secure access
-    @PatchMapping("/download/end")
+    @PatchMapping("download/end")
     public ResponseEntity<Void> endDownload(@RequestParam String appName, @RequestParam String fileName) throws IOException {
         storageService.endDownload(appName, fileName);
         return ok().build();

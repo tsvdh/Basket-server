@@ -1,23 +1,23 @@
 package basket.server.validation.validators;
 
 import basket.server.validation.FaultChecker;
-import basket.server.validation.annotations.Username;
+import basket.server.validation.annotations.Description;
 import java.util.List;
 import java.util.function.Function;
 
 /**
  * Rules: <br/>
- * - No whitespaces <br/>
- * - At least 4 characters, at most 30 characters
+ * - No whitespaces at start or end
+ * - At least 20 character, at most 150 characters
  */
-public class UsernameValidator extends FaultChecker<Username, String> {
+public class DescriptionValidator extends FaultChecker<Description, String> {
 
     @Override
     protected List<Function<String, String>> makeCheckers() {
         return List.of(
-                WHITESPACE_CHECKER,
+                TRIM_CHECKER,
 
-                getLengthChecker(4, 30)
+                getLengthChecker(20, 150)
         );
     }
 }

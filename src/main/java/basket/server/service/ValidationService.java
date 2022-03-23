@@ -1,7 +1,11 @@
 package basket.server.service;
 
+import basket.server.model.App;
+import basket.server.model.AppStats;
 import basket.server.model.DeveloperInfo;
+import basket.server.model.Rating;
 import basket.server.model.User;
+import basket.server.model.input.FormApp;
 import basket.server.model.input.FormDeveloperInfo;
 import basket.server.model.input.FormPhoneNumber;
 import basket.server.model.input.FormUser;
@@ -9,7 +13,9 @@ import basket.server.model.input.FormUser.Type;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -29,12 +35,44 @@ public class ValidationService {
     private final Validator validator;
     private final PasswordEncoder passwordEncoder;
     private final VerificationCodeService verificationCodeService;
+    private final UserService userService;
 
     public <T> void validate(T object) throws ConstraintViolationException {
         Set<ConstraintViolation<T>> violations = validator.validate(object);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
         }
+    }
+
+    public App validateFormApp(FormApp formApp, String creatorName) throws ConstraintViolationException {
+        validate(formApp);
+
+        Optional<User> optionalUser = userService.getByUsername(creatorName);
+        if (optionalUser.isEmpty()) {
+            throw new ValidationException("Creator does not exist");
+        }
+
+        User creator = optionalUser.get();
+        if (!creator.isDeveloper()) {
+            throw new ValidationException("Creator must be a developer");
+        }
+
+        return new App(
+                formApp.getAppName(),
+                formApp.getDescription(),
+                creator.getId(),
+                Set.of(creator.getId()),
+                new AppStats(
+                        0,
+                        new Rating(
+                                null,
+                                new HashMap<>()
+                        )
+                ),
+                false,
+                null,
+                null
+        );
     }
 
     public User validateFormUser(FormUser formUser) throws ConstraintViolationException {

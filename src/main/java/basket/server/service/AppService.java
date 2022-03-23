@@ -2,6 +2,7 @@ package basket.server.service;
 
 import basket.server.dao.database.app.AppDAO;
 import basket.server.model.App;
+import basket.server.model.input.FormApp;
 import basket.server.util.IllegalActionException;
 import java.util.List;
 import java.util.Optional;
@@ -15,10 +16,13 @@ import org.springframework.stereotype.Service;
 public class AppService {
 
     private final AppDAO appDAO;
+    private final ValidationService validationService;
 
     @Autowired
-    public AppService(@Qualifier("localAppDAO") AppDAO appDAO) {
+    public AppService(@Qualifier("localAppDAO") AppDAO appDAO,
+                      ValidationService validationService) {
         this.appDAO = appDAO;
+        this.validationService = validationService;
     }
 
     public Optional<App> get(String name) {
@@ -36,9 +40,23 @@ public class AppService {
         return appDAO.get(names);
     }
 
+    public void add(FormApp formApp, String creatorName) throws IllegalActionException {
+        log.info("Validating new app");
+
+        App newApp = validationService.validateFormApp(formApp, creatorName);
+        add(newApp);
+    }
+
     public void add(App app) throws IllegalActionException {
         log.info("Adding new app {}", app.getName());
         appDAO.add(app);
+    }
+
+    public void update(FormApp formApp, String creatorName) throws IllegalActionException {
+        log.info("Validating updated app");
+
+        App updatedApp = validationService.validateFormApp(formApp, creatorName);
+        update(updatedApp);
     }
 
     public void update(App updatedApp) throws IllegalActionException {

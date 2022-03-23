@@ -37,6 +37,6 @@ package-lock.json
 node_modules
 *.js
 
-/src/main/resources/random.png
-/src/main/resources/test.txt
-/src/main/resources/test.zip
+testing
+
+drive

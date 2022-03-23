@@ -58,22 +58,24 @@ public class BasketServerApplication {
             App app1 = new App(
                     "app1",
                     "an app1",
-                    new Release("1.0.0", LocalDate.EPOCH),
-                    new Release("1.0.1", LocalDate.of(2018, 5, 2)),
                     "awefihoewh",
                     Set.of("awefihoewh"),
-                    new AppStats(25234, new Rating(3.8f, Map.of("beadsfewfa", 4)))
+                    new AppStats(25234, new Rating(3.8f, Map.of("beadsfewfa", 4))),
+                    true,
+                    new Release("1.0.0", LocalDate.EPOCH),
+                    new Release("1.0.1", LocalDate.of(2018, 5, 2))
             );
             app1.setId("sbdasdfa");
 
             App app2 = new App(
                     "app2",
                     "an app2",
-                    new Release("2.0.0", LocalDate.ofEpochDay(10000)),
-                    new Release("2.0.2", LocalDate.of(2019, 9, 24)),
                     "awefihoewh",
                     Set.of("awefihoewh"),
-                    new AppStats(7844, new Rating(4.2f, Map.of("beadsfewfa", 2)))
+                    new AppStats(7844, new Rating(4.2f, Map.of("beadsfewfa", 2))),
+                    false,
+                    null,
+                    null
             );
             app2.setId("bdfefwfgew");
 
@@ -84,9 +86,9 @@ public class BasketServerApplication {
                 storageDAO.getDrive().files().delete(file.getId()).execute();
             }
 
-            var stable = new ClassPathResource("test.zip").getInputStream();
-            var experimental = new ClassPathResource("test.zip").getInputStream();
-            var icon = new ClassPathResource("random.png").getInputStream();
+            var stable = new ClassPathResource("testing/test.zip").getInputStream();
+            var experimental = new ClassPathResource("testing/test.zip").getInputStream();
+            var icon = new ClassPathResource("testing/random.png").getInputStream();
 
             storageService.create("test");
 

@@ -22,9 +22,7 @@ public class PasswordValidator extends FaultChecker<Password, String> {
         return List.of(
                 WHITESPACE_CHECKER,
 
-                value -> value.length() < 8
-                        ? "Must contain at least 8 characters"
-                        : null,
+                getLengthChecker(8, Integer.MAX_VALUE),
 
                 value -> {
                     for (Character c : value.toCharArray()) {
