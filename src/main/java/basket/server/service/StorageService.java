@@ -25,7 +25,7 @@ public class StorageService {
     private final Set<String> pendingSet;
 
     @Autowired
-    public StorageService(@Qualifier("driveStorageDAO") StorageDAO storageDAO) {
+    public StorageService(@Qualifier("localStorageDAO") StorageDAO storageDAO) {
         this.storageDAO = storageDAO;
         this.busyMap = new HashMap<>();
         this.pendingSet = new HashSet<>();
@@ -40,7 +40,7 @@ public class StorageService {
     }
 
     public void create(String appName) throws IllegalActionException, IOException {
-        log.info("Creating and initializing storage for app {}", appName);
+        log.info("Creating storage for app {}", appName);
         storageDAO.create(appName);
     }
 
