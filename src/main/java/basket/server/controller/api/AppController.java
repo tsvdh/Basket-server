@@ -3,6 +3,7 @@ package basket.server.controller.api;
 import basket.server.model.App;
 import basket.server.service.AppService;
 import basket.server.util.HTMLUtil;
+import basket.server.util.HTMLUtil.InputType;
 import basket.server.validation.validators.AppNameValidator;
 import basket.server.validation.validators.DescriptionValidator;
 import java.util.List;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import static basket.server.util.HTMLUtil.APP_INPUT_MODEL;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
@@ -69,10 +69,10 @@ public class AppController {
 
         return htmlUtil.getInputFragment(
                 request, response,
-                appName,
                 "appName",
+                appName,
                 faults,
-                APP_INPUT_MODEL
+                InputType.APP
         );
     }
 
@@ -90,10 +90,10 @@ public class AppController {
 
         return htmlUtil.getInputFragment(
                 request, response,
-                description,
                 "description",
+                description,
                 faults,
-                APP_INPUT_MODEL
+                InputType.APP
         );
     }
 }

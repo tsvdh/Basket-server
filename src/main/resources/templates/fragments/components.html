@@ -19,8 +19,8 @@
         </div>
 
         <div sec:authorize="isAuthenticated()" th:with="name = ${#authentication.getName()}" class="d-flex align-items-center">
-            <a th:href="@{/developers/__${name}__}" th:text="${name}" class="text-dark text-decoration-none fs-5 align-top me-3"></a>
-            <a th:href="@{/logout}" class="btn btn-outline-dark">Logout</a>
+            <a th:href="@{/users/__${name}__}" th:text="${name}" class="text-dark text-decoration-none fs-5 align-top me-3"></a>
+            <a th:href="@{/logout}" class="btn btn-outline-secondary">Logout</a>
         </div>
     </div>
 </header>

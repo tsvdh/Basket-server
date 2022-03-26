@@ -50,20 +50,20 @@
 
         <div class="row mb-4">
             <div class="col-6">
-                <div th:replace="fragments/inputs :: username"></div>
+                <div th:replace="fragments/inputs/user :: username"></div>
             </div>
             <div class="col-6">
-                <div th:replace="fragments/inputs :: password"></div>
+                <div th:replace="fragments/inputs/user :: password"></div>
             </div>
         </div>
 
         <label class="form-label">Email</label>
         <div class="row mb-4">
             <div class="col-10">
-                <div th:replace="fragments/inputs :: email"></div>
+                <div th:replace="fragments/inputs/user :: email"></div>
             </div>
             <div class="col-2">
-                <div th:replace="fragments/inputs :: emailCode"></div>
+                <div th:replace="fragments/inputs/user :: emailCode"></div>
             </div>
         </div>
 
@@ -87,10 +87,10 @@
                 <label class="form-label">Phone number</label>
                 <div class="row mb-4">
                     <div class="col-10">
-                        <div th:replace="fragments/inputs :: phoneNumber"></div>
+                        <div th:replace="fragments/inputs/user :: phoneNumber"></div>
                     </div>
                     <div class="col-2">
-                        <div th:replace="fragments/inputs :: phoneNumberCode"></div>
+                        <div th:replace="fragments/inputs/user :: phoneNumberCode"></div>
                     </div>
                 </div>
             </div>

@@ -7,6 +7,7 @@ import basket.server.service.UserService;
 import basket.server.service.ValidationService;
 import basket.server.service.VerificationCodeService;
 import basket.server.util.HTMLUtil;
+import basket.server.util.HTMLUtil.InputType;
 import basket.server.validation.annotations.Email;
 import basket.server.validation.validators.EmailValidator;
 import basket.server.validation.validators.PasswordValidator;
@@ -29,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import static basket.server.service.PhoneService.phoneToString;
-import static basket.server.util.HTMLUtil.USER_INPUT_MODEL;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
@@ -68,7 +68,7 @@ public class UserController {
                 "username",
                 username,
                 faults,
-                USER_INPUT_MODEL
+                InputType.USER
         );
     }
 
@@ -91,7 +91,7 @@ public class UserController {
                 "email",
                 email,
                 faults,
-                USER_INPUT_MODEL
+                InputType.USER
         );
     }
 
@@ -111,7 +111,7 @@ public class UserController {
                 "password",
                 password,
                 faults,
-                USER_INPUT_MODEL
+                InputType.USER
         );
     }
 
@@ -138,7 +138,7 @@ public class UserController {
                 "phoneNumber",
                 number,
                 faults,
-                USER_INPUT_MODEL
+                InputType.USER
         );
     }
 
@@ -162,7 +162,7 @@ public class UserController {
                 "emailCode",
                 emailCode,
                 faults,
-                USER_INPUT_MODEL
+                InputType.USER
         );
     }
 
@@ -191,7 +191,7 @@ public class UserController {
                 "phoneNumberCode",
                 phoneCode,
                 faults,
-                USER_INPUT_MODEL
+                InputType.USER
         );
     }
 

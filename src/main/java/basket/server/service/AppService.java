@@ -17,12 +17,14 @@ public class AppService {
 
     private final AppDAO appDAO;
     private final ValidationService validationService;
+    private final UserService userService;
 
     @Autowired
     public AppService(@Qualifier("localAppDAO") AppDAO appDAO,
-                      ValidationService validationService) {
+                      ValidationService validationService, UserService userService) {
         this.appDAO = appDAO;
         this.validationService = validationService;
+        this.userService = userService;
     }
 
     public Optional<App> get(String name) {
@@ -43,7 +45,8 @@ public class AppService {
     public void add(FormApp formApp, String creatorName) throws IllegalActionException {
         log.info("Validating new app");
 
-        App newApp = validationService.validateFormApp(formApp, creatorName);
+        var optionalCreator = userService.getByUsername(creatorName);
+        App newApp = validationService.validateFormApp(formApp, optionalCreator);
         add(newApp);
     }
 
@@ -55,7 +58,8 @@ public class AppService {
     public void update(FormApp formApp, String creatorName) throws IllegalActionException {
         log.info("Validating updated app");
 
-        App updatedApp = validationService.validateFormApp(formApp, creatorName);
+        var optionalCreator = userService.getByUsername(creatorName);
+        App updatedApp = validationService.validateFormApp(formApp, optionalCreator);
         update(updatedApp);
     }
 

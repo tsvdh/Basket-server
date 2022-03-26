@@ -1,6 +1,7 @@
 package basket.server;
 
 import basket.server.dao.storage.DriveStorageDAO;
+import basket.server.dao.storage.LocalStorageDAO;
 import basket.server.model.App;
 import basket.server.model.AppStats;
 import basket.server.model.DeveloperInfo;
@@ -10,11 +11,9 @@ import basket.server.model.User;
 import basket.server.service.AppService;
 import basket.server.service.StorageService;
 import basket.server.service.UserService;
-import basket.server.util.storage.FileName;
-import basket.server.util.storage.FileType;
-import com.google.api.services.drive.model.File;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +21,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,7 +39,9 @@ public class BasketServerApplication {
     }
 
     @Bean
-    CommandLineRunner run(UserService userService, PasswordEncoder passwordEncoder, AppService appService, DriveStorageDAO storageDAO, StorageService storageService) {
+    CommandLineRunner run(UserService userService, PasswordEncoder passwordEncoder,
+                          AppService appService, DriveStorageDAO storageDAO, StorageService storageService,
+                          LocalStorageDAO localStorageDAO) {
         return args -> {
             String pwd = passwordEncoder.encode("1");
             User user1 = new User("a@a.com", "userA", pwd, new HashSet<>(), false, null);
@@ -72,7 +72,7 @@ public class BasketServerApplication {
                     "an app2",
                     "awefihoewh",
                     Set.of("awefihoewh"),
-                    new AppStats(7844, new Rating(4.2f, Map.of("beadsfewfa", 2))),
+                    new AppStats(0, new Rating(null, new HashMap<>())),
                     false,
                     null,
                     null
@@ -82,24 +82,28 @@ public class BasketServerApplication {
             appService.add(app1);
             appService.add(app2);
 
-            for (File file : storageDAO.getDrive().files().list().execute().getFiles()) {
-                storageDAO.getDrive().files().delete(file.getId()).execute();
-            }
+            // for (File file : storageDAO.getDrive().files().list().execute().getFiles()) {
+            //     storageDAO.getDrive().files().delete(file.getId()).execute();
+            // }
+            //
+            // var stable = new ClassPathResource("testing/test.zip").getInputStream();
+            // var experimental = new ClassPathResource("testing/test.zip").getInputStream();
+            // var icon = new ClassPathResource("testing/random.png").getInputStream();
+            //
+            // storageService.create("test");
+            //
+            // storageService.upload("test", stable, FileName.STABLE, FileType.ZIP);
+            // storageService.upload("test", experimental, FileName.EXPERIMENTAL, FileType.ZIP);
+            // storageService.upload("test", icon, FileName.ICON, FileType.PNG);
+            //
+            // System.out.println(storageService.isComplete("test"));
+            //
+            // System.out.println(storageDAO.getDrive().files().list().execute());
+            // System.out.println(storageDAO.getDrive().about().get().setFields("storageQuota").execute().getStorageQuota());
 
-            var stable = new ClassPathResource("testing/test.zip").getInputStream();
-            var experimental = new ClassPathResource("testing/test.zip").getInputStream();
-            var icon = new ClassPathResource("testing/random.png").getInputStream();
-
-            storageService.create("test");
-
-            storageService.upload("test", stable, FileName.STABLE, FileType.ZIP);
-            storageService.upload("test", experimental, FileName.EXPERIMENTAL, FileType.ZIP);
-            storageService.upload("test", icon, FileName.ICON, FileType.PNG);
-
-            System.out.println(storageService.isComplete("test"));
-
-            System.out.println(storageDAO.getDrive().files().list().execute());
-            System.out.println(storageDAO.getDrive().about().get().setFields("storageQuota").execute().getStorageQuota());
+            // localStorageDAO.create("test1");
+            // localStorageDAO.upload("test1", new ClassPathResource("testing/test.txt").getInputStream(), "test.txt", null);
+            // IOUtils.copy(localStorageDAO.download("test1", "test.txt"), System.out);
         };
     }
 }

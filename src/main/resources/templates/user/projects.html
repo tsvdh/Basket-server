@@ -36,11 +36,12 @@
         <div class="pb-1 me-2">Projects</div>
         <div class="badge bg-secondary rounded-pill fs-6" th:text="${projects}">Amount of projects</div>
     </div>
-    <div class="list-group w-50">
+    <div class="list-group w-50 mb-3">
         <a class="list-group-item list-group-item-action"
            th:each="appName : ${pageUser.getDeveloperInfo().getDeveloperOf()}"
            th:href="@{'/apps/' + ${appName}}" th:text="${appName}">App name</a>
     </div>
+    <a th:href="@{/create}" class="btn btn-outline-primary">Add</a>
 </main>
 
 </body>

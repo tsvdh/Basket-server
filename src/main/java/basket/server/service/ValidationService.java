@@ -35,7 +35,6 @@ public class ValidationService {
     private final Validator validator;
     private final PasswordEncoder passwordEncoder;
     private final VerificationCodeService verificationCodeService;
-    private final UserService userService;
 
     public <T> void validate(T object) throws ConstraintViolationException {
         Set<ConstraintViolation<T>> violations = validator.validate(object);
@@ -44,15 +43,14 @@ public class ValidationService {
         }
     }
 
-    public App validateFormApp(FormApp formApp, String creatorName) throws ConstraintViolationException {
+    public App validateFormApp(FormApp formApp, Optional<User> optionalCreator) throws ConstraintViolationException {
         validate(formApp);
 
-        Optional<User> optionalUser = userService.getByUsername(creatorName);
-        if (optionalUser.isEmpty()) {
+        if (optionalCreator.isEmpty()) {
             throw new ValidationException("Creator does not exist");
         }
 
-        User creator = optionalUser.get();
+        User creator = optionalCreator.get();
         if (!creator.isDeveloper()) {
             throw new ValidationException("Creator must be a developer");
         }

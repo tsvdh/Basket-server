@@ -31,21 +31,22 @@
 
 <main class="container pt-4" style="width: 800px">
 
-    <div sec:authorize="!hasRole('DEVELOPER')">
-        Please <a th:href="@{/login}">log in</a> to create an app
+    <div sec:authorize="!isAuthenticated()">
+        <div>You must be a developer to create apps. Please <a th:href="@{/login}">login</a>, or <a th:href="@{/register}">register</a> if you don't have an account yet!</div>
+        <div></div>
     </div>
 
     <div sec:authorize="hasRole('DEVELOPER')">
         <h2>Create an app</h2>
 
-        <form id="form" method="post" th:action="@{/new}" th:object="${formApp}">
+        <form id="form" method="post" th:action="@{/create}" th:object="${formApp}">
 
             <div class="col-4 mb-4">
-                <div th:replace="fragments/inputs :: appName"></div>
+                <div th:replace="fragments/inputs/app :: appName"></div>
             </div>
 
             <div class="mb-4">
-                <div th:replace="fragments/inputs :: description"></div>
+                <div th:replace="fragments/inputs/app :: description"></div>
             </div>
 
             <div th:replace="fragments/components :: form-submit ('Create')"></div>

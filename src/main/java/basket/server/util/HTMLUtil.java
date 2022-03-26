@@ -82,8 +82,13 @@ public class HTMLUtil {
         return fragment.outerHtml();
     }
 
-    public static final Map<String, Object> USER_INPUT_MODEL = getUserInputModel();
-    public static final Map<String, Object> APP_INPUT_MODEL = getAppInputModel();
+    public enum InputType {
+        USER,
+        APP
+    }
+
+    private static final Map<String, Object> USER_INPUT_MODEL = getUserInputModel();
+    private static final Map<String, Object> APP_INPUT_MODEL = getAppInputModel();
 
     private static Map<String, Object> getUserInputModel() {
         var model = new HashMap<String, Object>();
@@ -100,9 +105,15 @@ public class HTMLUtil {
 
     public String getInputFragment(HttpServletRequest request, HttpServletResponse response,
                                     String fragmentAttribute, String inputValue,
-                                    @Nullable List<String> faults, Map<String, Object> model) {
+                                    @Nullable List<String> faults, InputType inputType) {
 
-        String html = process(request, response, "fragments/input", model);
+        String templateName = "fragments/inputs/" + inputType.toString().toLowerCase();
+        var model = switch (inputType) {
+            case APP -> APP_INPUT_MODEL;
+            case USER -> USER_INPUT_MODEL;
+        };
+
+        String html = process(request, response, templateName, model);
 
         return getInputFragment(html, fragmentAttribute, inputValue, faults);
     }

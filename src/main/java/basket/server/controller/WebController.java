@@ -9,6 +9,8 @@ import basket.server.service.UserService;
 import basket.server.util.HTMLUtil;
 import basket.server.util.IllegalActionException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +19,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -79,6 +85,16 @@ public class WebController {
         } catch (IllegalActionException e) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
+
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+
+        List<GrantedAuthority> authorities = new ArrayList<>(auth.getAuthorities());
+        authorities.add(new SimpleGrantedAuthority("ROLE_DEVELOPER/" + formApp.getAppName()));
+        authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN/" + formApp.getAppName()));
+
+        var newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
+
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
 
         response.sendRedirect("apps/%s/releases".formatted(formApp.getAppName()));
 

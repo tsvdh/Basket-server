@@ -1,6 +1,6 @@
 package basket.server.validation.annotations;
 
-import basket.server.validation.validators.AppNameValidator;
+import basket.server.validation.validators.DescriptionValidator;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -16,7 +16,7 @@ import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Documented
-@Constraint(validatedBy = AppNameValidator.class)
+@Constraint(validatedBy = DescriptionValidator.class)
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 @Retention(RUNTIME)
 public @interface Description {

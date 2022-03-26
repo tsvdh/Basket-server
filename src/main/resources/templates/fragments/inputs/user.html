@@ -3,7 +3,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Input fragments</title>
+    <title>User input fragments</title>
 </head>
 <body>
 
@@ -93,29 +93,6 @@
                hx-include="[name='formDeveloperInfo.formPhoneNumber.regionCode'], [name='formDeveloperInfo.formPhoneNumber.number']"
                hx-trigger="input delay:500ms"
                hx-target="#phoneNumberCodeFragment" hx-swap="outerHTML"
-        >
-    </div>
-</form>
-
-<form th:object="${formApp}">
-
-    <div th:fragment="appName" id="appNameFragment">
-        <label for="appNameFragment" class="form-label">App name</label>
-        <input type="text" spellcheck="false" class="form-control" id="appNameInput" th:field="*{appName}" required
-
-               hx-get="api/v1/app/html/valid/name"
-               hx-trigger="input delay:500ms"
-               hx-target="#appNameFragment" hx-swap="outerHTML"
-        >
-    </div>
-
-    <div th:fragment="description" id="descriptionFragment">
-        <label for="descriptionInput" class="form-label">Description</label>
-        <input type="text" spellcheck="false" class="form-control" id="descriptionInput" th:field="*{description}" required
-
-               hx-get="api/v1/app/html/valid/description"
-               hx-trigger="input delay:500ms"
-               hx-target="#descriptionFragment" hx-swap="outerHTML"
         >
     </div>
 </form>

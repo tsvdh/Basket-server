@@ -69,12 +69,12 @@
             <td>-</td>
         </tr>
 
-        <tr th:if="${!hasExperimental}">
+        <tr th:if="${hasExperimental}">
             <th scope="row">Experimental</th>
             <td th:text="${app.getExperimental().getVersion()}">Version</td>
             <td th:text="${{app.getExperimental().getDate()}}">Date</td>
         </tr>
-        <tr th:if="${hasExperimental}">
+        <tr th:if="${!hasExperimental}">
             <th scope="row">Experimental</th>
             <td>-</td>
             <td>-</td>
