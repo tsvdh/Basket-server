@@ -4,7 +4,7 @@ import basket.server.dao.database.app.AppDAO;
 import basket.server.model.App;
 import basket.server.model.input.FormApp;
 import basket.server.util.IllegalActionException;
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +32,12 @@ public class AppService {
         return appDAO.get(name);
     }
 
-    public List<App> getAll() {
+    public Collection<App> getAll() {
         log.info("Getting all apps");
         return appDAO.getAll();
     }
 
-    public List<App> get(List<String> names) {
+    public Collection<App> get(Collection<String> names) {
         log.info("Getting apps {}", names);
         return appDAO.get(names);
     }

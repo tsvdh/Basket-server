@@ -3,6 +3,7 @@ package basket.server.dao.database.app;
 import basket.server.model.App;
 import basket.server.util.IllegalActionException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
@@ -20,12 +21,12 @@ public class LocalAppDAO implements AppDAO {
     }
 
     @Override
-    public List<App> getAll() {
+    public Collection<App> getAll() {
         return localDB;
     }
 
     @Override
-    public List<App> get(List<String> names) {
+    public Collection<App> get(Collection<String> names) {
         return localDB.stream()
                 .filter(app -> names.contains(app.getName()))
                 .toList();

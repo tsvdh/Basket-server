@@ -2,7 +2,7 @@ package basket.server.dao.database.app;
 
 import basket.server.model.App;
 import basket.server.util.IllegalActionException;
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -19,12 +19,12 @@ public class MongoAppDAO implements AppDAO {
     }
 
     @Override
-    public List<App> getAll() {
+    public Collection<App> getAll() {
         return mongoRepository.findAll();
     }
 
     @Override
-    public List<App> get(List<String> names) {
+    public Collection<App> get(Collection<String> names) {
         return mongoRepository.findAppsByNameIn(names);
     }
 

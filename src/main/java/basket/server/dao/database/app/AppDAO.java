@@ -2,16 +2,16 @@ package basket.server.dao.database.app;
 
 import basket.server.model.App;
 import basket.server.util.IllegalActionException;
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 
 public interface AppDAO {
 
     Optional<App> get(String name);
 
-    List<App> getAll();
+    Collection<App> getAll();
 
-    List<App> get(List<String> names);
+    Collection<App> get(Collection<String> names);
 
     void add(App newApp) throws IllegalActionException;
 
