@@ -35,22 +35,22 @@ public class UserService implements UserDetailsService {
     }
 
     public Optional<User> getById(String id) {
-        log.info("Getting user with id {}", id);
+        log.info("Getting user with id '{}'", id);
         return userDAO.getById(id);
     }
 
     public Optional<User> getByEmail(String email) {
-        log.info("Getting user with email {}", email);
+        log.info("Getting user with email '{}'", email);
         return userDAO.getByEmail(email);
     }
 
     public Optional<User> getByUsername(String username) {
-        log.info("Getting user with username {}", username);
+        log.info("Getting user with username '{}'", username);
         return userDAO.getByUsername(username);
     }
 
     public Optional<User> getByPhoneNumber(PhoneNumber phoneNumber) {
-        log.info("Getting user with phone number {}", phoneNumber);
+        log.info("Getting user with phone number '{}'", phoneNumber);
         return userDAO.getByPhoneNumber(phoneNumber);
     }
 
@@ -62,7 +62,7 @@ public class UserService implements UserDetailsService {
     }
 
     public void add(User newUser) throws IllegalActionException {
-        log.info("Adding new user {}", newUser.getUsername());
+        log.info("Adding new user '{}'", newUser.getUsername());
         userDAO.add(newUser);
     }
 
@@ -74,7 +74,7 @@ public class UserService implements UserDetailsService {
     }
 
     public void update(User updatedUser) throws IllegalActionException {
-        log.info("Updating user {}", updatedUser.getUsername());
+        log.info("Updating user '{}'", updatedUser.getUsername());
         userDAO.update(updatedUser);
     }
 

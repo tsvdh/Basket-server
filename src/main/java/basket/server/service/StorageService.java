@@ -2,7 +2,7 @@ package basket.server.service;
 
 import basket.server.dao.storage.StorageDAO;
 import basket.server.util.IllegalActionException;
-import basket.server.util.storage.FileName;
+import basket.server.util.types.storage.FileName;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -40,12 +40,12 @@ public class StorageService {
     }
 
     public void create(String appName) throws IllegalActionException, IOException {
-        log.info("Creating storage for app {}", appName);
+        log.info("Creating storage for app '{}'", appName);
         storageDAO.create(appName);
     }
 
     public void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IllegalActionException, IOException {
-        log.info("Uploading {} for app {}", fileName, appName);
+        log.info("Uploading '{}' for app '{}'", fileName, appName);
 
         String fullName = toFullName(appName, fileName);
         String tempFileName = toTempFileName(fileName);
@@ -75,16 +75,15 @@ public class StorageService {
         }
     }
 
-    public boolean isComplete(String appName) throws IOException {
-        log.info("Checking if {} is complete", appName);
+    public boolean isReleasable(String appName) throws IOException {
+        log.info("Checking if '{}' is complete", appName);
 
         return storageDAO.exists(appName, FileName.STABLE)
-                && storageDAO.exists(appName, FileName.EXPERIMENTAL)
                 && storageDAO.exists(appName, FileName.ICON);
     }
 
     public Optional<InputStream> download(String appName, String fileName) throws IllegalActionException, IOException {
-        log.info("Downloading {} of app {}", fileName, appName);
+        log.info("Downloading '{}' of app '{}'", fileName, appName);
 
         InputStream inputStream = storageDAO.download(appName, fileName);
 
@@ -100,7 +99,7 @@ public class StorageService {
     }
 
     public void endDownload(String appName, String fileName) throws IOException {
-        log.info("Handling end of {} download of app {}", fileName, appName);
+        log.info("Handling end of '{}' download of app '{}'", fileName, appName);
 
         String fullName = toFullName(appName, fileName);
 

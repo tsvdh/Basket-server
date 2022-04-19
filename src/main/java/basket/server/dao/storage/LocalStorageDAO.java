@@ -75,6 +75,8 @@ public class LocalStorageDAO implements StorageDAO {
         file.loadContent(inputStream);
 
         folder.put(fileName, file);
+
+        inputStream.close();
     }
 
     @Override

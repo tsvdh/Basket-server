@@ -1,7 +1,7 @@
 package basket.server.dao.storage;
 
 import basket.server.util.IllegalActionException;
-import basket.server.util.storage.FileType;
+import basket.server.util.types.storage.FileType;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.InputStreamContent;
 import com.google.api.client.json.gson.GsonFactory;
@@ -180,6 +180,8 @@ public class DriveStorageDAO implements StorageDAO {
         var content = new InputStreamContent(fileType, inputStream);
 
         drive.files().create(newFile, content).execute();
+
+        inputStream.close();
     }
 
     @Override

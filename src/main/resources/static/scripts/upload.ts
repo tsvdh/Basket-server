@@ -1,6 +1,5 @@
 export {}
-
-const address = "http://localhost:8080";
+import {address} from "./util/constants";
 
 document.getElementById("fileButton").onclick = async function () {
     let fileInput = <HTMLInputElement>document.getElementById("fileInput");

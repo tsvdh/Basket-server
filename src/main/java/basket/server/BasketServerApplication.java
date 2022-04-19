@@ -82,6 +82,9 @@ public class BasketServerApplication {
             appService.add(app1);
             appService.add(app2);
 
+            storageService.create("app1");
+            storageService.create("app2");
+
             // for (File file : storageDAO.getDrive().files().list().execute().getFiles()) {
             //     storageDAO.getDrive().files().delete(file.getId()).execute();
             // }

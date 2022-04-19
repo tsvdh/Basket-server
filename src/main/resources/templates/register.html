@@ -40,7 +40,7 @@
         <button class="nav-link" id="nav-developer" data-bs-toggle="tab" data-bs-target="#tab-developer" type="button" >Developer</button>
     </nav>
 
-    <form id="form" method="post" th:action="@{/register}" th:object="${formUser}">
+    <form method="post" th:action="@{/register}" th:object="${formUser}">
 
         <!--suppress HtmlFormInputWithoutLabel -->
         <select class="visually-hidden" id="userTypeInput" th:field="*{userType}">

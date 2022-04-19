@@ -39,7 +39,7 @@
     <div sec:authorize="hasRole('DEVELOPER')">
         <h2>Create an app</h2>
 
-        <form id="form" method="post" th:action="@{/create}" th:object="${formApp}">
+        <form method="post" th:action="@{/create}" th:object="${formApp}">
 
             <div class="col-4 mb-4">
                 <div th:replace="fragments/inputs/app :: appName"></div>

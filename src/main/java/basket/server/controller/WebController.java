@@ -5,6 +5,7 @@ import basket.server.model.User;
 import basket.server.model.input.FormApp;
 import basket.server.model.input.FormUser;
 import basket.server.service.AppService;
+import basket.server.service.StorageService;
 import basket.server.service.UserService;
 import basket.server.util.HTMLUtil;
 import basket.server.util.IllegalActionException;
@@ -42,6 +43,7 @@ public class WebController {
 
     private final UserService userService;
     private final AppService appService;
+    private final StorageService storageService;
 
     @GetMapping("login")
     public String getLogin() {
@@ -96,18 +98,16 @@ public class WebController {
 
         SecurityContextHolder.getContext().setAuthentication(newAuth);
 
+        try {
+            storageService.create(formApp.getAppName());
+        } catch (IllegalActionException e) {
+            // ignore as app name cannot be taken at this point and no exception should be thrown
+        }
+
         response.sendRedirect("apps/%s/releases".formatted(formApp.getAppName()));
 
         return ok().build();
     }
-
-    // @PostMapping
-    // @PreAuthorize("hasRole('DEVELOPER')")
-    // public ResponseEntity<Void> addApp(@RequestBody @NonNull @Validated App app) {
-    //     appService.add(app);
-    //
-    //     return ok().build();
-    // }
 
     // @PutMapping
     // @PreAuthorize("hasRole('DEVELOPER-' + updatedApp.getName())")

@@ -28,7 +28,7 @@ public class AppService {
     }
 
     public Optional<App> get(String name) {
-        log.info("Getting app {}", name);
+        log.info("Getting app '{}'", name);
         return appDAO.get(name);
     }
 
@@ -37,8 +37,16 @@ public class AppService {
         return appDAO.getAll();
     }
 
+    public Collection<App> getAvailable() {
+        log.info("Getting available apps");
+
+        return appDAO.getAll().stream()
+                .filter(App::isAvailable)
+                .toList();
+    }
+
     public Collection<App> get(Collection<String> names) {
-        log.info("Getting apps {}", names);
+        log.info("Getting apps '{}'", names);
         return appDAO.get(names);
     }
 
@@ -51,7 +59,7 @@ public class AppService {
     }
 
     public void add(App app) throws IllegalActionException {
-        log.info("Adding new app {}", app.getName());
+        log.info("Adding new app '{}'", app.getName());
         appDAO.add(app);
     }
 
@@ -64,7 +72,7 @@ public class AppService {
     }
 
     public void update(App updatedApp) throws IllegalActionException {
-        log.info("Updating app {}", updatedApp.getName());
+        log.info("Updating app '{}'", updatedApp.getName());
         appDAO.update(updatedApp);
     }
 }

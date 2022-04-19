@@ -1,5 +1,5 @@
 export {}
-import {makeDangerAlert, makePrimaryAlert, makeSuccessAlert} from "./alert.js";
+import {makeDangerAlert, makePrimaryAlert, makeSuccessAlert} from "./util/alert.js";
 
 /*--- Helper methods ---*/
 
@@ -10,7 +10,7 @@ function insertAlert(alert: HTMLElement) {
         .insertAdjacentElement("afterbegin", alert);
 }
 
-/*--- Buttons ---*/
+/*--- Button actions ---*/
 
 document.getElementById("form").onsubmit = function (ev) {
     let invalids = document.getElementsByClassName("is-invalid");

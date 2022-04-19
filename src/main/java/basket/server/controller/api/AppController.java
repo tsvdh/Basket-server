@@ -2,11 +2,14 @@ package basket.server.controller.api;
 
 import basket.server.model.App;
 import basket.server.service.AppService;
+import basket.server.service.StorageService;
 import basket.server.service.UserService;
 import basket.server.util.HTMLUtil;
 import basket.server.util.HTMLUtil.InputType;
+import basket.server.util.IllegalActionException;
 import basket.server.validation.validators.AppNameValidator;
 import basket.server.validation.validators.DescriptionValidator;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -14,7 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -31,6 +36,7 @@ public class AppController {
 
     private final AppService appService;
     private final UserService userService;
+    private final StorageService storageService;
     private final HTMLUtil htmlUtil;
 
     @GetMapping("get/one")
@@ -46,6 +52,11 @@ public class AppController {
     @GetMapping("get/all")
     public ResponseEntity<Collection<App>> getAll() {
         return ok(appService.getAll());
+    }
+
+    @GetMapping("get/available")
+    public ResponseEntity<Collection<App>> getAvailable() {
+        return ok(appService.getAvailable());
     }
 
     @GetMapping("get/user-library")
@@ -102,5 +113,32 @@ public class AppController {
                 faults,
                 InputType.APP
         );
+    }
+
+    @PatchMapping("release")
+    @PreAuthorize("hasRole('DEVELOPER/' + #appName)")
+    public ResponseEntity<Void> release(@RequestParam String appName,
+                                        HttpServletResponse response) throws IOException {
+        var optionalApp = appService.get(appName);
+        if (optionalApp.isEmpty()) {
+            return badRequest().build();
+        }
+
+        if (!storageService.isReleasable(appName)) {
+            return badRequest().build();
+        }
+
+        App app = optionalApp.get();
+        app.setAvailable(true);
+
+        try {
+            appService.update(app);
+        } catch (IllegalActionException e) {
+            // ignore as app always already exists
+        }
+
+        response.sendRedirect("apps/%s/releases".formatted(appName));
+
+        return ok().build();
     }
 }

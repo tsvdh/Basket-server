@@ -40,7 +40,7 @@
         <div class="p-2">
             <b>Rating</b>
             <div th:with="grade = ${app.getAppStats().getRating().getGrade()}, amount = ${app.getAppStats().getRating().getReviews().keySet().size()}">
-                <th:block th:text="${grade == null ? '-' : grade}"/> <span th:text="${amount}" class="badge bg-secondary rounded-pill"></span>
+                <th:block th:text="${grade == null ? '-' : grade}"/> <span th:if="${amount > 0}" th:text="${amount}" class="badge bg-secondary rounded-pill"></span>
             </div>
         </div>
     </div>

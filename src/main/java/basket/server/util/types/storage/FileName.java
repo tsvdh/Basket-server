@@ -1,4 +1,4 @@
-package basket.server.util.storage;
+package basket.server.util.types.storage;
 
 public class FileName {
 
