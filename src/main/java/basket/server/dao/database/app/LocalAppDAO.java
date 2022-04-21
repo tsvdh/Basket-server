@@ -1,6 +1,6 @@
 package basket.server.dao.database.app;
 
-import basket.server.model.App;
+import basket.server.model.app.App;
 import basket.server.util.IllegalActionException;
 import java.util.ArrayList;
 import java.util.Collection;

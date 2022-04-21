@@ -1,7 +1,7 @@
 package basket.server.service;
 
 import basket.server.dao.database.app.AppDAO;
-import basket.server.model.App;
+import basket.server.model.app.App;
 import basket.server.model.input.FormApp;
 import basket.server.util.IllegalActionException;
 import java.util.Collection;

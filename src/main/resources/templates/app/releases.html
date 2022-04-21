@@ -10,7 +10,8 @@
 	{
 		"imports": {
 			"bootstrap": "/webjars/bootstrap/dist/js/bootstrap.esm.min.js",
-			"@popperjs/core": "/webjars/popperjs__core/lib/index.js"
+			"@popperjs/core": "/webjars/popperjs__core/lib/index.js",
+			"htmx": "/webjars/htmx.org/dist/htmx.min.js"
 		}
 	}
     </script>
@@ -19,6 +20,7 @@
     <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/font/bootstrap-icons.css}">
     <script type="module">
         import 'bootstrap'
+        import 'htmx'
     </script>
     <link rel="stylesheet" th:href="@{/style/base.css}">
     <script type="module" th:href="@{/scripts/app/releases}"></script>
@@ -44,9 +46,47 @@
 
     <div class="col-7 mb-4">
         <h4>Stable</h4>
+
+<!--        &lt;!&ndash;suppress HtmlFormInputWithoutLabel &ndash;&gt;-->
+<!--        <input type="text" class="visually-hidden" name="appName" th:value="${app.getName()}">-->
+<!--        &lt;!&ndash;suppress HtmlFormInputWithoutLabel &ndash;&gt;-->
+<!--        <input type="text" class="visually-hidden" name="type" value="stable">-->
+<!--        <label for="versionInput" class="form-label">Version</label>-->
+<!--        <div class="input-group">-->
+<!--            <input type="text" spellcheck="false" class="form-control" name="version" id="versionInput" required>-->
+<!--            <button type="button" class="btn btn-outline-secondary"-->
+
+<!--                    hx-get="/api/v1/storage/upload/init"-->
+<!--                    hx-target="#stableUploadFragment" hx-swap="outerHTML"-->
+<!--                    hx-include="[name='appName'], [name='type'], [name='version']"-->
+
+<!--            >Send</button>-->
+<!--        </div>-->
+
+        <form th:object="${formPendingUpload}"
+
+              hx-post="/api/v1/storage/upload/init"
+              hx-target="#stableUploadFragment" hx-swap="outerHTML"
+        >
+            <!--suppress HtmlFormInputWithoutLabel -->
+            <input type="text" id="uploadAppNameInput" th:field="*{appName}">
+            <!--suppress HtmlFormInputWithoutLabel -->
+            <input type="text" id="uploadTypeInput" th:field="*{type}">
+
+            <label for="versionInput" class="form-label">Version</label>
+            <div class="input-group">
+                <input type="text" spellcheck="false" class="form-control" name="version" id="versionInput" required>
+                <button type="submit" class="btn btn-outline-secondary">Send</button>
+            </div>
+        </form>
+
+        <div id="stableUploadFragment">Test</div>
+
+        <label class="form-label">Upload</label>
         <form method="post" th:action="@{/api/v1/storage/upload/__${app.getName()}__/stable}"
               enctype="multipart/form-data" class="input-group">
-            <input type="file" accept="application/zip" name="file" class="form-control" required>
+            <input type="file" accept="application/zip" name="file" class="form-control" required
+                   hx-preserve="true">
             <button type="submit" class="btn btn-outline-primary" id="stableButton">Upload</button>
         </form>
     </div>

@@ -2,11 +2,11 @@ package basket.server;
 
 import basket.server.dao.storage.DriveStorageDAO;
 import basket.server.dao.storage.LocalStorageDAO;
-import basket.server.model.App;
-import basket.server.model.AppStats;
+import basket.server.model.app.App;
+import basket.server.model.app.AppStats;
 import basket.server.model.DeveloperInfo;
-import basket.server.model.Rating;
-import basket.server.model.Release;
+import basket.server.model.app.Rating;
+import basket.server.model.app.Release;
 import basket.server.model.User;
 import basket.server.service.AppService;
 import basket.server.service.StorageService;

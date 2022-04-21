@@ -1,6 +1,6 @@
 package basket.server.controller.api;
 
-import basket.server.model.App;
+import basket.server.model.app.App;
 import basket.server.service.AppService;
 import basket.server.service.StorageService;
 import basket.server.service.UserService;

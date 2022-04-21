@@ -1,8 +1,9 @@
 package basket.server.controller;
 
-import basket.server.model.App;
+import basket.server.model.app.App;
 import basket.server.model.User;
 import basket.server.model.input.FormApp;
+import basket.server.model.input.FormPendingUpload;
 import basket.server.model.input.FormUser;
 import basket.server.service.AppService;
 import basket.server.service.StorageService;
@@ -162,6 +163,7 @@ public class WebController {
         var modelAndView = new ModelAndView("app/releases");
 
         modelAndView.addObject("app", getApp(appName));
+        modelAndView.addObject("formPendingUpload", new FormPendingUpload());
 
         return modelAndView;
     }

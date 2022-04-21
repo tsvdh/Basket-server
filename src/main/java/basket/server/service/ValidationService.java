@@ -1,12 +1,14 @@
 package basket.server.service;
 
-import basket.server.model.App;
-import basket.server.model.AppStats;
 import basket.server.model.DeveloperInfo;
-import basket.server.model.Rating;
+import basket.server.model.PendingUpload;
 import basket.server.model.User;
+import basket.server.model.app.App;
+import basket.server.model.app.AppStats;
+import basket.server.model.app.Rating;
 import basket.server.model.input.FormApp;
 import basket.server.model.input.FormDeveloperInfo;
+import basket.server.model.input.FormPendingUpload;
 import basket.server.model.input.FormPhoneNumber;
 import basket.server.model.input.FormUser;
 import basket.server.model.input.FormUser.Type;
@@ -42,6 +44,8 @@ public class ValidationService {
             throw new ConstraintViolationException(violations);
         }
     }
+
+    // TODO: change method names to overloading pattern
 
     public App validateFormApp(FormApp formApp, Optional<User> optionalCreator) throws ConstraintViolationException {
         validate(formApp);
@@ -148,5 +152,26 @@ public class ValidationService {
 
     public PhoneNumber validateFormPhoneNumber(String regionCode, String number) throws ConstraintViolationException {
         return validateFormPhoneNumber(new FormPhoneNumber(regionCode, number));
+    }
+
+    public PendingUpload validateFormPendingUpload(FormPendingUpload formPendingUpload) throws ConstraintViolationException {
+        validate(formPendingUpload);
+
+        String type = formPendingUpload.getType();
+
+        switch (type) {
+            case "icon":
+            case "stable":
+            case "experimental":
+                break;
+            default:
+                throw new ValidationException("Upload type does not exist");
+        }
+
+        return new PendingUpload(
+                formPendingUpload.getAppName(),
+                type,
+                formPendingUpload.getVersion()
+        );
     }
 }

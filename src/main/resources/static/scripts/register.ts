@@ -12,7 +12,7 @@ function insertAlert(alert: HTMLElement) {
 
 /*--- Button actions ---*/
 
-document.getElementById("form").onsubmit = function (ev) {
+document.getElementById("registerForm").onsubmit = function (ev) {
     let invalids = document.getElementsByClassName("is-invalid");
 
     if (invalids.length == 0) {

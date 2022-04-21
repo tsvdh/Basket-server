@@ -1,6 +1,10 @@
 package basket.server.controller.api;
 
+import basket.server.model.input.FormPendingUpload;
+import basket.server.service.PendingUploadService;
 import basket.server.service.StorageService;
+import basket.server.service.ValidationService;
+import basket.server.util.HTMLUtil;
 import basket.server.util.IllegalActionException;
 import basket.server.util.types.storage.FileName;
 import basket.server.util.types.storage.FileType;
@@ -21,23 +25,31 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.HttpClientErrorException;
 
+import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("api/v1/storage")
+@Validated
 public class StorageController {
 
     private final StorageService storageService;
+    private final PendingUploadService pendingUploadService;
+    private final ValidationService validationService;
+    private final HTMLUtil htmlUtil;
 
     @PostMapping("upload/{appName}/{type}")
     @PreAuthorize("hasRole('DEVELOPER/' + #appName)")
@@ -94,6 +106,18 @@ public class StorageController {
         }
 
         return ok().build();
+    }
+
+    @ResponseBody
+    @PostMapping(path = "upload/init", produces = TEXT_HTML_VALUE)
+    @PreAuthorize("hasRole('DEVELOPER/' + #formPendingUpload.getAppName())")
+    public String initUpload(@ModelAttribute FormPendingUpload formPendingUpload) {
+
+        var pendingUpload = validationService.validateFormPendingUpload(formPendingUpload);
+
+        pendingUploadService.add(pendingUpload);
+
+        return "<div>%s</div>".formatted(pendingUpload.getToken());
     }
 
     @GetMapping("download")
