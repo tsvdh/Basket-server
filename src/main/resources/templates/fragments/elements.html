@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Elements</title>
+</head>
+<body>
+
+<div th:fragment="form-submit (text)"
+     class="container mt-3 p-0 d-flex justify-content-end">
+    <button th:text="${text}" class="btn btn-primary btn-lg w-auto" type="submit">Action</button>
+</div>
+
+<div th:fragment="file-info (type)">
+    <div th:id="${type + 'InfoFragment'}">
+        <form th:object="${formPendingUpload}"
+
+              hx-post="/api/v1/storage/upload/init"
+              th:hx-target="${'#' + type + 'UploadFragment'}" hx-swap="outerHTML"
+        >
+            <!--suppress HtmlFormInputWithoutLabel -->
+            <input type="text" class="visually-hidden" th:field="*{appName}">
+            <!--suppress HtmlFormInputWithoutLabel -->
+            <input type="text" class="visually-hidden" th:placeholder="${type}" th:field="*{type}">
+
+            <label for="versionInput" class="form-label">Version</label>
+            <div class="input-group">
+                <input type="text" spellcheck="false" class="form-control" name="version" id="versionInput" required>
+                <button type="submit" class="btn btn-outline-secondary">Send</button>
+            </div>
+        </form>
+    </div>
+
+    <div th:id="${type + 'UploadFragment'}"></div>
+</div>
+
+<div th:fragment="file-upload (type, fileType)" th:id="${type + 'UploadFragment'}"
+    class="mt-3">
+    <form method="post" action="/api/v1/storage/upload/"
+          enctype="multipart/form-data">
+        <label class="form-label">Upload</label>
+        <div class="input-group">
+            <input type="file" th:accept="${fileType}" name="file" class="form-control" required
+                   hx-preserve="true">
+            <button type="submit" class="btn btn-outline-primary" id="stableButton">Upload</button>
+        </div>
+    </form>
+</div>
+
+<div th:replace="fragments/elements :: file-upload ('icon', 'image/png')"></div>
+
+<div th:replace="fragments/elements :: file-upload ('stable', 'application/zip')"></div>
+
+<div th:replace="fragments/elements :: file-upload ('experimental', 'application/zip')"></div>
+
+</body>
+</html>

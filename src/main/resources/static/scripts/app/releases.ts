@@ -1,19 +1,14 @@
 export {}
-import {address} from "../util/constants";
 
-/*--- Button actions ---*/
+window.addEventListener("load", function () {
+    let appName = document.getElementById("appNameValue").innerText;
 
-document.getElementById("iconButton").onclick = function () {
+    document.getElementsByName("appName").forEach(function (element) {
+        (<HTMLInputElement>element).value = appName;
+    });
 
-};
-
-document.getElementById("releaseButton").onclick = function () {
-    
-    let request = new Request(
-        address + "api/v1/app/release",
-        {
-            method: "PATCH",
-
-        }
-    );
-};
+    document.getElementsByName("type").forEach(function (element) {
+        (<HTMLInputElement>element).value = element.getAttribute("placeholder");
+        element.removeAttribute("placeholder");
+    });
+});

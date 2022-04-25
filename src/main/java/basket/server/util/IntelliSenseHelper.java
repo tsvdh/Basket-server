@@ -2,6 +2,7 @@ package basket.server.util;
 
 import basket.server.model.User;
 import basket.server.model.input.FormApp;
+import basket.server.model.input.FormPendingUpload;
 import basket.server.model.input.FormUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +27,12 @@ public class IntelliSenseHelper {
     @GetMapping("3")
     private String method3(Model model) {
         model.addAttribute("pageUser", new User());
-        return "fragments/components";
+        return "fragments/page-components";
+    }
+
+    @GetMapping("4")
+    private String method4(Model model) {
+        model.addAttribute("formPendingUpload", new FormPendingUpload());
+        return "fragments/elements";
     }
 }

@@ -1,6 +1,7 @@
 package basket.server.util;
 
 import basket.server.model.input.FormApp;
+import basket.server.model.input.FormPendingUpload;
 import basket.server.model.input.FormUser;
 import com.neovisionaries.i18n.CountryCode;
 import java.util.HashMap;
@@ -36,14 +37,14 @@ public class HTMLUtil {
                 .toList();
     }
 
-    private String process(HttpServletRequest request, HttpServletResponse response,
-                          String viewName, Map<String, Object> model) {
-
+    private String thymeleafProcess(HttpServletRequest request, HttpServletResponse response,
+                                    String viewName, Map<String, Object> model) {
         var requestContext = new SpringWebMvcThymeleafRequestContext(
                 new RequestContext(request, response, servletContext, model),
                 request
         );
 
+        // new WebContext(request, response, new ApplicationContext(new StandardContext()));
         var templateContext = new Context();
         templateContext.setVariable(SpringContextVariableNames.THYMELEAF_REQUEST_CONTEXT, requestContext);
 
@@ -89,6 +90,7 @@ public class HTMLUtil {
 
     private static final Map<String, Object> USER_INPUT_MODEL = getUserInputModel();
     private static final Map<String, Object> APP_INPUT_MODEL = getAppInputModel();
+    private static final Map<String, Object> ELEMENTS_MODEL = getElementsModel();
 
     private static Map<String, Object> getUserInputModel() {
         var model = new HashMap<String, Object>();
@@ -103,6 +105,12 @@ public class HTMLUtil {
         return model;
     }
 
+    private static Map<String, Object> getElementsModel() {
+        var model = new HashMap<String, Object>();
+        model.put("formPendingUpload", new FormPendingUpload());
+        return model;
+    }
+
     public String getInputFragment(HttpServletRequest request, HttpServletResponse response,
                                     String fragmentAttribute, String inputValue,
                                     @Nullable List<String> faults, InputType inputType) {
@@ -113,8 +121,22 @@ public class HTMLUtil {
             case USER -> USER_INPUT_MODEL;
         };
 
-        String html = process(request, response, templateName, model);
+        String html = thymeleafProcess(request, response, templateName, model);
 
         return getInputFragment(html, fragmentAttribute, inputValue, faults);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    public String getFileUploadFragment(HttpServletRequest request, HttpServletResponse response, String type, String token) {
+        String html = thymeleafProcess(request, response, "fragments/elements", ELEMENTS_MODEL);
+
+        var document = Jsoup.parse(html);
+
+        var fragment = document.getElementById(type + "UploadFragment");
+
+        var form = fragment.getElementsByTag("form").get(0);
+        form.attr("action", form.attr("action") + token);
+
+        return fragment.outerHtml();
     }
 }

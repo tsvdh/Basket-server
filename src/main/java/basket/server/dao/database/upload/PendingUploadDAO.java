@@ -5,7 +5,9 @@ import java.util.Optional;
 
 public interface PendingUploadDAO {
 
-    Optional<PendingUpload> get(String destination);
+    Optional<PendingUpload> getByDestination(String destination);
+
+    Optional<PendingUpload> getByToken(String token);
 
     void add(PendingUpload pendingUpload);
 }

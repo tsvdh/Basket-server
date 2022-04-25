@@ -51,15 +51,21 @@ public class StorageController {
     private final ValidationService validationService;
     private final HTMLUtil htmlUtil;
 
-    @PostMapping("upload/{appName}/{type}")
-    @PreAuthorize("hasRole('DEVELOPER/' + #appName)")
+    @PostMapping("upload/{token}")
     public ResponseEntity<Void> upload(HttpServletRequest request, HttpServletResponse response,
-                                        @PathVariable String appName,
-                                        @PathVariable String type) throws IOException, FileUploadException {
+                                        @PathVariable String token) throws IOException, FileUploadException {
+
+        var optionalPendingUpload = pendingUploadService.getByToken(token);
+        if (optionalPendingUpload.isEmpty()) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Invalid token");
+        }
+
+        var pendingUpload = optionalPendingUpload.get();
+
         String fileName;
         String fileType;
 
-        switch (type) {
+        switch (pendingUpload.getType()) {
             case "icon" -> {
                 fileName = FileName.ICON;
                 fileType = FileType.PNG;
@@ -74,7 +80,7 @@ public class StorageController {
             }
             default -> throw new HttpClientErrorException(
                     HttpStatus.NOT_FOUND,
-                    "'%s' upload type does not exist".formatted(type)
+                    "'%s' upload type does not exist".formatted(pendingUpload.getType())
             );
         }
 
@@ -100,7 +106,7 @@ public class StorageController {
         }
 
         try {
-            storageService.upload(appName, inputStream, fileName, fileType);
+            storageService.upload(pendingUpload.getAppName(), inputStream, fileName, fileType);
         } catch (IllegalActionException e) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
@@ -111,13 +117,14 @@ public class StorageController {
     @ResponseBody
     @PostMapping(path = "upload/init", produces = TEXT_HTML_VALUE)
     @PreAuthorize("hasRole('DEVELOPER/' + #formPendingUpload.getAppName())")
-    public String initUpload(@ModelAttribute FormPendingUpload formPendingUpload) {
+    public String initUpload(HttpServletRequest request, HttpServletResponse response,
+                             @ModelAttribute FormPendingUpload formPendingUpload) {
 
         var pendingUpload = validationService.validateFormPendingUpload(formPendingUpload);
 
         pendingUploadService.add(pendingUpload);
 
-        return "<div>%s</div>".formatted(pendingUpload.getToken());
+        return htmlUtil.getFileUploadFragment(request, response, pendingUpload.getType(), pendingUpload.getToken());
     }
 
     @GetMapping("download")

@@ -19,10 +19,16 @@ public class PendingUploadService {
         this.pendingUploadDAO = pendingUploadDAO;
     }
 
-    public Optional<PendingUpload> get(String destination) {
-        log.info("Getting pending upload for '{}'", destination);
+    public Optional<PendingUpload> getByDestination(String destination) {
+        log.info("Getting pending upload for destination '{}'", destination);
 
-        return pendingUploadDAO.get(destination);
+        return pendingUploadDAO.getByDestination(destination);
+    }
+
+    public Optional<PendingUpload> getByToken(String token) {
+        log.info("Getting pending upload for token '{}'", token);
+
+        return pendingUploadDAO.getByToken(token);
     }
 
     public void add(PendingUpload pendingUpload) {
