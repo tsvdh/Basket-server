@@ -1,6 +1,6 @@
 package basket.server.dao.database.user;
 
-import basket.server.model.User;
+import basket.server.model.user.User;
 import basket.server.util.IllegalActionException;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.util.ArrayList;

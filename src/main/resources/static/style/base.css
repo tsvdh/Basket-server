@@ -25,3 +25,19 @@ aside {
 main {
     background-color: var(--bs-white);
 }
+
+/* Htmx indicator styling */
+
+.htmx-indicator {
+    display: none;
+}
+
+.htmx-request.htmx-indicator {
+    display: inline-block;
+}
+
+.htmx-request .htmx-indicator {
+    display: inline-block;
+}
+
+/* ---------------------- */

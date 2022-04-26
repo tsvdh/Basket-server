@@ -1,7 +1,7 @@
 package basket.server.service;
 
 import basket.server.dao.database.user.UserDAO;
-import basket.server.model.User;
+import basket.server.model.user.User;
 import basket.server.model.input.FormUser;
 import basket.server.util.IllegalActionException;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;

@@ -134,7 +134,7 @@ public class AppController {
         try {
             appService.update(app);
         } catch (IllegalActionException e) {
-            // ignore as app always already exists
+            // ignore as update will always be legal
         }
 
         response.sendRedirect("apps/%s/releases".formatted(appName));

@@ -1,4 +1,4 @@
-package basket.server.model;
+package basket.server.model.user;
 
 import java.io.Serial;
 import java.io.Serializable;

@@ -1,4 +1,4 @@
-package basket.server.model;
+package basket.server.model.user;
 
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.io.Serial;

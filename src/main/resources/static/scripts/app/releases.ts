@@ -11,4 +11,8 @@ window.addEventListener("load", function () {
         (<HTMLInputElement>element).value = element.getAttribute("placeholder");
         element.removeAttribute("placeholder");
     });
+
+    document.getElementsByName("toFire").forEach(function (element) {
+        (<HTMLButtonElement>element).click();
+    });
 });

@@ -1,7 +1,7 @@
 package basket.server.controller;
 
 import basket.server.model.app.App;
-import basket.server.model.User;
+import basket.server.model.user.User;
 import basket.server.model.input.FormApp;
 import basket.server.model.input.FormPendingUpload;
 import basket.server.model.input.FormUser;

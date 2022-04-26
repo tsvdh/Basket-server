@@ -1,6 +1,6 @@
 package basket.server.dao.database.user;
 
-import basket.server.model.User;
+import basket.server.model.user.User;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.util.Optional;
 import org.springframework.data.mongodb.repository.MongoRepository;

@@ -35,19 +35,19 @@
 
     <div class="display-3 mb-5" id="appNameValue" th:text="${app.getName()}">App name</div>
 
-    <div class="col-7 mb-5">
+    <div class="mb-4">
         <h4>Icon</h4>
-        <div th:replace="fragments/elements :: file-info ('icon')"></div>
+        <div th:replace="fragments/elements/app/releases :: file-info ('icon')"></div>
     </div>
 
-    <div class="col-7 mb-5">
+    <div class="mb-4">
         <h4>Stable</h4>
-        <div th:replace="fragments/elements :: file-info ('stable')"></div>
+        <div th:replace="fragments/elements/app/releases :: file-info ('stable')"></div>
     </div>
 
-    <div class="col-7 mb-5">
+    <div class="mb-4">
         <h4>Experimental</h4>
-        <div th:replace="fragments/elements :: file-info ('experimental')"></div>
+        <div th:replace="fragments/elements/app/releases :: file-info ('experimental')"></div>
     </div>
 
     <button type="button" id="releaseButton">Release</button>

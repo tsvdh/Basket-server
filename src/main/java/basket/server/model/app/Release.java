@@ -1,5 +1,6 @@
 package basket.server.model.app;
 
+import basket.server.model.PendingUpload;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -15,6 +16,13 @@ public class Release implements Serializable {
     private String version;
 
     private LocalDate date;
+
+    public Release(PendingUpload pendingUpload) {
+        this(
+                pendingUpload.getVersion(),
+                pendingUpload.getCreatedAt().toLocalDate()
+        );
+    }
 
     public Release(@BsonProperty String version,
                    @BsonProperty LocalDate date) {

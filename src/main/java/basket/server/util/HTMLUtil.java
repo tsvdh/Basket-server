@@ -128,7 +128,7 @@ public class HTMLUtil {
 
     @SuppressWarnings("ConstantConditions")
     public String getFileUploadFragment(HttpServletRequest request, HttpServletResponse response, String type, String token) {
-        String html = thymeleafProcess(request, response, "fragments/elements", ELEMENTS_MODEL);
+        String html = thymeleafProcess(request, response, "fragments/elements/app/releases", ELEMENTS_MODEL);
 
         var document = Jsoup.parse(html);
 

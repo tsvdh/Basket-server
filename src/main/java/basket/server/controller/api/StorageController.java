@@ -1,6 +1,8 @@
 package basket.server.controller.api;
 
+import basket.server.model.app.Release;
 import basket.server.model.input.FormPendingUpload;
+import basket.server.service.AppService;
 import basket.server.service.PendingUploadService;
 import basket.server.service.StorageService;
 import basket.server.service.ValidationService;
@@ -50,6 +52,7 @@ public class StorageController {
     private final PendingUploadService pendingUploadService;
     private final ValidationService validationService;
     private final HTMLUtil htmlUtil;
+    private final AppService appService;
 
     @PostMapping("upload/{token}")
     public ResponseEntity<Void> upload(HttpServletRequest request, HttpServletResponse response,
@@ -109,6 +112,20 @@ public class StorageController {
             storageService.upload(pendingUpload.getAppName(), inputStream, fileName, fileType);
         } catch (IllegalActionException e) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+
+        var optionalApp = appService.get(pendingUpload.getAppName());
+        if (optionalApp.isEmpty()) {
+            // should not happen as token guarantees app existence
+            return ResponseEntity.internalServerError().build();
+        }
+
+        var app = optionalApp.get();
+        var release = new Release(pendingUpload);
+
+        switch (pendingUpload.getType()) {
+            case "stable" -> app.setStable(release);
+            case "experimental" -> app.setExperimental(release);
         }
 
         return ok().build();

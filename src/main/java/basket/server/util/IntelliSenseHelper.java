@@ -1,6 +1,6 @@
 package basket.server.util;
 
-import basket.server.model.User;
+import basket.server.model.user.User;
 import basket.server.model.input.FormApp;
 import basket.server.model.input.FormPendingUpload;
 import basket.server.model.input.FormUser;
@@ -33,6 +33,6 @@ public class IntelliSenseHelper {
     @GetMapping("4")
     private String method4(Model model) {
         model.addAttribute("formPendingUpload", new FormPendingUpload());
-        return "fragments/elements";
+        return "fragments/elements/app/releases";
     }
 }

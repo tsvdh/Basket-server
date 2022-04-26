@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Releases elements</title>
+</head>
+<body>
+
+<div th:fragment="form-submit (text)"
+     class="container mt-3 p-0 d-flex justify-content-end">
+    <button th:text="${text}" class="btn btn-primary btn-lg w-auto" type="submit">Action</button>
+</div>
+
+<div th:fragment="file-info (type)" th:with="versionRequired = ${!#strings.equals(type, 'icon')}"
+     class="d-flex" style="height: 70px;">
+    <div th:id="${type + 'InfoFragment'}" class="">
+        <form th:object="${formPendingUpload}"
+
+              hx-post="/api/v1/storage/upload/init"
+              th:hx-target="${'#' + type + 'UploadFragment'}" hx-swap="outerHTML"
+              th:hx-indicator="${'#' + type + 'UploadFragment'}"
+        >
+            <!--suppress HtmlFormInputWithoutLabel -->
+            <input type="text" class="visually-hidden" th:field="*{appName}">
+            <!--suppress HtmlFormInputWithoutLabel -->
+            <input type="text" class="visually-hidden" th:placeholder="${type}" th:field="*{type}">
+
+            <div th:if="${!versionRequired}" class="visually-hidden">
+                <!--suppress HtmlFormInputWithoutLabel -->
+                <input type="text" name="version" value="no version">
+                <button type="submit" name="toFire">Send</button>
+            </div>
+
+            <div th:if="${versionRequired}" class="me-4">
+                <label for="versionInput" class="form-label">Version</label>
+                <div class="input-group">
+                    <input type="text" spellcheck="false" class="form-control" name="version" id="versionInput" required>
+                    <button type="submit" class="btn btn-outline-secondary">Send</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div th:id="${type + 'UploadFragment'}" th:classappend="${versionRequired ? 'align-self-end' : 'align-self-center'}">
+        <div th:classappend="${versionRequired ? 'htmx-indicator' : ''}" class="spinner-border" role="status"></div>
+    </div>
+</div>
+
+<div th:fragment="file-upload (type, fileType)" th:id="${type + 'UploadFragment'}"
+     class="">
+    <form method="post" action="/api/v1/storage/upload/"
+          enctype="multipart/form-data">
+        <label class="form-label">Upload</label>
+        <div class="d-flex">
+            <div class="input-group">
+                <input type="file" th:accept="${fileType}" name="file" th:id="${type + 'FileInput'}" class="form-control" required
+                       hx-preserve="true">
+                <button type="submit" class="btn btn-outline-primary">
+                    Upload
+                    <span class="spinner-border spinner-border-sm htmx-indicator" role="status"></span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div th:replace="fragments/elements/app/releases :: file-upload ('icon', 'image/png')"></div>
+
+<div th:replace="fragments/elements/app/releases :: file-upload ('stable', 'application/zip')"></div>
+
+<div th:replace="fragments/elements/app/releases :: file-upload ('experimental', 'application/zip')"></div>
+
+</body>
+</html>

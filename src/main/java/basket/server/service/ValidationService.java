@@ -1,8 +1,8 @@
 package basket.server.service;
 
-import basket.server.model.DeveloperInfo;
+import basket.server.model.user.DeveloperInfo;
 import basket.server.model.PendingUpload;
-import basket.server.model.User;
+import basket.server.model.user.User;
 import basket.server.model.app.App;
 import basket.server.model.app.AppStats;
 import basket.server.model.app.Rating;
