@@ -12,21 +12,21 @@ function insertAlert(alert: HTMLElement) {
 
 /*--- Button actions ---*/
 
-document.getElementById("registerForm").onsubmit = function (ev) {
+document.getElementById("registerForm").onsubmit = event => {
     let invalids = document.getElementsByClassName("is-invalid");
 
     if (invalids.length == 0) {
         return;
     }
 
-    ev.preventDefault();
-    ev.stopPropagation();
+    event.preventDefault();
+    event.stopPropagation();
 
     let alert = makeDangerAlert("All fields must be valid!");
     insertAlert(alert);
 };
 
-document.getElementById("emailButton").addEventListener("htmx:beforeRequest", function (ev) {
+document.getElementById("emailButton").addEventListener("htmx:beforeRequest", event => {
     let emailInput = document.getElementById("emailInput");
 
     let alert: HTMLElement;
@@ -34,8 +34,8 @@ document.getElementById("emailButton").addEventListener("htmx:beforeRequest", fu
     if (emailInput.classList.contains("is-valid")) {
         alert = makePrimaryAlert("Email sent!");
     } else {
-        ev.preventDefault();
-        ev.stopImmediatePropagation();
+        event.preventDefault();
+        event.stopImmediatePropagation();
 
         alert = makeDangerAlert("Email must be valid!");
     }
@@ -43,7 +43,7 @@ document.getElementById("emailButton").addEventListener("htmx:beforeRequest", fu
     insertAlert(alert);
 });
 
-document.getElementById("phoneNumberButton").addEventListener("htmx:beforeRequest", function (ev) {
+document.getElementById("phoneNumberButton").addEventListener("htmx:beforeRequest", event => {
     let phoneNumberInput = document.getElementById("phoneNumberInput");
 
     let alert: HTMLElement;
@@ -51,8 +51,8 @@ document.getElementById("phoneNumberButton").addEventListener("htmx:beforeReques
     if (phoneNumberInput.classList.contains("is-valid")) {
         alert = makePrimaryAlert("SMS sent!");
     } else {
-        ev.preventDefault();
-        ev.stopImmediatePropagation();
+        event.preventDefault();
+        event.stopImmediatePropagation();
 
         alert = makeDangerAlert("Phone number must be valid!");
     }

@@ -135,7 +135,7 @@ public class HTMLUtil {
         var fragment = document.getElementById(type + "UploadFragment");
 
         var form = fragment.getElementsByTag("form").get(0);
-        form.attr("action", form.attr("action") + token);
+        form.attr("hx-post", form.attr("hx-post") + token);
 
         return fragment.outerHtml();
     }

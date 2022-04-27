@@ -63,7 +63,7 @@ public class StorageService {
             storageDAO.delete(appName, tempFileName);
         }
 
-        // upload temp file
+        // upload new temp file
         storageDAO.upload(appName, inputStream, tempFileName, fileType);
 
         // if file is in use, wait. else, execute update

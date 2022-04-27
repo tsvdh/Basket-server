@@ -6,14 +6,9 @@
 </head>
 <body>
 
-<div th:fragment="form-submit (text)"
-     class="container mt-3 p-0 d-flex justify-content-end">
-    <button th:text="${text}" class="btn btn-primary btn-lg w-auto" type="submit">Action</button>
-</div>
-
 <div th:fragment="file-info (type)" th:with="versionRequired = ${!#strings.equals(type, 'icon')}"
      class="d-flex" style="height: 70px;">
-    <div th:id="${type + 'InfoFragment'}" class="">
+    <div th:id="${type + 'InfoFragment'}">
         <form th:object="${formPendingUpload}"
 
               hx-post="/api/v1/storage/upload/init"
@@ -44,12 +39,20 @@
     <div th:id="${type + 'UploadFragment'}" th:classappend="${versionRequired ? 'align-self-end' : 'align-self-center'}">
         <div th:classappend="${versionRequired ? 'htmx-indicator' : ''}" class="spinner-border" role="status"></div>
     </div>
+
+    <div th:id="${type + 'UploadProgress'}" class="d-flex align-self-end align-items-center mb-2 d-none">
+        <div name="bar" class="progress me-3" style="width: 200px;">
+            <div class="progress-bar" role="progressbar" style="width: 0;"></div>
+        </div>
+        <div name="text"></div>
+    </div>
 </div>
 
-<div th:fragment="file-upload (type, fileType)" th:id="${type + 'UploadFragment'}"
-     class="">
-    <form method="post" action="/api/v1/storage/upload/"
-          enctype="multipart/form-data">
+<div th:fragment="file-upload (type, fileType)" th:id="${type + 'UploadFragment'}">
+    <form hx-post="/api/v1/storage/upload/" th:id="${type + 'UploadForm'}"
+          hx-encoding="multipart/form-data"
+          hx-swap="none"
+    >
         <label class="form-label">Upload</label>
         <div class="d-flex">
             <div class="input-group">
