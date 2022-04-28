@@ -59,7 +59,7 @@ public class LocalStorageDAO implements StorageDAO {
     }
 
     @Override
-    public void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IOException, IllegalActionException {
+    public void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IOException, IllegalActionException, InterruptedException {
         var optionalFolder = getFolder(appName);
         if (optionalFolder.isEmpty()) {
             throw new IllegalActionException("App does not exist");
@@ -72,11 +72,15 @@ public class LocalStorageDAO implements StorageDAO {
         }
 
         var file = new File();
-        file.loadContent(inputStream);
+        try {
+            file.loadContent(inputStream);
+        } catch (IOException e) {
+            throw new InterruptedException("File upload not completed");
+        } finally {
+            IOUtils.closeQuietly(inputStream);
+        }
 
         folder.put(fileName, file);
-
-        inputStream.close();
     }
 
     @Override

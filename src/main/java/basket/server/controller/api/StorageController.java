@@ -112,6 +112,8 @@ public class StorageController {
             storageService.upload(pendingUpload.getAppName(), inputStream, fileName, fileType);
         } catch (IllegalActionException e) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (InterruptedException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
         var optionalApp = appService.get(pendingUpload.getAppName());

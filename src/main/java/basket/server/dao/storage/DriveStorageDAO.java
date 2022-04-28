@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
 import lombok.Getter;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -159,7 +160,7 @@ public class DriveStorageDAO implements StorageDAO {
     }
 
     @Override
-    public void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IOException, IllegalActionException {
+    public void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IOException, IllegalActionException, InterruptedException {
         if (getFile(appName, fileName).isPresent()) {
             throw new IllegalActionException("File already exists");
         }
@@ -179,9 +180,20 @@ public class DriveStorageDAO implements StorageDAO {
 
         var content = new InputStreamContent(fileType, inputStream);
 
-        drive.files().create(newFile, content).execute();
+        var action = drive.files().create(newFile, content);
+        try {
+            action.execute();
+        }
+        catch (IOException e) {
+            try {
+                delete(appName, fileName);
+            } catch (IOException ignored) {}
 
-        inputStream.close();
+            throw new InterruptedException("File upload not completed");
+        }
+        finally {
+            IOUtils.closeQuietly(inputStream);
+        }
     }
 
     @Override

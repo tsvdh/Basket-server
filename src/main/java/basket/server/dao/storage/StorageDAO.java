@@ -10,7 +10,7 @@ public interface StorageDAO {
 
     void create(String appName) throws IOException, IllegalActionException;
 
-    void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IOException, IllegalActionException;
+    void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IOException, IllegalActionException, InterruptedException;
 
     void rename(String appName, String oldName, String newName) throws IOException, IllegalActionException;
 

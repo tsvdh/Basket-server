@@ -44,7 +44,7 @@ public class StorageService {
         storageDAO.create(appName);
     }
 
-    public void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IllegalActionException, IOException {
+    public void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IllegalActionException, IOException, InterruptedException {
         log.info("Uploading '{}' for app '{}'", fileName, appName);
 
         String fullName = toFullName(appName, fileName);
