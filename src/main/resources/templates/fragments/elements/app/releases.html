@@ -40,11 +40,12 @@
         <div th:classappend="${versionRequired ? 'htmx-indicator' : ''}" class="spinner-border" role="status"></div>
     </div>
 
-    <div th:id="${type + 'UploadProgress'}" class="d-flex align-self-end align-items-center mb-2 d-none">
+    <div th:id="${type + 'UploadProgress'}" class="d-flex align-self-end align-items-center d-none">
         <div name="bar" class="progress me-3" style="width: 200px;">
             <div class="progress-bar" role="progressbar" style="width: 0;"></div>
         </div>
-        <div name="text"></div>
+        <div name="text" class="me-3"></div>
+        <button th:id="${type + 'CancelButton'}" class="btn btn-outline-secondary">Cancel</button>
     </div>
 </div>
 
@@ -58,10 +59,7 @@
             <div class="input-group">
                 <input type="file" th:accept="${fileType}" name="file" th:id="${type + 'FileInput'}" class="form-control" required
                        hx-preserve="true">
-                <button type="submit" class="btn btn-outline-primary">
-                    Upload
-                    <span class="spinner-border spinner-border-sm htmx-indicator" role="status"></span>
-                </button>
+                <button type="submit" class="btn btn-outline-primary">Upload</button>
             </div>
         </div>
     </form>
