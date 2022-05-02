@@ -164,6 +164,7 @@ public class WebController {
 
         modelAndView.addObject("app", getApp(appName));
         modelAndView.addObject("formPendingUpload", new FormPendingUpload());
+        modelAndView.addObject("storageService", storageService);
 
         return modelAndView;
     }

@@ -1,4 +1,4 @@
-import {toMB} from "../util/utils.js";
+import {toKB, toMB} from "../util/utils.js";
 
 export {}
 
@@ -23,10 +23,15 @@ window.addEventListener("load", function () {
 
 // Progress listeners
 
-const types = ["icon", "stable", "experimental"];
+const uploadTypes: string[] = ["icon", "stable", "experimental"];
+
+const loadingMap = new Map<string, boolean>();
+uploadTypes.forEach(type => {
+    loadingMap.set(type, false);
+});
 
 document.addEventListener("htmx:afterSwap", function () {
-    types.forEach((type: string) => {
+    uploadTypes.forEach((type: string) => {
         let form = document.getElementById(type + "UploadForm");
         let progress = document.getElementById(type + "UploadProgress");
         let cancelButton = document.getElementById(type + "CancelButton");
@@ -34,33 +39,58 @@ document.addEventListener("htmx:afterSwap", function () {
         if (form == null) {
             return;
         }
-        types.splice(types.indexOf(type), 1);
+        uploadTypes.splice(uploadTypes.indexOf(type), 1);
 
-        form.addEventListener("htmx:xhr:loadstart", function (event: CustomEvent) {
+        form.addEventListener("htmx:xhr:loadstart", function () {
+            if (loadingMap.get(type)) {
+                return;
+            } else {
+                loadingMap.set(type, true);
+            }
+
             form.classList.add("d-none");
 
             let bar = progress.children.namedItem("bar");
             (<HTMLElement>bar.firstElementChild).style.width = "0";
 
-            progress.children.namedItem("text").textContent = "0 / 0 MB";
-
             progress.classList.remove("d-none");
         });
 
         form.addEventListener("htmx:xhr:loadend", function () {
-            progress.classList.add("d-none");
-            form.classList.remove("d-none");
+            if (!loadingMap.get(type)) {
+                return;
+            } else {
+                loadingMap.set(type, false);
+            }
+
+            setTimeout(function () {
+                progress.classList.add("d-none");
+                form.classList.remove("d-none");
+
+                (<HTMLButtonElement>document.getElementById("storageStatusRefreshButton")).click();
+            }, 1000);
         });
 
         form.addEventListener("htmx:xhr:progress", (event: CustomEvent) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            let progressPercent = `${(event.detail.loaded / event.detail.total) * 100}%`;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            const loaded: number = event.detail.loaded;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            const total: number = event.detail.total;
+
+            let progressPercent = `${(loaded / total) * 100}%`;
 
             let bar = progress.children.namedItem("bar");
             (<HTMLElement>bar.firstElementChild).style.width = progressPercent;
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
-            progress.children.namedItem("text").textContent = `${toMB(event.detail.loaded)} / ${toMB(event.detail.total)} MB`;
+            let progressText: string;
+
+            if (total < 1000000) {
+                progressText = `${toKB(loaded)} / ${toKB(total)} KB`;
+            }  else {
+                progressText = `${toMB(loaded)} / ${toMB(total)} MB`;
+            }
+
+            progress.children.namedItem("text").textContent = progressText;
         });
 
         cancelButton.onclick = function () {
@@ -70,4 +100,14 @@ document.addEventListener("htmx:afterSwap", function () {
             htmx.trigger(form, "htmx:abort", null);
         };
     });
+
+    let releaseButton = document.getElementById("releaseButton");
+
+    if (releaseButton != null) {
+        releaseButton.onclick = function () {
+            setTimeout(function () {
+                (<HTMLButtonElement>document.getElementById("storageStatusRefreshButton")).click();
+            }, 1000);
+        };
+    }
 });

@@ -78,8 +78,14 @@ public class StorageService {
     public boolean isReleasable(String appName) throws IOException {
         log.info("Checking if '{}' is complete", appName);
 
-        return storageDAO.exists(appName, FileName.STABLE)
-                && storageDAO.exists(appName, FileName.ICON);
+        return storageDAO.exists(appName, FileName.ICON)
+                && storageDAO.exists(appName, FileName.STABLE);
+    }
+
+    public boolean exists(String appName, String fileName) throws IOException {
+        log.info("Checking if '{}' of '{}' exists", fileName, appName);
+
+        return storageDAO.exists(appName, fileName);
     }
 
     public Optional<InputStream> download(String appName, String fileName) throws IllegalActionException, IOException {

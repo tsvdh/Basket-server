@@ -1,9 +1,11 @@
 package basket.server.util;
 
-import basket.server.model.user.User;
+import basket.server.model.app.App;
 import basket.server.model.input.FormApp;
 import basket.server.model.input.FormPendingUpload;
 import basket.server.model.input.FormUser;
+import basket.server.model.user.User;
+import basket.server.service.StorageService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +34,10 @@ public class IntelliSenseHelper {
 
     @GetMapping("4")
     private String method4(Model model) {
+        model.addAttribute("app", new App());
         model.addAttribute("formPendingUpload", new FormPendingUpload());
+        model.addAttribute("storageService", new StorageService(null));
+
         return "fragments/elements/app/releases";
     }
 }

@@ -6,7 +6,6 @@ import basket.server.service.AppService;
 import basket.server.service.PendingUploadService;
 import basket.server.service.StorageService;
 import basket.server.service.ValidationService;
-import basket.server.util.HTMLUtil;
 import basket.server.util.IllegalActionException;
 import basket.server.util.types.storage.FileName;
 import basket.server.util.types.storage.FileType;
@@ -14,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -27,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -35,10 +34,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.HttpClientErrorException;
 
-import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -51,12 +48,10 @@ public class StorageController {
     private final StorageService storageService;
     private final PendingUploadService pendingUploadService;
     private final ValidationService validationService;
-    private final HTMLUtil htmlUtil;
     private final AppService appService;
 
     @PostMapping("upload/{token}")
-    public ResponseEntity<Void> upload(HttpServletRequest request, HttpServletResponse response,
-                                        @PathVariable String token) throws IOException, FileUploadException {
+    public ResponseEntity<Void> upload(HttpServletRequest request, @PathVariable String token) throws IOException, FileUploadException {
 
         var optionalPendingUpload = pendingUploadService.getByToken(token);
         if (optionalPendingUpload.isEmpty()) {
@@ -133,17 +128,16 @@ public class StorageController {
         return ok().build();
     }
 
-    @ResponseBody
-    @PostMapping(path = "upload/init", produces = TEXT_HTML_VALUE)
+    @PostMapping(path = "upload/init")
     @PreAuthorize("hasRole('DEVELOPER/' + #formPendingUpload.getAppName())")
-    public String initUpload(HttpServletRequest request, HttpServletResponse response,
-                             @ModelAttribute FormPendingUpload formPendingUpload) {
+    public String initUpload(@ModelAttribute FormPendingUpload formPendingUpload) {
 
         var pendingUpload = validationService.validateFormPendingUpload(formPendingUpload);
 
         pendingUploadService.add(pendingUpload);
 
-        return htmlUtil.getFileUploadFragment(request, response, pendingUpload.getType(), pendingUpload.getToken());
+        return "fragments/elements/app/releases :: file-upload (type = '%s', token = '%s')"
+                .formatted(pendingUpload.getType(), pendingUpload.getToken());
     }
 
     @GetMapping("download")
@@ -178,5 +172,19 @@ public class StorageController {
     public ResponseEntity<Void> endDownload(@RequestParam String appName, @RequestParam String fileName) throws IOException {
         storageService.endDownload(appName, fileName);
         return ok().build();
+    }
+
+    @GetMapping(path = "html/status")
+    @PreAuthorize("hasRole('DEVELOPER/' + #appName)")
+    public String getStorageStatus(@RequestParam String appName, Model model) {
+        var optionalApp = appService.get(appName);
+        if (optionalApp.isEmpty()) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "App does not exist");
+        }
+
+        model.addAttribute("app", optionalApp.get());
+        model.addAttribute("storageService", storageService);
+
+        return "fragments/elements/app/releases :: storage-status";
     }
 }

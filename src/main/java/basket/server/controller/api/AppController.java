@@ -117,8 +117,7 @@ public class AppController {
 
     @PatchMapping("release")
     @PreAuthorize("hasRole('DEVELOPER/' + #appName)")
-    public ResponseEntity<Void> release(@RequestParam String appName,
-                                        HttpServletResponse response) throws IOException {
+    public ResponseEntity<Void> release(@RequestParam String appName) throws IOException {
         var optionalApp = appService.get(appName);
         if (optionalApp.isEmpty()) {
             return badRequest().build();
@@ -136,8 +135,6 @@ public class AppController {
         } catch (IllegalActionException e) {
             // ignore as update will always be legal
         }
-
-        response.sendRedirect("apps/%s/releases".formatted(appName));
 
         return ok().build();
     }

@@ -49,27 +49,77 @@
     </div>
 </div>
 
-<div th:fragment="file-upload (type, fileType)" th:id="${type + 'UploadFragment'}">
-    <form hx-post="/api/v1/storage/upload/" th:id="${type + 'UploadForm'}"
+<div th:fragment="file-upload (type, token)" th:id="${type + 'UploadFragment'}">
+    <form th:hx-post="${'/api/v1/storage/upload/' + token}" th:id="${type + 'UploadForm'}"
           hx-encoding="multipart/form-data"
           hx-swap="none"
     >
         <label class="form-label">Upload</label>
         <div class="d-flex">
             <div class="input-group">
-                <input type="file" th:accept="${fileType}" name="file" th:id="${type + 'FileInput'}" class="form-control" required
-                       hx-preserve="true">
+                <input type="file" name="file" th:id="${type + 'FileInput'}" class="form-control" required
+                       th:accept="${#strings.equals(type, 'icon') ? 'image/png' : 'application/zip'}">
                 <button type="submit" class="btn btn-outline-primary">Upload</button>
             </div>
         </div>
     </form>
 </div>
 
-<div th:replace="fragments/elements/app/releases :: file-upload ('icon', 'image/png')"></div>
+<!--suppress HtmlUnknownTag -->
+<td th:fragment="status-icon (exists)"
+    th:classappend="${exists ? 'bi-check-lg' : 'bi-x-lg'}"
+    th:style="${'font-size: 1.3rem; color: ' + (exists ? 'green' : 'red') + ';'}"></td>
 
-<div th:replace="fragments/elements/app/releases :: file-upload ('stable', 'application/zip')"></div>
+<div th:fragment="storage-status" id="storageStatusFragment"
+     th:with="iconExists = ${storageService.exists(app.getName(), T(basket.server.util.types.storage.FileName).ICON)},
+              stableExists = ${storageService.exists(app.getName(), T(basket.server.util.types.storage.FileName).STABLE)},
+              experimentalExists = ${storageService.exists(app.getName(), T(basket.server.util.types.storage.FileName).EXPERIMENTAL)}">
 
-<div th:replace="fragments/elements/app/releases :: file-upload ('experimental', 'application/zip')"></div>
+    <button type="button" class="visually-hidden" id="storageStatusRefreshButton"
+
+            hx-get="/api/v1/storage/html/status"
+            hx-target="#storageStatusFragment"
+            hx-swap="outerHTML"
+            th:hx-vals="${'{&quot;appName&quot; : &quot;' + app.getName() + '&quot;}'}"
+    ></button>
+
+    <table class="table align-middle">
+        <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Status</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr class="table-light">
+            <td>Icon</td>
+            <td th:replace=":: status-icon (${iconExists})"></td>
+        </tr>
+
+        <tr class="table-light">
+            <td>Stable</td>
+            <td th:replace=":: status-icon (${stableExists})"></td>
+        </tr>
+
+        <tr>
+            <td>Experimental</td>
+            <td th:replace=":: status-icon (${experimentalExists})"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="ms-2" th:with="readyToRelease = ${storageService.isReleasable(app.getName())}">
+        <div th:if="${!readyToRelease}" class="text-muted">Complete the highlighted rows to release the app.</div>
+        <button th:if="${readyToRelease && !app.isAvailable()}" type="button" id="releaseButton" class="btn btn-primary"
+
+                hx-patch="/api/v1/app/release"
+                hx-swap="none"
+                th:hx-vals="${'{&quot;appName&quot; : &quot;' + app.getName() + '&quot;}'}"
+        >Release</button>
+        <div th:if="${app.isAvailable()}" class="text-muted">App released</div>
+    </div>
+</div>
 
 </body>
 </html>
