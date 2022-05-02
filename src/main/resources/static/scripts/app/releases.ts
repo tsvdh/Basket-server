@@ -66,9 +66,9 @@ document.addEventListener("htmx:afterSwap", function () {
             setTimeout(function () {
                 progress.classList.add("d-none");
                 form.classList.remove("d-none");
-
-                (<HTMLButtonElement>document.getElementById("storageStatusRefreshButton")).click();
             }, 1000);
+
+            (<HTMLButtonElement>document.getElementById("storageStatusRefreshButton")).click();
         });
 
         form.addEventListener("htmx:xhr:progress", (event: CustomEvent) => {
@@ -105,9 +105,10 @@ document.addEventListener("htmx:afterSwap", function () {
 
     if (releaseButton != null) {
         releaseButton.onclick = function () {
+            // Schedule click so sync order is correct
             setTimeout(function () {
                 (<HTMLButtonElement>document.getElementById("storageStatusRefreshButton")).click();
-            }, 1000);
+            });
         };
     }
 });

@@ -53,6 +53,7 @@
     <form th:hx-post="${'/api/v1/storage/upload/' + token}" th:id="${type + 'UploadForm'}"
           hx-encoding="multipart/form-data"
           hx-swap="none"
+          hx-sync="#storageStatusRefreshButton:queue"
     >
         <label class="form-label">Upload</label>
         <div class="d-flex">
@@ -116,6 +117,7 @@
                 hx-patch="/api/v1/app/release"
                 hx-swap="none"
                 th:hx-vals="${'{&quot;appName&quot; : &quot;' + app.getName() + '&quot;}'}"
+                hx-sync="#storageStatusRefreshButton:queue"
         >Release</button>
         <div th:if="${app.isAvailable()}" class="text-muted">App released</div>
     </div>
