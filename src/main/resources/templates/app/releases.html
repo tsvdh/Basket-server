@@ -31,27 +31,33 @@
 
 <div th:replace="fragments/page-components :: header"></div>
 
-<main class="p-4 m-auto" style="width: 1000px;">
+<main class="p-4 m-auto" style="width: 1200px;">
 
     <div class="display-3 mb-5" id="appNameValue" th:text="${app.getName()}">App name</div>
 
-    <div class="mb-4">
-        <h4>Icon</h4>
-        <div th:replace="fragments/elements/app/releases :: file-info ('icon')"></div>
-    </div>
+    <div class="d-flex">
+        <div class="col-8">
+            <div class="mb-4">
+                <h4>Icon</h4>
+                <div th:replace="fragments/elements/app/releases :: file-info ('icon')"></div>
+            </div>
 
-    <div class="mb-4">
-        <h4>Stable</h4>
-        <div th:replace="fragments/elements/app/releases :: file-info ('stable')"></div>
-    </div>
+            <div class="mb-4">
+                <h4>Stable</h4>
+                <div th:replace="fragments/elements/app/releases :: file-info ('stable')"></div>
+            </div>
 
-    <div class="mb-5">
-        <h4>Experimental</h4>
-        <div th:replace="fragments/elements/app/releases :: file-info ('experimental')"></div>
-    </div>
+            <div>
+                <h4>Experimental</h4>
+                <div th:replace="fragments/elements/app/releases :: file-info ('experimental')"></div>
+            </div>
+        </div>
 
-    <div class="col-5">
-        <div th:replace="fragments/elements/app/releases :: storage-status"></div>
+        <div class="col-1"></div>
+
+        <div class="col-3">
+            <div th:replace="fragments/elements/app/releases :: storage-status"></div>
+        </div>
     </div>
 
 </main>
