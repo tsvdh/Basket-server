@@ -247,6 +247,7 @@ public class WebController {
 
         modelAndView.addObject("pageUser", pageUser);
         modelAndView.addObject("formUser", new SecureFormUser());
+        modelAndView.addObject("countryCodeList", HTMLUtil.getCountryList());
         modelAndView.addObject("emailCode", emailCode);
         modelAndView.addObject("phoneCode", phoneCode);
         modelAndView.addObject("phoneNumberUtil", PhoneNumberUtil.getInstance());
