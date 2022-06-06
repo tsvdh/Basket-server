@@ -22,12 +22,17 @@
 
     <div th:fragment="password" id="passwordFragment">
         <label for="passwordInput" class="form-label">Password</label>
-        <input type="password" class="form-control" id="passwordInput" th:field="*{password}" required
+        <div class="input-group">
+            <input type="password" class="form-control" id="passwordInput" th:field="*{password}" required
 
-               hx-get="/api/v1/user/html/valid/password"
-               hx-trigger="input delay:500ms"
-               hx-target="#passwordFragment" hx-swap="outerHTML"
-        >
+                   hx-get="/api/v1/user/html/valid/password"
+                   hx-trigger="input delay:500ms"
+                   hx-target="#passwordFragment" hx-swap="outerHTML"
+            >
+            <button id="passwordToggle" class="input-group-text" type="button" data-toggle-text hx-preserve="true">
+                <i class="bi-eye-fill"></i>
+            </button>
+        </div>
     </div>
 
     <div th:fragment="email" id="emailFragment">

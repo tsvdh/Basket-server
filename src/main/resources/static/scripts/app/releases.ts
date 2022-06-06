@@ -1,4 +1,4 @@
-import {autoFillInputs, toKB, toMB} from "../util/utils.js";
+import {toKB, toMB} from "../util/utils.js";
 
 export {}
 
@@ -10,8 +10,6 @@ window.addEventListener("load", function () {
     document.getElementsByName("appName").forEach(element => {
         (<HTMLInputElement>element).value = appName;
     });
-
-    autoFillInputs();
 
     document.getElementsByName("toFire").forEach(element => {
         (<HTMLButtonElement>element).click();
