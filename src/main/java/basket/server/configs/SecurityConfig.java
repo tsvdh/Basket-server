@@ -2,7 +2,9 @@ package basket.server.configs;
 
 import basket.server.handlers.AuthHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,17 +39,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutSuccessUrl("/");
+    }
 
-        // http
-        //         .antMatcher("/api/**")
-        //         .authorizeRequests().anyRequest().hasRole("USER")
-        //         .and()
-        //         .httpBasic();
-
-        // http
-        //         .authorizeRequests()
-        //         .antMatchers("/").permitAll()
-        //         // .antMatchers("/developers/**").hasRole("DEVELOPER")
-        //         // .antMatchers("/apps/**").hasRole("USER")
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 }

@@ -22,7 +22,7 @@ public interface UserDAO {
 
         boolean uniqueEmail = getByEmail(user.getEmail()).isEmpty();
 
-        boolean uniquePhoneNumber = user.getDeveloperInfo() == null
+        boolean uniquePhoneNumber = !user.isDeveloper()
                 || getByPhoneNumber(user.getDeveloperInfo().getPhoneNumber()).isEmpty();
 
         return uniqueId && uniqueUsername && uniqueEmail && uniquePhoneNumber;
@@ -31,13 +31,31 @@ public interface UserDAO {
     void add(User newUser) throws IllegalActionException;
 
     default boolean validUpdate(User updatedUser) {
-        String id = updatedUser.getId();
-        updatedUser.setId(null);
+        var optionalUser = getById(updatedUser.getId());
+        if (optionalUser.isEmpty()) {
+            return false;
+        }
 
-        boolean validUpdate = getById(id).isPresent() && isUnique(updatedUser);
-        updatedUser.setId(id);
+        var oldUser = optionalUser.get();
+        Optional<User> tempUser;
 
-        return validUpdate;
+        // check if new value is unused or same as old one
+
+        tempUser = getByUsername(updatedUser.getUsername());
+        boolean validUsername = tempUser.isEmpty() || tempUser.get().equals(oldUser);
+
+        tempUser = getByEmail(updatedUser.getEmail());
+        boolean validEmail = tempUser.isEmpty() || tempUser.get().equals(oldUser);
+
+        boolean validPhoneNumber;
+        if (!updatedUser.isDeveloper()) {
+            validPhoneNumber = true;
+        } else {
+            tempUser = getByPhoneNumber(updatedUser.getDeveloperInfo().getPhoneNumber());
+            validPhoneNumber = tempUser.isEmpty() || tempUser.get().equals(oldUser);
+        }
+
+        return validUsername && validEmail && validPhoneNumber;
     }
 
     void update(User updatedUser) throws IllegalActionException;

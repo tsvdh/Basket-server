@@ -1,5 +1,6 @@
 package basket.server.model.input;
 
+import basket.server.util.types.UserType;
 import basket.server.validation.annotations.Password;
 import basket.server.validation.annotations.Username;
 import javax.validation.constraints.Email;
@@ -10,13 +11,8 @@ import lombok.Data;
 @Data
 public class FormUser {
 
-    public enum Type {
-        USER,
-        DEVELOPER
-    }
-
     @NotNull
-    private Type userType;
+    private UserType userType;
 
 
     @NotNull @Email

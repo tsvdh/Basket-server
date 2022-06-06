@@ -1,15 +1,19 @@
 package basket.server.controller;
 
+import basket.server.model.VerificationCode;
 import basket.server.model.app.App;
-import basket.server.model.user.User;
 import basket.server.model.input.FormApp;
 import basket.server.model.input.FormPendingUpload;
 import basket.server.model.input.FormUser;
+import basket.server.model.input.SecureFormUser;
+import basket.server.model.user.User;
 import basket.server.service.AppService;
 import basket.server.service.StorageService;
 import basket.server.service.UserService;
+import basket.server.service.VerificationCodeService;
 import basket.server.util.HTMLUtil;
 import basket.server.util.IllegalActionException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.ModelAndView;
 
+import static basket.server.service.PhoneService.phoneToString;
 import static org.springframework.http.ResponseEntity.ok;
 
 @Controller
@@ -45,6 +51,7 @@ public class WebController {
     private final UserService userService;
     private final AppService appService;
     private final StorageService storageService;
+    private final VerificationCodeService verificationCodeService;
 
     @GetMapping("login")
     public String getLogin() {
@@ -81,7 +88,7 @@ public class WebController {
 
     @PostMapping("create")
     @PreAuthorize("hasRole('DEVELOPER')")
-    public ResponseEntity<Void> addApp(@ModelAttribute FormApp formApp,
+    public ResponseEntity<Void> addApp(@ModelAttribute FormApp formApp, Authentication auth,
                                        HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             appService.add(formApp, request.getRemoteUser());
@@ -89,23 +96,21 @@ public class WebController {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
 
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-
         List<GrantedAuthority> authorities = new ArrayList<>(auth.getAuthorities());
         authorities.add(new SimpleGrantedAuthority("ROLE_DEVELOPER/" + formApp.getAppName()));
         authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN/" + formApp.getAppName()));
 
-        var newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
 
         SecurityContextHolder.getContext().setAuthentication(newAuth);
 
         try {
             storageService.create(formApp.getAppName());
         } catch (IllegalActionException e) {
-            // ignore as app name cannot be taken at this point and no exception should be thrown
+            // ignore as pageApp name cannot be taken at this point and no exception should be thrown
         }
 
-        response.sendRedirect("apps/%s/releases".formatted(formApp.getAppName()));
+        response.sendRedirect("/apps/%s/releases".formatted(formApp.getAppName()));
 
         return ok().build();
     }
@@ -137,12 +142,11 @@ public class WebController {
         }
     }
 
-
     @GetMapping("apps/{appName}/overview")
     public ModelAndView getAppOverviewPage(@PathVariable String appName) {
         var modelAndView = new ModelAndView("app/overview");
 
-        modelAndView.addObject("app", getApp(appName));
+        modelAndView.addObject("pageApp", getApp(appName));
 
         return modelAndView;
     }
@@ -152,7 +156,7 @@ public class WebController {
     public ModelAndView getAppManagePage(@PathVariable String appName) {
         var modelAndView = new ModelAndView("app/manage");
 
-        modelAndView.addObject("app", getApp(appName));
+        modelAndView.addObject("pageApp", getApp(appName));
 
         return modelAndView;
     }
@@ -162,7 +166,7 @@ public class WebController {
     public ModelAndView getAppReleasesPage(@PathVariable String appName) {
         var modelAndView = new ModelAndView("app/releases");
 
-        modelAndView.addObject("app", getApp(appName));
+        modelAndView.addObject("pageApp", getApp(appName));
         modelAndView.addObject("formPendingUpload", new FormPendingUpload());
         modelAndView.addObject("storageService", storageService);
 
@@ -173,6 +177,7 @@ public class WebController {
     @GetMapping("users/{pageUsername}")
     public ResponseEntity<Void> getUserPage(@PathVariable String pageUsername,
                                             HttpServletRequest request, HttpServletResponse response) throws IOException {
+
         response.sendRedirect(request.getRequestURI() + "/home");
 
         return ok().build();
@@ -226,9 +231,25 @@ public class WebController {
     @PreAuthorize("authentication.name.equals(#pageUsername)")
     @GetMapping("users/{pageUsername}/settings")
     public ModelAndView getUserSettingsPage(@PathVariable String pageUsername) {
+        var pageUser = getUser(pageUsername);
+
+        VerificationCode emailCode = verificationCodeService.submit(pageUser.getEmail());
+
+        VerificationCode phoneCode;
+        if (pageUser.isDeveloper()) {
+            String formattedNumber = phoneToString(pageUser.getDeveloperInfo().getPhoneNumber());
+            phoneCode = verificationCodeService.submit(formattedNumber);
+        } else {
+            phoneCode = null;
+        }
+
         var modelAndView = new ModelAndView("user/settings");
 
-        modelAndView.addObject("pageUser", getUser(pageUsername));
+        modelAndView.addObject("pageUser", pageUser);
+        modelAndView.addObject("formUser", new SecureFormUser());
+        modelAndView.addObject("emailCode", emailCode);
+        modelAndView.addObject("phoneCode", phoneCode);
+        modelAndView.addObject("phoneNumberUtil", PhoneNumberUtil.getInstance());
 
         return modelAndView;
     }

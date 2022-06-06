@@ -132,7 +132,7 @@ public class StorageController {
     @PreAuthorize("hasRole('DEVELOPER/' + #formPendingUpload.getAppName())")
     public String initUpload(@ModelAttribute FormPendingUpload formPendingUpload) {
 
-        var pendingUpload = validationService.validateFormPendingUpload(formPendingUpload);
+        var pendingUpload = validationService.validate(formPendingUpload);
 
         pendingUploadService.add(pendingUpload);
 
@@ -182,7 +182,7 @@ public class StorageController {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "App does not exist");
         }
 
-        model.addAttribute("app", optionalApp.get());
+        model.addAttribute("pageApp", optionalApp.get());
         model.addAttribute("storageService", storageService);
 
         return "fragments/elements/app/releases :: storage-status";

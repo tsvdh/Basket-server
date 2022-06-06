@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="icon" th:href="@{/images/icon.ico}">
     <meta name="author" content="Tobias van den Hurk">
-    <title th:text="${app.getName()}"></title>
+    <title th:text="${'Releases · ' + pageApp.getName()}"></title>
 
     <script type="importmap">
 	{
@@ -33,7 +33,7 @@
 
 <main class="p-4 m-auto" style="width: 1200px;">
 
-    <div class="display-3 mb-5" id="appNameValue" th:text="${app.getName()}">App name</div>
+    <div class="display-3 mb-5" id="appNameValue" th:text="${pageApp.getName()}">App name</div>
 
     <div class="d-flex">
         <div class="col-8">

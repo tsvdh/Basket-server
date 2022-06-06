@@ -40,12 +40,12 @@ public class StorageService {
     }
 
     public void create(String appName) throws IllegalActionException, IOException {
-        log.info("Creating storage for app '{}'", appName);
+        log.info("Creating storage for pageApp '{}'", appName);
         storageDAO.create(appName);
     }
 
     public void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IllegalActionException, IOException, InterruptedException {
-        log.info("Uploading '{}' for app '{}'", fileName, appName);
+        log.info("Uploading '{}' for pageApp '{}'", fileName, appName);
 
         String fullName = toFullName(appName, fileName);
         String tempFileName = toTempFileName(fileName);
@@ -89,7 +89,7 @@ public class StorageService {
     }
 
     public Optional<InputStream> download(String appName, String fileName) throws IllegalActionException, IOException {
-        log.info("Downloading '{}' of app '{}'", fileName, appName);
+        log.info("Downloading '{}' of pageApp '{}'", fileName, appName);
 
         InputStream inputStream = storageDAO.download(appName, fileName);
 
@@ -105,7 +105,7 @@ public class StorageService {
     }
 
     public void endDownload(String appName, String fileName) throws IOException {
-        log.info("Handling end of '{}' download of app '{}'", fileName, appName);
+        log.info("Handling end of '{}' download of pageApp '{}'", fileName, appName);
 
         String fullName = toFullName(appName, fileName);
 

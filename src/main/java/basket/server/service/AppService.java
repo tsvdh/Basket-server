@@ -28,8 +28,8 @@ public class AppService {
     }
 
     public Optional<App> get(String name) {
-        log.info("Getting app '{}'", name);
-        return appDAO.get(name);
+        log.info("Getting pageApp '{}'", name);
+        return appDAO.getByName(name);
     }
 
     public Collection<App> getAll() {
@@ -51,28 +51,39 @@ public class AppService {
     }
 
     public void add(FormApp formApp, String creatorName) throws IllegalActionException {
-        log.info("Validating new app");
+        log.info("Validating new pageApp");
 
         var optionalCreator = userService.getByUsername(creatorName);
-        App newApp = validationService.validateFormApp(formApp, optionalCreator);
+        if (optionalCreator.isEmpty()) {
+            throw new IllegalActionException("Creator does not exist");
+        }
+
+        App newApp = validationService.validate(formApp, optionalCreator.get());
         add(newApp);
     }
 
     public void add(App app) throws IllegalActionException {
-        log.info("Adding new app '{}'", app.getName());
+        log.info("Adding new pageApp '{}'", app.getName());
         appDAO.add(app);
     }
 
-    public void update(FormApp formApp, String creatorName) throws IllegalActionException {
-        log.info("Validating updated app");
+    public void update(FormApp formApp, App oldApp, String creatorName) throws IllegalActionException {
+        log.info("Validating updated pageApp");
 
         var optionalCreator = userService.getByUsername(creatorName);
-        App updatedApp = validationService.validateFormApp(formApp, optionalCreator);
+        if (optionalCreator.isEmpty()) {
+            throw new IllegalActionException("Creator does not exist");
+        }
+
+        App updatedApp = validationService.validate(formApp, optionalCreator.get());
+
+        updatedApp.setId(oldApp.getId());
+
         update(updatedApp);
     }
 
     public void update(App updatedApp) throws IllegalActionException {
-        log.info("Updating app '{}'", updatedApp.getName());
+        log.info("Updating pageApp '{}'", updatedApp.getName());
         appDAO.update(updatedApp);
     }
 }

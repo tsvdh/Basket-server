@@ -1,5 +1,7 @@
 package basket.server.controller.api;
 
+import basket.server.model.input.FormDeveloperInfo;
+import basket.server.model.input.SecureFormUser;
 import basket.server.service.EmailService;
 import basket.server.service.PhoneService;
 import basket.server.service.StorageService;
@@ -8,10 +10,15 @@ import basket.server.service.ValidationService;
 import basket.server.service.VerificationCodeService;
 import basket.server.util.HTMLUtil;
 import basket.server.util.HTMLUtil.InputType;
+import basket.server.util.IllegalActionException;
+import basket.server.util.types.UserType;
 import basket.server.validation.annotations.Email;
 import basket.server.validation.validators.EmailValidator;
 import basket.server.validation.validators.PasswordValidator;
 import basket.server.validation.validators.UsernameValidator;
+import java.io.IOException;
+import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -20,18 +27,30 @@ import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.HttpClientErrorException;
 
 import static basket.server.service.PhoneService.phoneToString;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.ResponseEntity.badRequest;
+import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
 @Controller
@@ -48,6 +67,7 @@ public class UserController {
     private final PhoneService phoneService;
     private final StorageService storageService;
     private final ValidationService validationService;
+    private final AuthenticationManager authManager;
 
     @ResponseBody
     @GetMapping(path = "html/valid/username", produces = TEXT_HTML_VALUE)
@@ -125,7 +145,7 @@ public class UserController {
             faults = null;
         } else {
             try {
-                validationService.validateFormPhoneNumber(regionCode, number);
+                validationService.validate(regionCode, number);
                 faults = Collections.emptyList();
             }
             catch (ValidationException e) {
@@ -172,7 +192,7 @@ public class UserController {
                                            @RequestParam(name = "formDeveloperInfo.formPhoneNumber.number") String number,
                                            @RequestParam(name = "formDeveloperInfo.phoneCode") String phoneCode,
                                            HttpServletRequest request, HttpServletResponse response) {
-        var phoneNumber = validationService.validateFormPhoneNumber(regionCode, number);
+        var phoneNumber = validationService.validate(regionCode, number);
         String formattedNumber = phoneToString(phoneNumber);
 
         List<String> faults;
@@ -205,7 +225,8 @@ public class UserController {
 
         var newCode = verificationCodeService.submit(email);
 
-        emailService.sendVerificationEmail(newCode);
+        // emailService.sendVerificationEmail(newCode);
+        log.info("Code {} for {}", newCode.getCode(), newCode.getAddress());
 
         return ok().build();
     }
@@ -213,7 +234,7 @@ public class UserController {
     @PostMapping("submit/phone")
     public ResponseEntity<Void> submitPhone(@RequestParam(name = "formDeveloperInfo.formPhoneNumber.regionCode") String regionCode,
                                             @RequestParam(name = "formDeveloperInfo.formPhoneNumber.number") String number) {
-        var phoneNumber = validationService.validateFormPhoneNumber(regionCode, number);
+        var phoneNumber = validationService.validate(regionCode, number);
 
         boolean available = userService.getByPhoneNumber(phoneNumber).isEmpty();
 
@@ -226,6 +247,68 @@ public class UserController {
 
         // phoneService.sendVerificationSMS(newCode);
         log.info("Code {} for {}", newCode.getCode(), newCode.getAddress());
+
+        return ok().build();
+    }
+
+    @PostMapping("info/change")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> changeInfo(@ModelAttribute SecureFormUser formUser, Principal principal,
+                                           HttpServletResponse response) throws IOException {
+
+        var optionalUser = userService.getByUsername(principal.getName());
+        if (optionalUser.isEmpty()) {
+            // should not be possible as user is authenticated
+            return internalServerError().build();
+        }
+
+        var user = optionalUser.get();
+
+        UserType userType;
+
+        if (user.isDeveloper()) {
+            userType = UserType.DEVELOPER;
+        } else {
+            userType = UserType.USER;
+        }
+
+        if (!userType.equals(formUser.getUserType())) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "New type of user is not equal to existing type");
+        }
+
+        try {
+            Authentication oldAuth = new UsernamePasswordAuthenticationToken(principal.getName(), formUser.getCurrentPassword());
+            authManager.authenticate(oldAuth);
+
+            userService.update(formUser, user);
+        }
+        catch (BadCredentialsException | IllegalActionException e) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(formUser.getUsername(), formUser.getPassword());
+
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
+
+        response.sendRedirect("/users/%s/settings".formatted(formUser.getUsername()));
+
+        return ok().build();
+    }
+
+    @PostMapping("info/new/developer")
+    public ResponseEntity<Void> newDeveloper(@ModelAttribute FormDeveloperInfo formDeveloperInfo, Authentication auth,
+                                             HttpServletResponse response) throws IOException {
+
+
+
+        List<GrantedAuthority> authorities = new ArrayList<>(auth.getAuthorities());
+        authorities.add(new SimpleGrantedAuthority("ROLE_DEVELOPER"));
+
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
+
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
+
+        response.sendRedirect("/users/%s/settings".formatted(auth.getName()));
 
         return ok().build();
     }

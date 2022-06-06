@@ -14,7 +14,12 @@ public class MongoAppDAO implements AppDAO {
     private final AppMongoRepository mongoRepository;
 
     @Override
-    public Optional<App> get(String name) {
+    public Optional<App> getById(String id) {
+        return mongoRepository.findById(id);
+    }
+
+    @Override
+    public Optional<App> getByName(String name) {
         return mongoRepository.findAppByName(name);
     }
 
@@ -30,28 +35,19 @@ public class MongoAppDAO implements AppDAO {
 
     @Override
     public void add(App newApp) throws IllegalActionException {
-        if (get(newApp.getName()).isEmpty()) {
+        if (isUnique(newApp)) {
             mongoRepository.save(newApp);
         } else {
-            throw new IllegalActionException("App name already exists");
+            throw new IllegalActionException("Some of the values are already taken");
         }
     }
 
     @Override
     public void update(App updatedApp) throws IllegalActionException {
-        Optional<App> optionalApp = get(updatedApp.getName());
-
-        if (optionalApp.isEmpty()) {
-            throw new IllegalActionException("No app with the same name to update");
+        if (validUpdate(updatedApp)) {
+            mongoRepository.save(updatedApp);
+        } else {
+            throw new IllegalActionException("Could not find user to update or some the new values are already taken");
         }
-
-        App oldApp = optionalApp.get();
-
-        if (!oldApp.getId().equals(updatedApp.getId())) {
-            throw new IllegalActionException("Old and new ids do not match");
-        }
-
-        mongoRepository.delete(oldApp);
-        mongoRepository.save(updatedApp);
     }
 }

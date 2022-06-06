@@ -4,9 +4,9 @@ import basket.server.dao.storage.DriveStorageDAO;
 import basket.server.dao.storage.LocalStorageDAO;
 import basket.server.model.app.App;
 import basket.server.model.app.AppStats;
-import basket.server.model.user.DeveloperInfo;
 import basket.server.model.app.Rating;
 import basket.server.model.app.Release;
+import basket.server.model.user.DeveloperInfo;
 import basket.server.model.user.User;
 import basket.server.service.AppService;
 import basket.server.service.StorageService;
@@ -43,7 +43,7 @@ public class BasketServerApplication {
                           AppService appService, DriveStorageDAO storageDAO, StorageService storageService,
                           LocalStorageDAO localStorageDAO) {
         return args -> {
-            String pwd = passwordEncoder.encode("1");
+            String pwd = passwordEncoder.encode("a12341234");
             User user1 = new User("a@a.com", "userA", pwd, new HashSet<>(), false, null);
             user1.setId("beadsfewfa");
 

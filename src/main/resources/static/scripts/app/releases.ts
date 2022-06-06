@@ -1,4 +1,4 @@
-import {toKB, toMB} from "../util/utils.js";
+import {autoFillInputs, toKB, toMB} from "../util/utils.js";
 
 export {}
 
@@ -11,10 +11,7 @@ window.addEventListener("load", function () {
         (<HTMLInputElement>element).value = appName;
     });
 
-    document.getElementsByName("type").forEach(element => {
-        (<HTMLInputElement>element).value = element.getAttribute("placeholder");
-        element.removeAttribute("placeholder");
-    });
+    autoFillInputs();
 
     document.getElementsByName("toFire").forEach(element => {
         (<HTMLButtonElement>element).click();
@@ -66,9 +63,9 @@ document.addEventListener("htmx:afterSwap", function () {
             setTimeout(function () {
                 progress.classList.add("d-none");
                 form.classList.remove("d-none");
-            }, 1000);
 
-            (<HTMLButtonElement>document.getElementById("storageStatusRefreshButton")).click();
+                (<HTMLButtonElement>document.getElementById("storageStatusRefreshButton")).click();
+            }, 1000);
         });
 
         form.addEventListener("htmx:xhr:progress", (event: CustomEvent) => {
@@ -105,7 +102,7 @@ document.addEventListener("htmx:afterSwap", function () {
 
     if (releaseButton != null) {
         releaseButton.onclick = function () {
-            // Schedule click so sync order is correct
+            // Schedule click so htmx sync order is correct
             setTimeout(function () {
                 (<HTMLButtonElement>document.getElementById("storageStatusRefreshButton")).click();
             });

@@ -1,10 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Basket</title>
+    <link rel="icon" th:href="@{/images/icon.ico}">
+    <meta name="author" content="Tobias van den Hurk">
+    <title th:text="'Profile · ' + ${pageUser.getUsername()}"></title>
+
+    <script type="importmap">
+	{
+		"imports": {
+			"bootstrap": "/webjars/bootstrap/dist/js/bootstrap.esm.min.js",
+			"@popperjs/core": "/webjars/popperjs__core/lib/index.js"
+		}
+	}
+    </script>
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/dist/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/font/bootstrap-icons.css}">
+    <script type="module">
+        import 'bootstrap'
+    </script>
+    <link rel="stylesheet" th:href="@{/style/base.css}">
 </head>
-<body>
+<body class="with-header with-sidebar">
+
+<div th:replace="fragments/page-components :: user-sidebar"></div>
+
+<div th:replace="fragments/page-components :: header"></div>
+
+<main class="p-4 m-auto" style="width: 1000px;">
+    <div class="display-3 mb-5" th:text="${pageUser.getUsername()}">Username</div>
+
+    <div>Nothing to see here yet</div>
+</main>
 
 </body>
 </html>

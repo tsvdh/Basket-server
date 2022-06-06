@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.ResponseEntity.badRequest;
+import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RequestMapping( "api/v1/app")
@@ -133,7 +134,7 @@ public class AppController {
         try {
             appService.update(app);
         } catch (IllegalActionException e) {
-            // ignore as update will always be legal
+            return internalServerError().build();
         }
 
         return ok().build();

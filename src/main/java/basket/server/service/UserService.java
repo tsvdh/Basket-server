@@ -57,7 +57,7 @@ public class UserService implements UserDetailsService {
     public void add(FormUser formUser) throws IllegalActionException {
         log.info("Validating new user");
 
-        User newUser = validationService.validateFormUser(formUser);
+        User newUser = validationService.validate(formUser);
         add(newUser);
     }
 
@@ -66,10 +66,13 @@ public class UserService implements UserDetailsService {
         userDAO.add(newUser);
     }
 
-    public void update(FormUser formUser) throws IllegalActionException {
+    public void update(FormUser formUser, User oldUser) throws IllegalActionException {
         log.info("Validating updated user");
 
-        User updatedUser = validationService.validateFormUser(formUser);
+        User updatedUser = validationService.validate(formUser);
+
+        updatedUser.setId(oldUser.getId());
+
         update(updatedUser);
     }
 

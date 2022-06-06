@@ -12,6 +12,7 @@
     <div th:fragment="username" id="usernameFragment">
         <label for="usernameInput" class="form-label">Username</label>
         <input type="text" spellcheck="false" class="form-control" id="usernameInput" th:field="*{username}" required
+               th:data-auto-fill="${pageUser != null ? pageUser.username : ''}"
 
                hx-get="/api/v1/user/html/valid/username"
                hx-trigger="input delay:500ms"
@@ -21,7 +22,7 @@
 
     <div th:fragment="password" id="passwordFragment">
         <label for="passwordInput" class="form-label">Password</label>
-        <input type="password" spellcheck="false" class="form-control" id="passwordInput" th:field="*{password}" required
+        <input type="password" class="form-control" id="passwordInput" th:field="*{password}" required
 
                hx-get="/api/v1/user/html/valid/password"
                hx-trigger="input delay:500ms"
@@ -30,8 +31,11 @@
     </div>
 
     <div th:fragment="email" id="emailFragment">
+        <label class="form-label">Email</label>
+
         <div class="input-group">
             <input type="text" spellcheck="false" class="form-control" id="emailInput" th:field="*{email}" required
+                   th:data-auto-fill="${pageUser != null ? pageUser.email : ''}"
 
                    hx-get="/api/v1/user/html/valid/email"
                    hx-trigger="input delay:500ms"
@@ -39,7 +43,7 @@
             >
             <button class="btn btn-secondary" id="emailButton" type="button"
 
-                    hx-get="/api/v1/user/submit/email"
+                    hx-post="/api/v1/user/submit/email"
                     hx-include="[name='email']"
                     hx-swap="none"
                     hx-preserve="true"
@@ -50,6 +54,7 @@
 
     <div th:fragment="emailCode" id="emailCodeFragment">
         <input type="text" spellcheck="false" class="form-control" id="emailCodeInput" placeholder="Code" th:field="*{emailCode}" required
+               th:data-auto-fill="${emailCode != null ? emailCode.getCode() : ''}"
 
                hx-get="/api/v1/user/html/verify-code/email"
                hx-include="[name='email']"
@@ -58,9 +63,33 @@
         >
     </div>
 
+    <div th:fragment="firstName" id="firstNameFragment">
+        <label for="firstNameInput" class="form-label">First name</label>
+        <input type="text" class="form-control" id="firstNameInput" th:field="*{formDeveloperInfo.firstName}"
+               th:data-auto-fill="${pageUser != null && pageUser.isDeveloper()
+                    ? pageUser.getDeveloperInfo().getFirstName()
+                    : ''}"
+        >
+    </div>
+
+    <div th:fragment="lastName" id="lastNameFragment">
+        <label for="lastNameInput" class="form-label">Last name</label>
+        <input type="text" class="form-control" id="lastNameInput" th:field="*{formDeveloperInfo.lastName}"
+               th:data-auto-fill="${pageUser != null && pageUser.isDeveloper()
+                    ? pageUser.getDeveloperInfo().getLastName()
+                    : ''}"
+        >
+    </div>
+
     <div th:fragment="phoneNumber" id="phoneNumberFragment">
+        <label class="form-label">Phone number</label>
+
         <div class="input-group">
             <select class="form-select" id="countryCodeInput" th:field="*{formDeveloperInfo.formPhoneNumber.regionCode}"
+                    th:data-auto-fill="${pageUser != null && pageUser.isDeveloper()
+                        ? phoneNumberUtil.getRegionCodeForNumber(pageUser.getDeveloperInfo().getPhoneNumber())
+                        : ''}"
+
                     hx-preserve="true"
             >
                 <option value="" selected>Select country</option>
@@ -69,6 +98,9 @@
                         th:text="${countryCode.getName()}"></option>
             </select>
             <input type="text" class="form-control" id="phoneNumberInput" placeholder="Number" th:field="*{formDeveloperInfo.formPhoneNumber.number}"
+                   th:data-auto-fill="${pageUser != null && pageUser.isDeveloper()
+                        ? phoneNumberUtil.getNationalSignificantNumber(pageUser.getDeveloperInfo().getPhoneNumber())
+                        : ''}"
 
                    hx-get="/api/v1/user/html/valid/phone"
                    hx-include="[name='formDeveloperInfo.formPhoneNumber.regionCode']"
@@ -77,7 +109,7 @@
             >
             <button class="btn btn-secondary" id="phoneNumberButton" type="button"
 
-                    hx-get="/api/v1/user/submit/phone"
+                    hx-post="/api/v1/user/submit/phone"
                     hx-include="[name='formDeveloperInfo.formPhoneNumber.regionCode'], [name='formDeveloperInfo.formPhoneNumber.number']"
                     hx-swap="none"
                     hx-preserve="true"
@@ -88,6 +120,7 @@
 
     <div th:fragment="phoneNumberCode" id="phoneNumberCodeFragment">
         <input type="text" class="form-control" id="phoneNumberCodeInput" placeholder="Code" th:field="*{formDeveloperInfo.phoneCode}"
+               th:data-auto-fill="${phoneCode != null ? phoneCode.getCode() : ''}"
 
                hx-get="/api/v1/user/html/verify-code/phone"
                hx-include="[name='formDeveloperInfo.formPhoneNumber.regionCode'], [name='formDeveloperInfo.formPhoneNumber.number']"

@@ -66,15 +66,15 @@ public class LocalUserDAO implements UserDAO {
 
     @Override
     public void update(User updatedUser) throws IllegalActionException {
-        if (validUpdate(updatedUser)) {
-            for (int i = 0; i < localDB.size(); i++) {
-                if (localDB.get(i).getId().equals(updatedUser.getId())) {
-                    localDB.set(i, updatedUser);
-                    break;
-                }
+        if (!validUpdate(updatedUser)) {
+            throw new IllegalActionException("Could not find user to update or some of the new values are already taken");
+        }
+
+        for (int i = 0; i < localDB.size(); i++) {
+            if (localDB.get(i).getId().equals(updatedUser.getId())) {
+                localDB.set(i, updatedUser);
+                break;
             }
-        } else {
-            throw new IllegalActionException("Could not find user to update or some the new values are already taken");
         }
     }
 }
