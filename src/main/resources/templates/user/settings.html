@@ -32,6 +32,8 @@
 
 <div th:replace="fragments/page-components :: header"></div>
 
+<div th:replace="fragments/page-components :: toast-container"></div>
+
 <main class="p-4 m-auto" style="width: 1000px;">
     <div class="display-3 mb-5" th:text="${pageUser.getUsername()}">Username</div>
 
@@ -43,6 +45,8 @@
             <label for="currentPasswordInput" class="form-label">Re-enter your password for security</label>
             <input type="password" class="form-control" id="currentPasswordInput" th:field="*{currentPassword}" required>
         </div>
+
+        <hr class="mb-5">
 
         <!--suppress HtmlFormInputWithoutLabel -->
         <select class="visually-hidden" id="userTypeInput" th:field="*{userType}">
