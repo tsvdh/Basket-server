@@ -19,7 +19,7 @@
     <div th:fragment="username" id="usernameFragment">
         <label for="usernameInput" class="form-label">Username</label>
         <input type="text" spellcheck="false" class="form-control" id="usernameInput" th:field="*{username}" required
-               th:data-auto-fill="${pageUser != null ? pageUser.username : ''}"
+               th:data-auto-fill="${pageUser?.username}"
 
                hx-get="/api/v1/user/html/valid/username"
                hx-trigger="input delay:500ms"
@@ -48,7 +48,7 @@
 
         <div class="input-group">
             <input type="text" spellcheck="false" class="form-control" id="emailInput" th:field="*{email}" required
-                   th:data-auto-fill="${pageUser != null ? pageUser.email : ''}"
+                   th:data-auto-fill="${pageUser?.email}"
 
                    hx-get="/api/v1/user/html/valid/email"
                    hx-trigger="input delay:500ms"
@@ -66,8 +66,10 @@
     </div>
 
     <div th:fragment="emailCode" id="emailCodeFragment">
+        <label class="form-label invisible">Padding</label>
+
         <input type="text" spellcheck="false" class="form-control" id="emailCodeInput" placeholder="Code" th:field="*{emailCode}" required
-               th:data-auto-fill="${emailCode != null ? emailCode.getCode() : ''}"
+               th:data-auto-fill="${emailCode?.getCode()}"
 
                hx-get="/api/v1/user/html/verify-code/email"
                hx-include="[name='email']"
@@ -79,18 +81,14 @@
     <div th:fragment="firstName" id="firstNameFragment">
         <label for="firstNameInput" class="form-label">First name</label>
         <input type="text" class="form-control" id="firstNameInput" th:field="*{formDeveloperInfo.firstName}"
-               th:data-auto-fill="${pageUser != null && pageUser.isDeveloper()
-                    ? pageUser.getDeveloperInfo().getFirstName()
-                    : ''}"
+               th:data-auto-fill="${pageUser?.getDeveloperInfo()?.getFirstName()}"
         >
     </div>
 
     <div th:fragment="lastName" id="lastNameFragment">
         <label for="lastNameInput" class="form-label">Last name</label>
         <input type="text" class="form-control" id="lastNameInput" th:field="*{formDeveloperInfo.lastName}"
-               th:data-auto-fill="${pageUser != null && pageUser.isDeveloper()
-                    ? pageUser.getDeveloperInfo().getLastName()
-                    : ''}"
+               th:data-auto-fill="${pageUser?.getDeveloperInfo()?.getLastName()}"
         >
     </div>
 
@@ -132,8 +130,10 @@
     </div>
 
     <div th:fragment="phoneNumberCode" id="phoneNumberCodeFragment">
+        <label class="form-label invisible">Padding</label>
+
         <input type="text" class="form-control" id="phoneNumberCodeInput" placeholder="Code" th:field="*{formDeveloperInfo.phoneCode}"
-               th:data-auto-fill="${phoneCode != null ? phoneCode.getCode() : ''}"
+               th:data-auto-fill="${phoneCode?.getCode()}"
 
                hx-get="/api/v1/user/html/verify-code/phone"
                hx-include="[name='formDeveloperInfo.formPhoneNumber.regionCode'], [name='formDeveloperInfo.formPhoneNumber.number']"

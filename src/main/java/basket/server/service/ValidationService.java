@@ -132,7 +132,7 @@ public class ValidationService {
         }
 
         if (!util.isValidNumber(phoneNumber)) {
-            throw new ValidationException("Is not a valid number");
+            throw new ValidationException("Not a valid number");
         }
 
         if (!util.isPossibleNumberForType(phoneNumber, MOBILE)) {
