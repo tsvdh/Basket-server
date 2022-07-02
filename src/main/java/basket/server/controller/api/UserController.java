@@ -1,13 +1,16 @@
 package basket.server.controller.api;
 
+import basket.server.model.VerificationCode;
 import basket.server.model.input.FormDeveloperInfo;
 import basket.server.model.input.SecureFormUser;
+import basket.server.model.user.User;
 import basket.server.service.EmailService;
 import basket.server.service.PhoneService;
 import basket.server.service.StorageService;
 import basket.server.service.UserService;
 import basket.server.service.ValidationService;
 import basket.server.service.VerificationCodeService;
+import basket.server.util.ControllerUtil;
 import basket.server.util.HTMLUtil;
 import basket.server.util.HTMLUtil.InputType;
 import basket.server.util.IllegalActionException;
@@ -16,6 +19,7 @@ import basket.server.validation.annotations.Email;
 import basket.server.validation.validators.EmailValidator;
 import basket.server.validation.validators.PasswordValidator;
 import basket.server.validation.validators.UsernameValidator;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -38,6 +42,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -68,6 +73,7 @@ public class UserController {
     private final StorageService storageService;
     private final ValidationService validationService;
     private final AuthenticationManager authManager;
+    private final ControllerUtil controllerUtil;
 
     @ResponseBody
     @GetMapping(path = "html/valid/username", produces = TEXT_HTML_VALUE)
@@ -249,6 +255,40 @@ public class UserController {
         log.info("Code {} for {}", newCode.getCode(), newCode.getAddress());
 
         return ok().build();
+    }
+
+    @GetMapping("html/settings/verify")
+    @PreAuthorize("hasRole('USER')")
+    public String verifyPassword(@RequestParam String currentPassword, Principal principal, Model model) {
+        try {
+            Authentication auth = new UsernamePasswordAuthenticationToken(principal.getName(), currentPassword);
+            authManager.authenticate(auth);
+        }
+        catch (BadCredentialsException e) {
+            return "fragments/elements/user/settings :: wrong-password";
+        }
+
+        User pageUser = controllerUtil.getUser(principal.getName());
+
+        VerificationCode emailCode = verificationCodeService.submit(pageUser.getEmail());
+
+        VerificationCode phoneCode;
+        if (pageUser.isDeveloper()) {
+            String formattedNumber = phoneToString(pageUser.getDeveloperInfo().getPhoneNumber());
+            phoneCode = verificationCodeService.submit(formattedNumber);
+        } else {
+            phoneCode = null;
+        }
+
+        model.addAttribute("pageUser", pageUser);
+        model.addAttribute("formUser", new SecureFormUser());
+        model.addAttribute("countryCodeList", HTMLUtil.getCountryList());
+        model.addAttribute("emailCode", emailCode);
+        model.addAttribute("phoneCode", phoneCode);
+        model.addAttribute("phoneNumberUtil", PhoneNumberUtil.getInstance());
+        model.addAttribute("currentPassword", currentPassword);
+
+        return "fragments/elements/user/settings :: correct-password";
     }
 
     @PostMapping("info/change")

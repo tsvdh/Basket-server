@@ -1,16 +1,8 @@
+import {AlertQueue, AlertType} from "./util/alerts.js";
+
 export {}
-import {makeDangerAlert, makePrimaryAlert, makeSuccessAlert} from "./util/alert.js";
 
-/*--- Helper methods ---*/
-
-function insertAlert(alert: HTMLElement) {
-    document
-        .getElementsByTagName("main")
-        .item(0)
-        .insertAdjacentElement("afterbegin", alert);
-}
-
-/*--- Button actions ---*/
+/*--- Form submit ---*/
 
 document.getElementById("registerForm").onsubmit = event => {
     let invalids = document.getElementsByClassName("is-invalid");
@@ -22,43 +14,8 @@ document.getElementById("registerForm").onsubmit = event => {
     event.preventDefault();
     event.stopPropagation();
 
-    let alert = makeDangerAlert("All fields must be valid!");
-    insertAlert(alert);
+    AlertQueue.addAlert("All fields must be valid!", AlertType.Warning);
 };
-
-document.getElementById("emailButton").addEventListener("htmx:beforeRequest", event => {
-    let emailInput = document.getElementById("emailInput");
-
-    let alert: HTMLElement;
-
-    if (emailInput.classList.contains("is-valid")) {
-        alert = makePrimaryAlert("Email sent!");
-    } else {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-
-        alert = makeDangerAlert("Email must be valid!");
-    }
-
-    insertAlert(alert);
-});
-
-document.getElementById("phoneNumberButton").addEventListener("htmx:beforeRequest", event => {
-    let phoneNumberInput = document.getElementById("phoneNumberInput");
-
-    let alert: HTMLElement;
-
-    if (phoneNumberInput.classList.contains("is-valid")) {
-        alert = makePrimaryAlert("SMS sent!");
-    } else {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-
-        alert = makeDangerAlert("Phone number must be valid!");
-    }
-
-    insertAlert(alert);
-});
 
 /*--- Nav tabs ---*/
 

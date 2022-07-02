@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings fragments</title>
+</head>
+<body>
+
+<div th:fragment="password-input" class="col-6 mb-4">
+    <label for="currentPasswordInput" class="form-label">Current password</label>
+    <div class="input-group">
+        <input type="password" class="form-control" id="currentPasswordInput" name="currentPassword" required>
+        <button id="passwordToggle" class="input-group-text" type="button" data-toggle-text>
+            <i class="bi-eye-fill"></i>
+        </button>
+        <button type="button" class="btn btn-primary"
+
+                hx-get="/api/v1/user/html/settings/verify"
+                hx-include="[name='currentPassword']"
+                hx-target="#infoContainer" hx-swap="innerHTML"
+
+        >Check</button>
+    </div>
+</div>
+
+<div th:fragment="no-password">
+    <div th:replace="fragments/elements/user/settings :: password-input"></div>
+
+    <div class="text-muted">Please enter your password to change your info</div>
+</div>
+
+<div th:fragment="wrong-password">
+    <div th:replace="fragments/elements/user/settings :: password-input"></div>
+
+    <div class="text-danger">Wrong password</div>
+</div>
+
+<div th:fragment="correct-password">
+
+    <form method="post" id="userInfoForm" th:action="@{/api/v1/user/info/change}" th:object="${formUser}">
+
+        <!--suppress HtmlFormInputWithoutLabel -->
+        <input class="visually-hidden" th:field="*{currentPassword}"
+               th:data-auto-fill="${currentPassword != null ? currentPassword : ''}"
+        >
+
+        <div th:replace="fragments/inputs/user :: userType"></div>
+
+        <div class="col-6 mb-4">
+            <div th:replace="fragments/inputs/user :: username"></div>
+        </div>
+
+        <div class="col-6 mb-4">
+            <div th:replace="fragments/inputs/user :: password"></div>
+        </div>
+
+        <div class="row mb-4 d-flex align-items-end">
+            <div class="col-6">
+                <div th:replace="fragments/inputs/user :: email"></div>
+            </div>
+            <div class="col-2">
+                <div th:replace="fragments/inputs/user :: emailCode"></div>
+            </div>
+        </div>
+
+        <div th:classappend="${!pageUser.isDeveloper() ? 'visually-hidden' : ''}">
+
+            <div class="col-6 mb-4">
+                <div th:replace="fragments/inputs/user :: firstName"></div>
+            </div>
+
+            <div class="col-6 mb-4">
+                <div th:replace="fragments/inputs/user :: lastName"></div>
+            </div>
+
+            <div class="row mb-4 d-flex align-items-end">
+                <div class="col-10">
+                    <div th:replace="fragments/inputs/user :: phoneNumber"></div>
+                </div>
+                <div class="col-2">
+                    <div th:replace="fragments/inputs/user :: phoneNumberCode"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div th:insert="fragments/page-components :: form-submit ('Update')" class="mb-5"></div>
+
+    </form>
+</div>
+
+</body>
+</html>

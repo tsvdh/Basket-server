@@ -1,23 +1,19 @@
 package basket.server.controller;
 
-import basket.server.model.VerificationCode;
-import basket.server.model.app.App;
 import basket.server.model.input.FormApp;
 import basket.server.model.input.FormPendingUpload;
 import basket.server.model.input.FormUser;
-import basket.server.model.input.SecureFormUser;
 import basket.server.model.user.User;
 import basket.server.service.AppService;
 import basket.server.service.StorageService;
 import basket.server.service.UserService;
 import basket.server.service.VerificationCodeService;
+import basket.server.util.ControllerUtil;
 import basket.server.util.HTMLUtil;
 import basket.server.util.IllegalActionException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.ModelAndView;
 
-import static basket.server.service.PhoneService.phoneToString;
 import static org.springframework.http.ResponseEntity.ok;
 
 @Controller
@@ -52,6 +47,7 @@ public class WebController {
     private final AppService appService;
     private final StorageService storageService;
     private final VerificationCodeService verificationCodeService;
+    private final ControllerUtil controllerUtil;
 
     @GetMapping("login")
     public String getLogin() {
@@ -131,22 +127,11 @@ public class WebController {
         return ok().build();
     }
 
-    private App getApp(@PathVariable String appName) {
-        Optional<App> optionalApp = appService.get(appName);
-
-        if (optionalApp.isEmpty()) {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND,
-                     "App %s does not exist".formatted(appName));
-        } else {
-            return optionalApp.get();
-        }
-    }
-
     @GetMapping("apps/{appName}/overview")
     public ModelAndView getAppOverviewPage(@PathVariable String appName) {
         var modelAndView = new ModelAndView("app/overview");
 
-        modelAndView.addObject("pageApp", getApp(appName));
+        modelAndView.addObject("pageApp", controllerUtil.getApp(appName));
 
         return modelAndView;
     }
@@ -156,7 +141,7 @@ public class WebController {
     public ModelAndView getAppManagePage(@PathVariable String appName) {
         var modelAndView = new ModelAndView("app/manage");
 
-        modelAndView.addObject("pageApp", getApp(appName));
+        modelAndView.addObject("pageApp", controllerUtil.getApp(appName));
 
         return modelAndView;
     }
@@ -166,7 +151,7 @@ public class WebController {
     public ModelAndView getAppReleasesPage(@PathVariable String appName) {
         var modelAndView = new ModelAndView("app/releases");
 
-        modelAndView.addObject("pageApp", getApp(appName));
+        modelAndView.addObject("pageApp", controllerUtil.getApp(appName));
         modelAndView.addObject("formPendingUpload", new FormPendingUpload());
         modelAndView.addObject("storageService", storageService);
 
@@ -183,22 +168,11 @@ public class WebController {
         return ok().build();
     }
 
-    private User getUser(String userName) {
-        Optional<User> optionalUser = userService.getByUsername(userName);
-
-        if (optionalUser.isEmpty()) {
-            throw new HttpClientErrorException(HttpStatus.NOT_FOUND,
-                    "User %s does not exist".formatted(userName));
-        } else {
-            return optionalUser.get();
-        }
-    }
-
     @GetMapping("users/{pageUsername}/home")
     public ModelAndView getUserHomePage(@PathVariable String pageUsername) {
         var modelAndView = new ModelAndView("user/home");
 
-        modelAndView.addObject("pageUser", getUser(pageUsername));
+        modelAndView.addObject("pageUser", controllerUtil.getUser(pageUsername));
 
         return modelAndView;
     }
@@ -207,7 +181,7 @@ public class WebController {
     public ModelAndView getUserProjectsPage(@PathVariable String pageUsername) {
         var modelAndView = new ModelAndView("user/projects");
 
-        User user = getUser(pageUsername);
+        User user = controllerUtil.getUser(pageUsername);
         if (!user.isDeveloper()) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND,
                     "User %s is not a developer".formatted(user.getUsername()));
@@ -223,7 +197,7 @@ public class WebController {
     public ModelAndView getUserProfilePage(@PathVariable String pageUsername) {
         var modelAndView = new ModelAndView("user/profile");
 
-        modelAndView.addObject("pageUser", getUser(pageUsername));
+        modelAndView.addObject("pageUser", controllerUtil.getUser(pageUsername));
 
         return modelAndView;
     }
@@ -231,26 +205,9 @@ public class WebController {
     @PreAuthorize("authentication.name.equals(#pageUsername)")
     @GetMapping("users/{pageUsername}/settings")
     public ModelAndView getUserSettingsPage(@PathVariable String pageUsername) {
-        var pageUser = getUser(pageUsername);
-
-        VerificationCode emailCode = verificationCodeService.submit(pageUser.getEmail());
-
-        VerificationCode phoneCode;
-        if (pageUser.isDeveloper()) {
-            String formattedNumber = phoneToString(pageUser.getDeveloperInfo().getPhoneNumber());
-            phoneCode = verificationCodeService.submit(formattedNumber);
-        } else {
-            phoneCode = null;
-        }
-
         var modelAndView = new ModelAndView("user/settings");
 
-        modelAndView.addObject("pageUser", pageUser);
-        modelAndView.addObject("formUser", new SecureFormUser());
-        modelAndView.addObject("countryCodeList", HTMLUtil.getCountryList());
-        modelAndView.addObject("emailCode", emailCode);
-        modelAndView.addObject("phoneCode", phoneCode);
-        modelAndView.addObject("phoneNumberUtil", PhoneNumberUtil.getInstance());
+        modelAndView.addObject("pageUser", controllerUtil.getUser(pageUsername));
 
         return modelAndView;
     }

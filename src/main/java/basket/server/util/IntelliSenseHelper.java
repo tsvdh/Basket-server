@@ -5,6 +5,7 @@ import basket.server.model.app.App;
 import basket.server.model.input.FormApp;
 import basket.server.model.input.FormPendingUpload;
 import basket.server.model.input.FormUser;
+import basket.server.model.input.SecureFormUser;
 import basket.server.model.user.User;
 import basket.server.service.StorageService;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -29,6 +30,7 @@ public class IntelliSenseHelper {
         model.addAttribute("emailCode", new VerificationCode(""));
         model.addAttribute("phoneCode", new VerificationCode(""));
         model.addAttribute("phoneNumberUtil", PhoneNumberUtil.getInstance());
+        model.addAttribute("currentPassword", "");
 
         return "fragments/inputs/user";
     }
@@ -46,5 +48,14 @@ public class IntelliSenseHelper {
         model.addAttribute("storageService", new StorageService(null));
 
         return "fragments/elements/app/releases";
+    }
+
+    @GetMapping("5")
+    private String method5(Model model) {
+        model.addAttribute("pageUser", new User());
+        model.addAttribute("formUser", new SecureFormUser());
+        model.addAttribute("currentPassword", "");
+
+        return "fragments/elements/user/settings";
     }
 }

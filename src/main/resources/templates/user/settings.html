@@ -23,7 +23,7 @@
         import 'htmx'
     </script>
     <link rel="stylesheet" th:href="@{/style/base.css}">
-    <script type="module" th:src="@{/scripts/util/base.js}"></script>
+    <script type="module" th:src="@{/scripts/base.js}"></script>
     <script type="module" th:src="@{/scripts/user/settings.js}"></script>
 </head>
 <body class="with-header with-sidebar">
@@ -37,62 +37,13 @@
 <main class="p-4 m-auto" style="width: 1000px;">
     <div class="display-3 mb-5" th:text="${pageUser.getUsername()}">Username</div>
 
-    <form method="post" id="userInfoForm" th:action="@{/api/v1/user/info/change}" th:object="${formUser}">
+    <div class="h4 mb-4">Change info</div>
 
-        <div class="h4 mb-4">Change info</div>
+    <div id="infoContainer">
 
-        <div class="col-6 mb-4">
-            <label for="currentPasswordInput" class="form-label">Re-enter your password for security</label>
-            <input type="password" class="form-control" id="currentPasswordInput" th:field="*{currentPassword}" required>
-        </div>
+        <div th:replace="fragments/elements/user/settings :: no-password"></div>
 
-        <hr class="mb-5">
-
-        <!--suppress HtmlFormInputWithoutLabel -->
-        <select class="visually-hidden" id="userTypeInput" th:field="*{userType}">
-            <option th:value="${pageUser.isDeveloper() ? 'DEVELOPER' : 'USER'}"></option>
-        </select>
-
-        <div class="col-6 mb-4">
-            <div th:replace="fragments/inputs/user :: username"></div>
-        </div>
-
-        <div class="col-6 mb-4">
-            <div th:replace="fragments/inputs/user :: password"></div>
-        </div>
-
-        <div class="row mb-4 d-flex align-items-end">
-            <div class="col-6">
-                <div th:replace="fragments/inputs/user :: email"></div>
-            </div>
-            <div class="col-2">
-                <div th:replace="fragments/inputs/user :: emailCode"></div>
-            </div>
-        </div>
-
-        <div th:classappend="${!pageUser.isDeveloper() ? 'visually-hidden' : ''}">
-
-            <div class="col-6 mb-4">
-                <div th:replace="fragments/inputs/user :: firstName"></div>
-            </div>
-
-            <div class="col-6 mb-4">
-                <div th:replace="fragments/inputs/user :: lastName"></div>
-            </div>
-
-            <div class="row mb-4 d-flex align-items-end">
-                <div class="col-10">
-                    <div th:replace="fragments/inputs/user :: phoneNumber"></div>
-                </div>
-                <div class="col-2">
-                    <div th:replace="fragments/inputs/user :: phoneNumberCode"></div>
-                </div>
-            </div>
-
-        </div>
-
-        <div th:insert="fragments/page-components :: form-submit ('Update')" class="mb-5"></div>
-    </form>
+    </div>
 
 </main>
 

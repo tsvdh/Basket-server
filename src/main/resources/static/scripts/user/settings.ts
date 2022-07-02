@@ -1,22 +1,40 @@
 import {AlertQueue, AlertType} from "../util/alerts.js";
+import {autoFillInputs} from "../util/utils.js";
 
 export {}
 
-document.getElementById("emailInput").oninput = function () {
-    (<HTMLInputElement>document.getElementById("emailCodeInput")).value = "";
-};
+document.addEventListener("htmx:afterSwap", event => {
 
-const phoneNumberCodeReset = function () {
-    (<HTMLInputElement>document.getElementById("phoneNumberCodeInput")).value = "";
-};
+    if (!document.getElementById("userInfoForm")) {
+        // Main content not loaded yet
+        return;
+    }
 
-document.getElementById("phoneNumberInput").oninput = phoneNumberCodeReset;
-document.getElementById("countryCodeInput").oninput = phoneNumberCodeReset;
+    autoFillInputs();
 
-document.getElementById("currentPasswordInput").addEventListener("input", function () {
-    AlertQueue.addAlert("Hello world!", AlertType.Info);
-});
+    document.getElementById("emailInput").oninput = function () {
+        (<HTMLInputElement>document.getElementById("emailCodeInput")).value = "";
+    };
 
-document.getElementById("currentPasswordInput").addEventListener("mouseleave", function () {
-    AlertQueue.addAlert("Bye world!", AlertType.Warning);
+    const phoneNumberCodeReset = function () {
+        (<HTMLInputElement>document.getElementById("phoneNumberCodeInput")).value = "";
+    };
+
+    document.getElementById("phoneNumberInput").oninput = phoneNumberCodeReset;
+    document.getElementById("countryCodeInput").oninput = phoneNumberCodeReset;
+
+    /*--- Form submit ---*/
+
+    document.getElementById("userInfoForm").onsubmit = event => {
+        let invalids = document.getElementsByClassName("is-invalid");
+
+        if (invalids.length == 0) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        AlertQueue.addAlert("All fields must be valid!", AlertType.Warning);
+    };
 });

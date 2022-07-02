@@ -9,6 +9,13 @@
 
 <form th:object="${formUser}">
 
+    <div th:fragment="userType" id="userTypeFragment">
+        <!--suppress HtmlFormInputWithoutLabel -->
+        <select class="visually-hidden" id="userTypeInput" th:field="*{userType}">
+            <option th:value="${pageUser != null ? (pageUser.isDeveloper() ? 'DEVELOPER' : 'USER') : ''}"></option>
+        </select>
+    </div>
+
     <div th:fragment="username" id="usernameFragment">
         <label for="usernameInput" class="form-label">Username</label>
         <input type="text" spellcheck="false" class="form-control" id="usernameInput" th:field="*{username}" required
@@ -24,6 +31,7 @@
         <label for="passwordInput" class="form-label">Password</label>
         <div class="input-group">
             <input type="password" class="form-control" id="passwordInput" th:field="*{password}" required
+                   th:data-auto-fill="${currentPassword != null ? currentPassword : ''}"
 
                    hx-get="/api/v1/user/html/valid/password"
                    hx-trigger="input delay:500ms"
