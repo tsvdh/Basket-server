@@ -15,6 +15,7 @@ export function autoFillInputs () {
 
         if ("autoFill" in input.dataset) {
             input.value = input.dataset["autoFill"];
+            delete input.dataset["autoFill"];
         }
     }
 
@@ -23,6 +24,7 @@ export function autoFillInputs () {
 
         if ("autoFill" in select.dataset) {
             select.value = select.dataset["autoFill"];
+            delete select.dataset["autoFill"];
         }
     }
 }

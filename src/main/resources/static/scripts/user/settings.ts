@@ -3,11 +3,15 @@ import {autoFillInputs} from "../util/utils.js";
 
 export {}
 
+let formSwappedIn = false;
+
 document.addEventListener("htmx:afterSwap", event => {
 
-    if (!document.getElementById("userInfoForm")) {
-        // Main content not loaded yet
+    if (formSwappedIn || !document.getElementById("userInfoForm")) {
+        // swap actions completed or main content not loaded yet
         return;
+    } else {
+        formSwappedIn = true;
     }
 
     autoFillInputs();
