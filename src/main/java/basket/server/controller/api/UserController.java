@@ -20,11 +20,13 @@ import basket.server.validation.validators.EmailValidator;
 import basket.server.validation.validators.PasswordValidator;
 import basket.server.validation.validators.UsernameValidator;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ValidationException;
@@ -75,6 +77,22 @@ public class UserController {
     private final AuthenticationManager authManager;
     private final ControllerUtil controllerUtil;
 
+    private void checkTaken(Optional<User> takenBy, HttpServletRequest request, List<String> faults) {
+        if (takenBy.isEmpty()) {
+            return;
+        }
+
+        if (request.getRemoteUser() == null) {
+            return;
+        }
+
+        if (request.getRemoteUser().equals(takenBy.get().getUsername())) {
+            return;
+        }
+
+        faults.add("Already taken");
+    }
+
     @ResponseBody
     @GetMapping(path = "html/valid/username", produces = TEXT_HTML_VALUE)
     public String getUsernameHTMLResponse(@RequestParam String username, UsernameValidator validator,
@@ -84,9 +102,7 @@ public class UserController {
             faults = null;
         } else {
             faults = validator.getFaults(username);
-            if (userService.getByUsername(username).isPresent()) {
-                faults.add("Already taken");
-            }
+            checkTaken(userService.getByUsername(username), request, faults);
         }
 
         return htmlUtil.getInputFragment(
@@ -107,9 +123,7 @@ public class UserController {
             faults = null;
         } else {
             faults = emailValidator.getFaults(email);
-            if (userService.getByEmail(email).isPresent()) {
-                faults.add("Already taken");
-            }
+            checkTaken(userService.getByEmail(email), request, faults);
         }
 
         return htmlUtil.getInputFragment(
@@ -151,8 +165,9 @@ public class UserController {
             faults = null;
         } else {
             try {
-                validationService.validate(regionCode, number);
+                PhoneNumber phoneNumber = validationService.validate(regionCode, number);
                 faults = Collections.emptyList();
+                checkTaken(userService.getByPhoneNumber(phoneNumber), request, faults);
             }
             catch (ValidationException e) {
                 faults = List.of(e.getMessage());
