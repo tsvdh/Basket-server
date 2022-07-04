@@ -73,7 +73,7 @@
 
                hx-get="/api/v1/user/html/verify-code/email"
                hx-include="[name='email']"
-               hx-trigger="input delay:500ms"
+               hx-trigger="input delay:500ms, input from:#emailInput delay:500ms"
                hx-target="#emailCodeFragment" hx-swap="outerHTML"
         >
     </div>
@@ -115,7 +115,7 @@
 
                    hx-get="/api/v1/user/html/valid/phone"
                    hx-include="[name='formDeveloperInfo.formPhoneNumber.regionCode']"
-                   hx-trigger="input delay:500ms"
+                   hx-trigger="input delay:500ms, input from:#countryCodeInput delay:500ms"
                    hx-target="#phoneNumberFragment" hx-swap="outerHTML"
             >
             <button class="btn btn-secondary" id="phoneNumberButton" type="button"
@@ -137,7 +137,7 @@
 
                hx-get="/api/v1/user/html/verify-code/phone"
                hx-include="[name='formDeveloperInfo.formPhoneNumber.regionCode'], [name='formDeveloperInfo.formPhoneNumber.number']"
-               hx-trigger="input delay:500ms"
+               hx-trigger="input delay:500ms, input from:#phoneNumberInput delay:500ms, input from:#countryCodeInput delay:500ms"
                hx-target="#phoneNumberCodeFragment" hx-swap="outerHTML"
         >
     </div>

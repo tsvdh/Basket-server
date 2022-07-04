@@ -63,7 +63,7 @@
             </div>
         </div>
 
-        <div th:classappend="${!pageUser.isDeveloper() ? 'visually-hidden' : ''}">
+        <div th:if="${pageUser.isDeveloper()}">
 
             <div class="col-6 mb-4">
                 <div th:replace="fragments/inputs/user :: firstName"></div>

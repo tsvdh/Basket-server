@@ -31,17 +31,9 @@
 <div th:replace="fragments/page-components :: header"></div>
 
 <main class="p-4 m-auto" style="width: 1000px;">
-    <div class="display-3 mb-3" th:text="${pageUser.getUsername()}">Username</div>
-    <div sec:authorize="hasRole('DEVELOPER')">
-        <h2>Recent projects</h2>
-        <ul>
-            <li>Lorem ipsum</li>
-            <li>Lorem ipsum</li>
-        </ul>
-    </div>
-    <div sec:authorize="!hasRole('DEVELOPER')">
-        <h2>Nothing to see here yet!</h2>
-    </div>
+    <div class="display-3 mb-5" th:text="${pageUser.getUsername()}">Username</div>
+
+    <div>Nothing to see here yet</div>
 </main>
 
 </body>

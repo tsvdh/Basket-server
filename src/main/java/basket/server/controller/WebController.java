@@ -82,7 +82,7 @@ public class WebController {
         return "create";
     }
 
-    @PostMapping("create")
+    @PostMapping("apps/create")
     @PreAuthorize("hasRole('DEVELOPER')")
     public ResponseEntity<Void> addApp(@ModelAttribute FormApp formApp, Authentication auth,
                                        HttpServletRequest request, HttpServletResponse response) throws IOException {

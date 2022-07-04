@@ -42,7 +42,7 @@
            th:each="appName : ${pageUser.getDeveloperInfo().getDeveloperOf().stream().sorted().collect(T(java.util.stream.Collectors).toList())}"
            th:href="@{'/apps/' + ${appName}}" th:text="${appName}">App name</a>
     </div>
-    <a th:href="@{/create}" class="btn btn-outline-primary">Add</a>
+    <a th:href="@{/apps/create}" class="btn btn-outline-primary">Add</a>
 </main>
 
 </body>

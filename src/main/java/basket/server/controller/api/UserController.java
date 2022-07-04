@@ -185,10 +185,11 @@ public class UserController {
 
     @ResponseBody
     @GetMapping(path = "html/verify-code/email", produces = TEXT_HTML_VALUE)
-    public String getEmailCodeHTMLResponse(@RequestParam String emailCode, @RequestParam @Email String email,
+    public String getEmailCodeHTMLResponse(@RequestParam String emailCode, @RequestParam String email,
+                                           EmailValidator emailValidator,
                                            HttpServletRequest request, HttpServletResponse response) {
         List<String> faults;
-        if (emailCode.equals("")) {
+        if (emailCode.equals("") || !emailValidator.getFaults(email).isEmpty()) {
             faults = null;
         } else {
             if (!verificationCodeService.verify(email, emailCode)) {
@@ -213,11 +214,16 @@ public class UserController {
                                            @RequestParam(name = "formDeveloperInfo.formPhoneNumber.number") String number,
                                            @RequestParam(name = "formDeveloperInfo.phoneCode") String phoneCode,
                                            HttpServletRequest request, HttpServletResponse response) {
-        var phoneNumber = validationService.validate(regionCode, number);
-        String formattedNumber = phoneToString(phoneNumber);
+        String formattedNumber;
+        try {
+            var phoneNumber = validationService.validate(regionCode, number);
+            formattedNumber = phoneToString(phoneNumber);
+        } catch (ValidationException e) {
+            formattedNumber = null;
+        }
 
         List<String> faults;
-        if (phoneCode.equals("")) {
+        if (phoneCode.equals("") || formattedNumber == null) {
             faults = null;
         } else {
             if (!verificationCodeService.verify(formattedNumber, phoneCode)) {

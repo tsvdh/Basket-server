@@ -56,12 +56,12 @@ public class HTMLUtil {
 
         Element fragment = document.getElementById(fragmentAttribute + "Fragment");
 
-        if (inputValue.equals("")) {
-            return fragment.outerHtml();
-        }
-
         Element inputElement = fragment.getElementById(fragmentAttribute + "Input");
         inputElement.val(inputValue);
+
+        if (faults == null) {
+            return fragment.outerHtml();
+        }
 
         if (faults.isEmpty()) {
             inputElement.addClass("is-valid");
