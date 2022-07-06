@@ -1,6 +1,6 @@
 package basket.server.controller.api;
 
-import basket.server.model.VerificationCode;
+import basket.server.model.expiring.VerificationCode;
 import basket.server.model.input.FormDeveloperInfo;
 import basket.server.model.input.SecureFormUser;
 import basket.server.model.user.User;

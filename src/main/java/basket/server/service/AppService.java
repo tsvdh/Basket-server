@@ -75,7 +75,7 @@ public class AppService {
             throw new IllegalActionException("Creator does not exist");
         }
 
-        App updatedApp = validationService.validate(formApp, optionalCreator.get());
+        App updatedApp = validationService.validate(formApp, optionalCreator.get(), oldApp);
 
         updatedApp.setId(oldApp.getId());
 

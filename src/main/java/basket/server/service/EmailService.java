@@ -1,6 +1,6 @@
 package basket.server.service;
 
-import basket.server.model.VerificationCode;
+import basket.server.model.expiring.VerificationCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

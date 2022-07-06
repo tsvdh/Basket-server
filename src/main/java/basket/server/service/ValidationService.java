@@ -1,6 +1,6 @@
 package basket.server.service;
 
-import basket.server.model.PendingUpload;
+import basket.server.model.expiring.PendingUpload;
 import basket.server.model.app.App;
 import basket.server.model.app.AppStats;
 import basket.server.model.app.Rating;
@@ -45,6 +45,10 @@ public class ValidationService {
     }
 
     public App validate(FormApp formApp, User creator) throws ConstraintViolationException {
+        return validate(formApp, creator, null);
+    }
+
+    public App validate(FormApp formApp, User creator, App oldApp) throws ConstraintViolationException {
         validateConstraints(formApp);
 
         if (!creator.isDeveloper()) {
@@ -56,20 +60,26 @@ public class ValidationService {
                 formApp.getDescription(),
                 creator.getId(),
                 Set.of(creator.getId()),
-                new AppStats(
-                        0,
-                        new Rating(
-                                null,
-                                new HashMap<>()
-                        )
+                oldApp != null ? oldApp.getAppStats()
+                        : new AppStats(
+                                0,
+                                new Rating(
+                                        null,
+                                        new HashMap<>()
+                                )
+
                 ),
-                false,
-                null,
-                null
+                oldApp != null && oldApp.isAvailable(),
+                oldApp != null ? oldApp.getStable() : null,
+                oldApp != null ? oldApp.getExperimental() : null
         );
     }
 
     public User validate(FormUser formUser) throws ConstraintViolationException {
+        return validate(formUser, null);
+    }
+
+    public User validate(FormUser formUser, User oldUser) throws ConstraintViolationException {
         validateConstraints(formUser);
 
         boolean emailVerified = verificationCodeService.verify(formUser.getEmail(), formUser.getEmailCode());
@@ -83,13 +93,18 @@ public class ValidationService {
                 formUser.getEmail(),
                 formUser.getUsername(),
                 passwordEncoder.encode(formUser.getPassword()),
-                new HashSet<>(),
+                oldUser != null ? oldUser.getUserOf() : new HashSet<>(),
                 developer,
                 null
         );
 
+        DeveloperInfo oldInfo = null;
+        if (oldUser != null && oldUser.isDeveloper()) {
+            oldInfo = oldUser.getDeveloperInfo();
+        }
+
         if (developer) {
-            var developerInfo = validate(formUser.getFormDeveloperInfo());
+            var developerInfo = validate(formUser.getFormDeveloperInfo(), oldInfo);
             user.setDeveloperInfo(developerInfo);
         }
 
@@ -97,6 +112,10 @@ public class ValidationService {
     }
 
     public DeveloperInfo validate(FormDeveloperInfo formDeveloperInfo) throws ConstraintViolationException {
+        return validate(formDeveloperInfo, null);
+    }
+
+    public DeveloperInfo validate(FormDeveloperInfo formDeveloperInfo, DeveloperInfo oldInfo) throws ConstraintViolationException {
         validateConstraints(formDeveloperInfo);
 
         var phoneNumber = validate(formDeveloperInfo.getFormPhoneNumber());
@@ -114,8 +133,8 @@ public class ValidationService {
                 formDeveloperInfo.getFirstName(),
                 formDeveloperInfo.getLastName(),
                 phoneNumber,
-                new HashSet<>(),
-                new HashSet<>()
+                oldInfo != null ? oldInfo.getDeveloperOf() : new HashSet<>(),
+                oldInfo != null ? oldInfo.getAdminOf() : new HashSet<>()
         );
     }
 

@@ -1,6 +1,6 @@
 package basket.server.service;
 
-import basket.server.model.VerificationCode;
+import basket.server.model.expiring.VerificationCode;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;

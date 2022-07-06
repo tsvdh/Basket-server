@@ -1,7 +1,7 @@
 package basket.server.service;
 
 import basket.server.dao.database.upload.PendingUploadDAO;
-import basket.server.model.PendingUpload;
+import basket.server.model.expiring.PendingUpload;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

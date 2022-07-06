@@ -1,6 +1,6 @@
 package basket.server.util;
 
-import basket.server.model.VerificationCode;
+import basket.server.model.expiring.VerificationCode;
 import basket.server.model.app.App;
 import basket.server.model.input.FormApp;
 import basket.server.model.input.FormPendingUpload;

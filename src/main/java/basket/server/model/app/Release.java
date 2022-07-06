@@ -1,6 +1,6 @@
 package basket.server.model.app;
 
-import basket.server.model.PendingUpload;
+import basket.server.model.expiring.PendingUpload;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;

@@ -76,13 +76,13 @@ public class WebController {
         return ok().build();
     }
 
-    @GetMapping("create")
+    @GetMapping("create/app")
     public String getNewPage(Model model) {
         model.addAttribute("formApp", new FormApp());
         return "create";
     }
 
-    @PostMapping("apps/create")
+    @PostMapping("create/app")
     @PreAuthorize("hasRole('DEVELOPER')")
     public ResponseEntity<Void> addApp(@ModelAttribute FormApp formApp, Authentication auth,
                                        HttpServletRequest request, HttpServletResponse response) throws IOException {

@@ -1,6 +1,6 @@
 package basket.server.dao.database.verificationcode;
 
-import basket.server.model.VerificationCode;
+import basket.server.model.expiring.VerificationCode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

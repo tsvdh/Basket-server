@@ -1,7 +1,7 @@
 package basket.server.service;
 
 import basket.server.dao.database.verificationcode.VerificationCodeDAO;
-import basket.server.model.VerificationCode;
+import basket.server.model.expiring.VerificationCode;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

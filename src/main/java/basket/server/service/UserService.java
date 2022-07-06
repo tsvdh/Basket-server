@@ -69,7 +69,7 @@ public class UserService implements UserDetailsService {
     public void update(FormUser formUser, User oldUser) throws IllegalActionException {
         log.info("Validating updated user");
 
-        User updatedUser = validationService.validate(formUser);
+        User updatedUser = validationService.validate(formUser, oldUser);
 
         updatedUser.setId(oldUser.getId());
 

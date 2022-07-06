@@ -1,6 +1,6 @@
 package basket.server.dao.database.upload;
 
-import basket.server.model.PendingUpload;
+import basket.server.model.expiring.PendingUpload;
 import java.util.Optional;
 
 public interface PendingUploadDAO {

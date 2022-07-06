@@ -1,6 +1,6 @@
 package basket.server.dao.database.verificationcode;
 
-import basket.server.model.VerificationCode;
+import basket.server.model.expiring.VerificationCode;
 import java.util.Optional;
 
 public interface VerificationCodeDAO {
