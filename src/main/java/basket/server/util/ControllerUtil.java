@@ -18,7 +18,7 @@ public class ControllerUtil {
     private final UserService userService;
 
     public App getApp(String appName) throws HttpClientErrorException {
-        Optional<App> optionalApp = appService.get(appName);
+        Optional<App> optionalApp = appService.getByName(appName);
 
         if (optionalApp.isEmpty()) {
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND,

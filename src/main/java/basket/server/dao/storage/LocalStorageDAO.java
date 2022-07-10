@@ -28,12 +28,12 @@ public class LocalStorageDAO implements StorageDAO {
         }
     }
 
-    private Optional<Map<String, File>> getFolder(String appName) {
-        return Optional.ofNullable(files.get(appName));
+    private Optional<Map<String, File>> getFolder(String appId) {
+        return Optional.ofNullable(files.get(appId));
     }
 
-    private Optional<File> getFile(String appName, String fileName) {
-        var optionalFolder = getFolder(appName);
+    private Optional<File> getFile(String appId, String fileName) {
+        var optionalFolder = getFolder(appId);
         if (optionalFolder.isEmpty()) {
             return Optional.empty();
         }
@@ -41,8 +41,8 @@ public class LocalStorageDAO implements StorageDAO {
     }
 
     @Override
-    public InputStream download(String appName, String fileName) throws IllegalActionException {
-        var optionalFile = getFile(appName, fileName);
+    public InputStream download(String appId, String fileName) throws IllegalActionException {
+        var optionalFile = getFile(appId, fileName);
         if (optionalFile.isEmpty()) {
             throw new IllegalActionException("App or file does not exist");
         }
@@ -50,17 +50,17 @@ public class LocalStorageDAO implements StorageDAO {
     }
 
     @Override
-    public void create(String appName) throws IOException, IllegalActionException {
-        if (files.containsKey(appName)) {
+    public void create(String appId) throws IOException, IllegalActionException {
+        if (files.containsKey(appId)) {
             throw new IllegalActionException("App already exists");
         } else {
-            files.put(appName, new HashMap<>());
+            files.put(appId, new HashMap<>());
         }
     }
 
     @Override
-    public void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IOException, IllegalActionException, InterruptedException {
-        var optionalFolder = getFolder(appName);
+    public void upload(String appId, InputStream inputStream, String fileName, String fileType) throws IOException, IllegalActionException, InterruptedException {
+        var optionalFolder = getFolder(appId);
         if (optionalFolder.isEmpty()) {
             throw new IllegalActionException("App does not exist");
         }
@@ -84,38 +84,38 @@ public class LocalStorageDAO implements StorageDAO {
     }
 
     @Override
-    public void rename(String appName, String oldName, String newName) throws IllegalActionException {
-        var optionalFile = getFile(appName, oldName);
+    public void rename(String appId, String oldName, String newName) throws IllegalActionException {
+        var optionalFile = getFile(appId, oldName);
         if (optionalFile.isEmpty()) {
             throw new IllegalActionException("App or file does not exist");
         }
 
-        var folder = files.get(appName);
+        var folder = files.get(appId);
         folder.remove(oldName);
         folder.put(newName, optionalFile.get());
     }
 
     @Override
-    public void delete(String appName, String fileName) throws IllegalActionException {
-        var file = getFile(appName, fileName);
+    public void delete(String appId, String fileName) throws IllegalActionException {
+        var file = getFile(appId, fileName);
         if (file.isEmpty()) {
             throw new IllegalActionException("App or file does not exist");
         }
 
-        files.get(appName).remove(fileName);
+        files.get(appId).remove(fileName);
     }
 
     @Override
-    public void delete(String appName) throws IllegalActionException {
-        if (files.get(appName) == null) {
+    public void delete(String appId) throws IllegalActionException {
+        if (files.get(appId) == null) {
             throw new IllegalActionException("App does not exist");
         } else {
-            files.remove(appName);
+            files.remove(appId);
         }
     }
 
     @Override
-    public boolean exists(String appName, String fileName) {
-        return getFile(appName, fileName).isPresent();
+    public boolean exists(String appId, String fileName) {
+        return getFile(appId, fileName).isPresent();
     }
 }

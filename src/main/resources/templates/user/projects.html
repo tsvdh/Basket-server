@@ -39,8 +39,8 @@
     </div>
     <div class="list-group w-50 mb-3">
         <a class="list-group-item list-group-item-action"
-           th:each="appName : ${pageUser.getDeveloperInfo().getDeveloperOf().stream().sorted().collect(T(java.util.stream.Collectors).toList())}"
-           th:href="@{'/apps/' + ${appName}}" th:text="${appName}">App name</a>
+           th:each="app : ${apps}"
+           th:href="@{'/apps/' + ${app.getName()}}" th:text="${app.getName()}">App name</a>
     </div>
     <a th:href="@{/create/app}" class="btn btn-outline-primary">Add</a>
 </main>

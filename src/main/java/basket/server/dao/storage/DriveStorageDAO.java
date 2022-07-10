@@ -77,8 +77,8 @@ public class DriveStorageDAO implements StorageDAO {
                 .build();
     }
 
-    private Optional<File> getFolder(String appName) throws IOException {
-        String query = "name = '%s' and mimeType = '%s'".formatted(appName, FileType.FOLDER);
+    private Optional<File> getFolder(String appId) throws IOException {
+        String query = "name = '%s' and mimeType = '%s'".formatted(appId, FileType.FOLDER);
 
         return drive.files().list()
                 .setQ(query)
@@ -88,8 +88,8 @@ public class DriveStorageDAO implements StorageDAO {
                 .stream().findFirst();
     }
 
-    private Optional<File> getFile(String appName, String fileName) throws IOException {
-        Optional<File> optionalFolder = getFolder(appName);
+    private Optional<File> getFile(String appId, String fileName) throws IOException {
+        Optional<File> optionalFolder = getFolder(appId);
         String folderId;
 
         if (optionalFolder.isPresent()) {
@@ -109,8 +109,8 @@ public class DriveStorageDAO implements StorageDAO {
     }
 
     @Override
-    public InputStream download(String appName, String fileName) throws IOException, IllegalActionException {
-        Optional<File> optionalFile = getFile(appName, fileName);
+    public InputStream download(String appId, String fileName) throws IOException, IllegalActionException {
+        Optional<File> optionalFile = getFile(appId, fileName);
 
         if (optionalFile.isEmpty()) {
             throw new IllegalActionException("File does not exist");
@@ -121,12 +121,12 @@ public class DriveStorageDAO implements StorageDAO {
     }
 
     @Override
-    public void create(String appName) throws IOException, IllegalActionException {
+    public void create(String appId) throws IOException, IllegalActionException {
         var newFolder = new File()
-                .setName(appName)
+                .setName(appId)
                 .setMimeType(FileType.FOLDER);
 
-        Optional<File> optionalFolder = getFolder(appName);
+        Optional<File> optionalFolder = getFolder(appId);
 
         if (optionalFolder.isPresent()) {
             throw new IllegalActionException("App already exists");
@@ -136,8 +136,8 @@ public class DriveStorageDAO implements StorageDAO {
     }
 
     @Override
-    public void delete(String appName) throws IOException, IllegalActionException {
-        Optional<File> optionalFolder = getFolder(appName);
+    public void delete(String appId) throws IOException, IllegalActionException {
+        Optional<File> optionalFolder = getFolder(appId);
 
         if (optionalFolder.isEmpty()) {
             throw new IllegalActionException("App does not exist");
@@ -160,12 +160,12 @@ public class DriveStorageDAO implements StorageDAO {
     }
 
     @Override
-    public void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IOException, IllegalActionException, InterruptedException {
-        if (getFile(appName, fileName).isPresent()) {
+    public void upload(String appId, InputStream inputStream, String fileName, String fileType) throws IOException, IllegalActionException, InterruptedException {
+        if (getFile(appId, fileName).isPresent()) {
             throw new IllegalActionException("File already exists");
         }
 
-        Optional<File> optionalFolder = getFolder(appName);
+        Optional<File> optionalFolder = getFolder(appId);
         String folderId;
 
         if (optionalFolder.isPresent()) {
@@ -186,7 +186,7 @@ public class DriveStorageDAO implements StorageDAO {
         }
         catch (IOException e) {
             try {
-                delete(appName, fileName);
+                delete(appId, fileName);
             } catch (IOException ignored) {}
 
             throw new InterruptedException("File upload not completed");
@@ -197,8 +197,8 @@ public class DriveStorageDAO implements StorageDAO {
     }
 
     @Override
-    public void rename(String appName, String oldName, String newName) throws IOException, IllegalActionException {
-        Optional<File> optionalFile = getFile(appName, oldName);
+    public void rename(String appId, String oldName, String newName) throws IOException, IllegalActionException {
+        Optional<File> optionalFile = getFile(appId, oldName);
 
         if (optionalFile.isEmpty()) {
             throw new IllegalActionException("File does not exist");
@@ -213,8 +213,8 @@ public class DriveStorageDAO implements StorageDAO {
     }
 
     @Override
-    public void delete(String appName, String fileName) throws IOException, IllegalActionException {
-        Optional<File> optionalFile = getFile(appName, fileName);
+    public void delete(String appId, String fileName) throws IOException, IllegalActionException {
+        Optional<File> optionalFile = getFile(appId, fileName);
 
         if (optionalFile.isEmpty()) {
             throw new IllegalActionException("File does not exist");
@@ -224,7 +224,7 @@ public class DriveStorageDAO implements StorageDAO {
     }
 
     @Override
-    public boolean exists(String appName, String fileName) throws IOException {
-        return getFile(appName, fileName).isPresent();
+    public boolean exists(String appId, String fileName) throws IOException {
+        return getFile(appId, fileName).isPresent();
     }
 }

@@ -7,7 +7,7 @@ import lombok.Data;
 public class FormPendingUpload {
 
     @NotBlank
-    private String appName;
+    private String appId;
 
     @NotBlank
     private String type;

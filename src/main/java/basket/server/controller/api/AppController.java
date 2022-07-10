@@ -41,8 +41,8 @@ public class AppController {
     private final HTMLUtil htmlUtil;
 
     @GetMapping("get/one")
-    public ResponseEntity<App> get(@RequestParam String appName) {
-        var optionalApp = appService.get(appName);
+    public ResponseEntity<App> get(@RequestParam String appId) {
+        var optionalApp = appService.getById(appId);
         if (optionalApp.isEmpty()) {
             return badRequest().build();
         } else {
@@ -67,8 +67,8 @@ public class AppController {
             return badRequest().build();
         }
 
-        Set<String> apps = optionalUser.get().getUserOf();
-        return ok(appService.get(apps));
+        Set<String> appIds = optionalUser.get().getUserOf();
+        return ok(appService.getByIds(appIds));
     }
 
 
@@ -81,7 +81,7 @@ public class AppController {
             faults = null;
         } else {
             faults = appNameValidator.getFaults(appName);
-            if (appService.get(appName).isPresent()) {
+            if (appService.getByName(appName).isPresent()) {
                 faults.add("Already taken");
             }
         }
@@ -117,18 +117,19 @@ public class AppController {
     }
 
     @PatchMapping("release")
-    @PreAuthorize("hasRole('DEVELOPER/' + #appName)")
-    public ResponseEntity<Void> release(@RequestParam String appName) throws IOException {
-        var optionalApp = appService.get(appName);
+    @PreAuthorize("hasRole('DEVELOPER/' + #appId)")
+    public ResponseEntity<Void> release(@RequestParam String appId) throws IOException {
+        var optionalApp = appService.getById(appId);
         if (optionalApp.isEmpty()) {
             return badRequest().build();
         }
 
-        if (!storageService.isReleasable(appName)) {
+        App app = optionalApp.get();
+
+        if (!storageService.isReleasable(app.getId())) {
             return badRequest().build();
         }
 
-        App app = optionalApp.get();
         app.setAvailable(true);
 
         try {

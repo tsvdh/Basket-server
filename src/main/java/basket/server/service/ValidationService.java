@@ -180,7 +180,7 @@ public class ValidationService {
         }
 
         return new PendingUpload(
-                formPendingUpload.getAppName(),
+                formPendingUpload.getAppId(),
                 type,
                 formPendingUpload.getVersion()
         );

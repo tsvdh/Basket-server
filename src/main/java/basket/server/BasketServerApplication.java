@@ -43,47 +43,53 @@ public class BasketServerApplication {
                           AppService appService, DriveStorageDAO storageDAO, StorageService storageService,
                           LocalStorageDAO localStorageDAO) {
         return args -> {
+
+            /*--- Mutation of objects in database through reference. Can only use local database. ---*/
+
             String pwd = passwordEncoder.encode("a12341234");
+
             User user1 = new User("a@a.com", "userA", pwd, new HashSet<>(), false, null);
-            user1.setId("beadsfewfa");
 
             User user2 = new User("b@b.com", "userB", pwd, new HashSet<>(), true,
                     new DeveloperInfo("B", "B", PhoneNumberUtil.getInstance().getExampleNumberForType("NL", PhoneNumberUtil.PhoneNumberType.MOBILE),
-                            Set.of("app1", "app2"), Set.of("app1")));
-            user2.setId("awefihoewh");
+                            Set.of("app1ID", "app2ID"), Set.of("app1ID", "app2ID")));
 
             userService.add(user1);
+            user1.setId("user1ID");
+
             userService.add(user2);
+            user2.setId("user2ID");
 
             App app1 = new App(
                     "app1",
-                    "an app1",
-                    "awefihoewh",
-                    Set.of("awefihoewh"),
-                    new AppStats(25234, new Rating(3.8f, Map.of("beadsfewfa", 4))),
+                    "an app 1",
+                    "user2ID",
+                    Set.of("user2ID"),
+                    new AppStats(25234, new Rating(3.8f, Map.of("user1ID", 4))),
                     true,
                     new Release("1.0.0", LocalDate.EPOCH),
                     new Release("1.0.1", LocalDate.of(2018, 5, 2))
             );
-            app1.setId("sbdasdfa");
 
             App app2 = new App(
                     "app2",
-                    "an app2",
-                    "awefihoewh",
-                    Set.of("awefihoewh"),
+                    "an app 2",
+                    "user2ID",
+                    Set.of("user2ID"),
                     new AppStats(0, new Rating(null, new HashMap<>())),
                     false,
                     null,
                     null
             );
-            app2.setId("bdfefwfgew");
 
             appService.add(app1);
-            appService.add(app2);
+            app1.setId("app1ID");
 
-            storageService.create("app1");
-            storageService.create("app2");
+            appService.add(app2);
+            app2.setId("app2ID");
+
+            storageService.create("app1ID");
+            storageService.create("app2ID");
 
             // for (File file : storageDAO.getDrive().files().list().execute().getFiles()) {
             //     storageDAO.getDrive().files().delete(file.getId()).execute();

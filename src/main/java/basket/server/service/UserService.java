@@ -54,11 +54,13 @@ public class UserService implements UserDetailsService {
         return userDAO.getByPhoneNumber(phoneNumber);
     }
 
-    public void add(FormUser formUser) throws IllegalActionException {
+    public User add(FormUser formUser) throws IllegalActionException {
         log.info("Validating new user");
 
         User newUser = validationService.validate(formUser);
         add(newUser);
+
+        return newUser;
     }
 
     public void add(User newUser) throws IllegalActionException {
@@ -66,14 +68,15 @@ public class UserService implements UserDetailsService {
         userDAO.add(newUser);
     }
 
-    public void update(FormUser formUser, User oldUser) throws IllegalActionException {
+    public User update(FormUser formUser, User oldUser) throws IllegalActionException {
         log.info("Validating updated user");
 
         User updatedUser = validationService.validate(formUser, oldUser);
-
         updatedUser.setId(oldUser.getId());
 
         update(updatedUser);
+
+        return updatedUser;
     }
 
     public void update(User updatedUser) throws IllegalActionException {
@@ -100,12 +103,12 @@ public class UserService implements UserDetailsService {
 
             authorities.add(new SimpleGrantedAuthority("ROLE_DEVELOPER"));
 
-            for (String appName : user.getDeveloperInfo().getDeveloperOf()) {
-                authorities.add(new SimpleGrantedAuthority("ROLE_DEVELOPER/" + appName));
+            for (String appId : user.getDeveloperInfo().getDeveloperOf()) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_DEVELOPER/" + appId));
             }
 
-            for (String appName : user.getDeveloperInfo().getAdminOf()) {
-                authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN/" + appName));
+            for (String appId : user.getDeveloperInfo().getAdminOf()) {
+                authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN/" + appId));
             }
         }
 

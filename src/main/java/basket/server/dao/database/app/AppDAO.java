@@ -13,7 +13,7 @@ public interface AppDAO {
 
     Collection<App> getAll();
 
-    Collection<App> get(Collection<String> names);
+    Collection<App> getByIds(Collection<String> ids);
 
     default boolean isUnique(App app) {
         boolean uniqueId = app.getId() == null || getById(app.getId()).isEmpty();

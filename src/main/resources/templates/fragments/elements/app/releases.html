@@ -16,9 +16,9 @@
               th:hx-indicator="${'#' + type + 'UploadFragment'}"
         >
             <!--suppress HtmlFormInputWithoutLabel -->
-            <input type="text" class="visually-hidden" th:field="*{appName}">
+            <input type="text" class="visually-hidden" th:data-auto-fill="${pageApp.getId()}" th:field="*{appId}">
             <!--suppress HtmlFormInputWithoutLabel -->
-            <input type="text" class="visually-hidden"  th:data-auto-fill="${type}" th:field="*{type}">
+            <input type="text" class="visually-hidden" th:data-auto-fill="${type}" th:field="*{type}">
 
             <div th:if="${!versionRequired}" class="visually-hidden">
                 <!--suppress HtmlFormInputWithoutLabel -->
@@ -72,16 +72,16 @@
     th:style="${'font-size: 1.3rem; color: ' + (exists ? 'green' : 'red') + ';'}"></td>
 
 <div th:fragment="storage-status" id="storageStatusFragment"
-     th:with="iconExists = ${storageService.exists(pageApp.getName(), T(basket.server.util.types.storage.FileName).ICON)},
-              stableExists = ${storageService.exists(pageApp.getName(), T(basket.server.util.types.storage.FileName).STABLE)},
-              experimentalExists = ${storageService.exists(pageApp.getName(), T(basket.server.util.types.storage.FileName).EXPERIMENTAL)}">
+     th:with="iconExists = ${storageService.exists(pageApp.getId(), T(basket.server.util.types.storage.FileName).ICON)},
+              stableExists = ${storageService.exists(pageApp.getId(), T(basket.server.util.types.storage.FileName).STABLE)},
+              experimentalExists = ${storageService.exists(pageApp.getId(), T(basket.server.util.types.storage.FileName).EXPERIMENTAL)}">
 
     <button type="button" class="visually-hidden" id="storageStatusRefreshButton"
 
             hx-get="/api/v1/storage/html/status"
             hx-target="#storageStatusFragment"
             hx-swap="outerHTML"
-            th:hx-vals="${'{&quot;appName&quot; : &quot;' + pageApp.getName() + '&quot;}'}"
+            th:hx-vals="${'{&quot;appId&quot; : &quot;' + pageApp.getId() + '&quot;}'}"
     ></button>
 
     <table class="table align-middle">
@@ -110,17 +110,19 @@
         </tbody>
     </table>
 
-    <div class="ms-2" th:with="readyToRelease = ${storageService.isReleasable(pageApp.getName())}">
+    <div class="ms-2" th:with="readyToRelease = ${storageService.isReleasable(pageApp.getId())}">
         <div th:if="${!readyToRelease}" class="text-muted">Complete the highlighted rows to release the app.</div>
+
         <button th:if="${readyToRelease && !pageApp.isAvailable()}" type="button" id="releaseButton" class="btn btn-primary"
 
                 hx-patch="/api/v1/app/release"
                 hx-swap="none"
-                th:hx-vals="${'{&quot;appName&quot; : &quot;' + pageApp.getName() + '&quot;}'}"
+                th:hx-vals="${'{&quot;appId&quot; : &quot;' + pageApp.getId() + '&quot;}'}"
                 hx-sync="#storageStatusRefreshButton:queue"
         >
             Release <span class="spinner-border spinner-border-sm ms-1 htmx-indicator" role="status"></span>
         </button>
+
         <div th:if="${pageApp.isAvailable()}" class="text-muted">App released</div>
     </div>
 </div>

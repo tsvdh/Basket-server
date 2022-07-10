@@ -104,14 +104,14 @@ public class StorageController {
         }
 
         try {
-            storageService.upload(pendingUpload.getAppName(), inputStream, fileName, fileType);
+            storageService.upload(pendingUpload.getAppId(), inputStream, fileName, fileType);
         } catch (IllegalActionException e) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (InterruptedException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
-        var optionalApp = appService.get(pendingUpload.getAppName());
+        var optionalApp = appService.getById(pendingUpload.getAppId());
         if (optionalApp.isEmpty()) {
             // should not happen as token guarantees app existence
             return ResponseEntity.internalServerError().build();
@@ -129,7 +129,7 @@ public class StorageController {
     }
 
     @PostMapping(path = "upload/init")
-    @PreAuthorize("hasRole('DEVELOPER/' + #formPendingUpload.getAppName())")
+    @PreAuthorize("hasRole('DEVELOPER/' + #formPendingUpload.appId)")
     public String initUpload(@ModelAttribute FormPendingUpload formPendingUpload) {
 
         var pendingUpload = validationService.validate(formPendingUpload);
@@ -141,10 +141,10 @@ public class StorageController {
     }
 
     @GetMapping("download")
-    public ResponseEntity<Resource> download(@RequestParam String appName, @RequestParam String fileName) throws IOException {
+    public ResponseEntity<Resource> download(@RequestParam String appId, @RequestParam String fileName) throws IOException {
         Optional<InputStream> optionalStream;
         try {
-            optionalStream = storageService.download(appName, fileName);
+            optionalStream = storageService.download(appId, fileName);
         } catch (IllegalActionException e) {
             return badRequest().build();
         }
@@ -167,17 +167,16 @@ public class StorageController {
                 .body(resource);
     }
 
-    // TODO: secure access
-    @PatchMapping("download/end")
-    public ResponseEntity<Void> endDownload(@RequestParam String appName, @RequestParam String fileName) throws IOException {
-        storageService.endDownload(appName, fileName);
+    @PatchMapping("download/end") // TODO: secure access
+    public ResponseEntity<Void> endDownload(@RequestParam String appId, @RequestParam String fileName) throws IOException {
+        storageService.endDownload(appId, fileName);
         return ok().build();
     }
 
     @GetMapping(path = "html/status")
-    @PreAuthorize("hasRole('DEVELOPER/' + #appName)")
-    public String getStorageStatus(@RequestParam String appName, Model model) {
-        var optionalApp = appService.get(appName);
+    @PreAuthorize("hasRole('DEVELOPER/' + #appId)")
+    public String getStorageStatus(@RequestParam String appId, Model model) {
+        var optionalApp = appService.getById(appId);
         if (optionalApp.isEmpty()) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "App does not exist");
         }

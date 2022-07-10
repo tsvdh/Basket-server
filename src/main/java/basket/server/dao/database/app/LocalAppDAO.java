@@ -34,9 +34,9 @@ public class LocalAppDAO implements AppDAO {
     }
 
     @Override
-    public Collection<App> get(Collection<String> names) {
+    public Collection<App> getByIds(Collection<String> ids) {
         return localDB.stream()
-                .filter(app -> names.contains(app.getName()))
+                .filter(app -> ids.contains(app.getId()))
                 .toList();
     }
 

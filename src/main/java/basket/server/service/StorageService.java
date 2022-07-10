@@ -31,69 +31,69 @@ public class StorageService {
         this.pendingSet = new HashSet<>();
     }
 
-    private static String toFullName(String appName, String fileName) {
-        return appName + "/" + fileName;
+    private static String toFullName(String appId, String fileName) {
+        return appId + "/" + fileName;
     }
 
     public static String toTempFileName(String fileName) {
         return "temp_" + fileName;
     }
 
-    public void create(String appName) throws IllegalActionException, IOException {
-        log.info("Creating storage for pageApp '{}'", appName);
-        storageDAO.create(appName);
+    public void create(String appId) throws IllegalActionException, IOException {
+        log.info("Creating storage for app '{}'", appId);
+        storageDAO.create(appId);
     }
 
-    public void upload(String appName, InputStream inputStream, String fileName, String fileType) throws IllegalActionException, IOException, InterruptedException {
-        log.info("Uploading '{}' for pageApp '{}'", fileName, appName);
+    public void upload(String appId, InputStream inputStream, String fileName, String fileType) throws IllegalActionException, IOException, InterruptedException {
+        log.info("Uploading '{}' for app '{}'", fileName, appId);
 
-        String fullName = toFullName(appName, fileName);
+        String fullName = toFullName(appId, fileName);
         String tempFileName = toTempFileName(fileName);
 
         // initial upload
-        if (!storageDAO.exists(appName, fileName)) {
-            storageDAO.upload(appName, inputStream, fileName, fileType);
+        if (!storageDAO.exists(appId, fileName)) {
+            storageDAO.upload(appId, inputStream, fileName, fileType);
 
             busyMap.put(fullName, 0);
             return;
         }
 
         // delete pending temp file
-        if (storageDAO.exists(appName, tempFileName)) {
-            storageDAO.delete(appName, tempFileName);
+        if (storageDAO.exists(appId, tempFileName)) {
+            storageDAO.delete(appId, tempFileName);
         }
 
         // upload new temp file
-        storageDAO.upload(appName, inputStream, tempFileName, fileType);
+        storageDAO.upload(appId, inputStream, tempFileName, fileType);
 
         // if file is in use, wait. else, execute update
         if (busyMap.get(fullName) > 0) {
             pendingSet.add(fullName);
         } else {
-            storageDAO.delete(appName, fileName);
-            storageDAO.rename(appName, tempFileName, fileName);
+            storageDAO.delete(appId, fileName);
+            storageDAO.rename(appId, tempFileName, fileName);
         }
     }
 
-    public boolean isReleasable(String appName) throws IOException {
-        log.info("Checking if '{}' is complete", appName);
+    public boolean isReleasable(String appId) throws IOException {
+        log.info("Checking if '{}' is complete", appId);
 
-        return storageDAO.exists(appName, FileName.ICON)
-                && storageDAO.exists(appName, FileName.STABLE);
+        return storageDAO.exists(appId, FileName.ICON)
+                && storageDAO.exists(appId, FileName.STABLE);
     }
 
-    public boolean exists(String appName, String fileName) throws IOException {
-        log.info("Checking if '{}' of '{}' exists", fileName, appName);
+    public boolean exists(String appId, String fileName) throws IOException {
+        log.info("Checking if '{}' of '{}' exists", fileName, appId);
 
-        return storageDAO.exists(appName, fileName);
+        return storageDAO.exists(appId, fileName);
     }
 
-    public Optional<InputStream> download(String appName, String fileName) throws IllegalActionException, IOException {
-        log.info("Downloading '{}' of pageApp '{}'", fileName, appName);
+    public Optional<InputStream> download(String appId, String fileName) throws IllegalActionException, IOException {
+        log.info("Downloading '{}' of app '{}'", fileName, appId);
 
-        InputStream inputStream = storageDAO.download(appName, fileName);
+        InputStream inputStream = storageDAO.download(appId, fileName);
 
-        String fullName = toFullName(appName, fileName);
+        String fullName = toFullName(appId, fileName);
 
         if (pendingSet.contains(fullName)) {
             return Optional.empty();
@@ -104,17 +104,17 @@ public class StorageService {
         return Optional.of(inputStream);
     }
 
-    public void endDownload(String appName, String fileName) throws IOException {
-        log.info("Handling end of '{}' download of pageApp '{}'", fileName, appName);
+    public void endDownload(String appId, String fileName) throws IOException {
+        log.info("Handling end of '{}' download of app '{}'", fileName, appId);
 
-        String fullName = toFullName(appName, fileName);
+        String fullName = toFullName(appId, fileName);
 
         busyMap.replace(fullName, busyMap.get(fullName) - 1);
 
         if (busyMap.get(fullName) == 0 && pendingSet.contains(fullName)) {
             try {
-                storageDAO.delete(appName, fileName);
-                storageDAO.rename(appName, toTempFileName(fileName), fileName);
+                storageDAO.delete(appId, fileName);
+                storageDAO.rename(appId, toTempFileName(fileName), fileName);
 
                 pendingSet.remove(fullName);
             }

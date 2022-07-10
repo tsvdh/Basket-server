@@ -26,7 +26,7 @@ public class PendingUpload implements Serializable {
     @Indexed(unique = true)
     private final String destination;
 
-    private final String appName;
+    private final String appId;
 
     private final String type;
 
@@ -34,11 +34,11 @@ public class PendingUpload implements Serializable {
 
     private final LocalDateTime createdAt;
 
-    public PendingUpload(String appName, String type, String version) {
+    public PendingUpload(String appId, String type, String version) {
         this(
                 RandomStringUtils.randomAlphanumeric(10),
-                appName + "/" + type,
-                appName,
+                appId + "/" + type,
+                appId,
                 type,
                 version,
                 LocalDateTime.now()
@@ -47,13 +47,13 @@ public class PendingUpload implements Serializable {
 
     public PendingUpload(@BsonProperty String token,
                          @BsonProperty String destination,
-                         @BsonProperty String appName,
+                         @BsonProperty String appId,
                          @BsonProperty String type,
                          @BsonProperty String version,
                          @BsonProperty LocalDateTime createdAt) {
         this.token = token;
         this.destination = destination;
-        this.appName = appName;
+        this.appId = appId;
         this.type = type;
         this.version = version;
         this.createdAt = createdAt;

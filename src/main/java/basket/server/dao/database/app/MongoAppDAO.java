@@ -29,8 +29,8 @@ public class MongoAppDAO implements AppDAO {
     }
 
     @Override
-    public Collection<App> get(Collection<String> names) {
-        return mongoRepository.findAppsByNameIn(names);
+    public Collection<App> getByIds(Collection<String> ids) {
+        return mongoRepository.findAppsByIdIn(ids);
     }
 
     @Override

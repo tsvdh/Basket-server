@@ -21,7 +21,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface AppName {
 
-    String message() default "Invalid pageApp name";
+    String message() default "Invalid app name";
 
     Class<?>[] groups() default { };
 

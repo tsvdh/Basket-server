@@ -27,8 +27,13 @@ public class AppService {
         this.userService = userService;
     }
 
-    public Optional<App> get(String name) {
-        log.info("Getting pageApp '{}'", name);
+    public Optional<App> getById(String id) {
+        log.info("Getting app by id '{}'", id);
+        return appDAO.getById(id);
+    }
+
+    public Optional<App> getByName(String name) {
+        log.info("Getting app by name '{}'", name);
         return appDAO.getByName(name);
     }
 
@@ -45,13 +50,13 @@ public class AppService {
                 .toList();
     }
 
-    public Collection<App> get(Collection<String> names) {
-        log.info("Getting apps '{}'", names);
-        return appDAO.get(names);
+    public Collection<App> getByIds(Collection<String> ids) {
+        log.info("Getting apps '{}'", ids);
+        return appDAO.getByIds(ids);
     }
 
-    public void add(FormApp formApp, String creatorName) throws IllegalActionException {
-        log.info("Validating new pageApp");
+    public App add(FormApp formApp, String creatorName) throws IllegalActionException {
+        log.info("Validating new app");
 
         var optionalCreator = userService.getByUsername(creatorName);
         if (optionalCreator.isEmpty()) {
@@ -60,15 +65,17 @@ public class AppService {
 
         App newApp = validationService.validate(formApp, optionalCreator.get());
         add(newApp);
+
+        return newApp;
     }
 
     public void add(App app) throws IllegalActionException {
-        log.info("Adding new pageApp '{}'", app.getName());
+        log.info("Adding new app '{}'", app.getName());
         appDAO.add(app);
     }
 
-    public void update(FormApp formApp, App oldApp, String creatorName) throws IllegalActionException {
-        log.info("Validating updated pageApp");
+    public App update(FormApp formApp, App oldApp, String creatorName) throws IllegalActionException {
+        log.info("Validating updated app");
 
         var optionalCreator = userService.getByUsername(creatorName);
         if (optionalCreator.isEmpty()) {
@@ -76,14 +83,15 @@ public class AppService {
         }
 
         App updatedApp = validationService.validate(formApp, optionalCreator.get(), oldApp);
-
         updatedApp.setId(oldApp.getId());
 
         update(updatedApp);
+
+        return updatedApp;
     }
 
     public void update(App updatedApp) throws IllegalActionException {
-        log.info("Updating pageApp '{}'", updatedApp.getName());
+        log.info("Updating app '{}'", updatedApp.getName());
         appDAO.update(updatedApp);
     }
 }

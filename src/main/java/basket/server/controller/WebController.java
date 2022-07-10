@@ -1,5 +1,6 @@
 package basket.server.controller;
 
+import basket.server.model.app.App;
 import basket.server.model.input.FormApp;
 import basket.server.model.input.FormPendingUpload;
 import basket.server.model.input.FormUser;
@@ -14,12 +15,14 @@ import basket.server.util.IllegalActionException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -86,8 +89,9 @@ public class WebController {
     @PreAuthorize("hasRole('DEVELOPER')")
     public ResponseEntity<Void> addApp(@ModelAttribute FormApp formApp, Authentication auth,
                                        HttpServletRequest request, HttpServletResponse response) throws IOException {
+        App newApp;
         try {
-            appService.add(formApp, request.getRemoteUser());
+            newApp = appService.add(formApp, request.getRemoteUser());
         } catch (IllegalActionException e) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
@@ -101,23 +105,15 @@ public class WebController {
         SecurityContextHolder.getContext().setAuthentication(newAuth);
 
         try {
-            storageService.create(formApp.getAppName());
+            storageService.create(newApp.getId());
         } catch (IllegalActionException e) {
-            // ignore as pageApp name cannot be taken at this point and no exception should be thrown
+            // ignore as app cannot have a database entry at this point and no exception should be thrown
         }
 
         response.sendRedirect("/apps/%s/releases".formatted(formApp.getAppName()));
 
         return ok().build();
     }
-
-    // @PutMapping
-    // @PreAuthorize("hasRole('DEVELOPER-' + updatedApp.getName())")
-    // public ResponseEntity<Void> updateApp(@RequestBody @NonNull @Validated App updatedApp) {
-    //     appService.update(updatedApp);
-    //
-    //     return ok().build();
-    // }
 
     @GetMapping("apps/{appName}")
     public ResponseEntity<Void> getAppPage(@PathVariable String appName,
@@ -136,17 +132,19 @@ public class WebController {
         return modelAndView;
     }
 
-    @PreAuthorize("hasRole('DEVELOPER/' + #appName)")
+    @PostAuthorize("hasRole('DEVELOPER/' + returnObject.model.get('pageApp').id)")
     @GetMapping("apps/{appName}/manage")
     public ModelAndView getAppManagePage(@PathVariable String appName) {
         var modelAndView = new ModelAndView("app/manage");
 
-        modelAndView.addObject("pageApp", controllerUtil.getApp(appName));
+        App pageApp = controllerUtil.getApp(appName);
+
+        modelAndView.addObject("pageApp", pageApp);
 
         return modelAndView;
     }
 
-    @PreAuthorize("hasRole('DEVELOPER/' + #appName)")
+    @PostAuthorize("hasRole('DEVELOPER/' + returnObject.model.get('pageApp').id)")
     @GetMapping("apps/{appName}/releases")
     public ModelAndView getAppReleasesPage(@PathVariable String appName) {
         var modelAndView = new ModelAndView("app/releases");
@@ -187,7 +185,16 @@ public class WebController {
                     "User %s is not a developer".formatted(user.getUsername()));
         }
 
+        List<App> apps = user.getDeveloperInfo().getDeveloperOf()
+                .stream()
+                .map(appService::getById)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .sorted((app1, app2) -> app1.getName().compareToIgnoreCase(app2.getName()))
+                .toList();
+
         modelAndView.addObject("pageUser", user);
+        modelAndView.addObject("apps", apps);
 
         return modelAndView;
     }

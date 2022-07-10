@@ -9,5 +9,5 @@ public interface AppMongoRepository extends MongoRepository<App, String> {
 
     Optional<App> findAppByName(String name);
 
-    Collection<App> findAppsByNameIn(Collection<String> name);
+    Collection<App> findAppsByIdIn(Collection<String> ids);
 }
