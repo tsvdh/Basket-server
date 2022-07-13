@@ -2,21 +2,6 @@ import {AlertQueue, AlertType} from "./util/alerts.js";
 
 export {}
 
-/*--- Form submit ---*/
-
-document.getElementById("registerForm").onsubmit = event => {
-    let invalids = document.getElementsByClassName("is-invalid");
-
-    if (invalids.length == 0) {
-        return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    AlertQueue.addAlert("All fields must be valid!", AlertType.Warning);
-};
-
 /*--- Nav tabs ---*/
 
 const userTypeInput = <HTMLSelectElement>document.getElementById("userTypeInput");

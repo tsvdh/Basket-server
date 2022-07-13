@@ -55,7 +55,7 @@ public class ValidationService {
     private App validate(FormApp formApp, App oldApp, User creator) {
         validateConstraints(formApp);
 
-        if (oldApp == null &&  creator == null ) {
+        if (oldApp == null && creator == null ) {
             throw new ValidationException("App and creator are both null");
         }
 

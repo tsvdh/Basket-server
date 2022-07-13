@@ -30,19 +30,24 @@
 
 <div th:replace="fragments/page-components :: header"></div>
 
+<div th:replace="fragments/page-components :: toast-container"></div>
+
 <main class="container pt-4" style="width: 800px">
 
-    <!-- TODO: fix for USER role -->
-
     <div sec:authorize="!isAuthenticated()">
-        <div>You must be a developer to create apps. Please <a th:href="@{/login}">login</a>, or <a th:href="@{/register}">register</a> if you don't have an account yet!</div>
-        <div></div>
+        <div>You must be logged in to create an app.</div>
+        <div>Please <a th:href="@{/login}">login</a>, or <a th:href="@{/register}">register</a> if you don't have an account yet!</div>
+    </div>
+
+    <div sec:authorize="hasRole('USER') && !hasRole('DEVELOPER')">
+        <div>You have to be a developer to create an app.</div>
+        <div>If you want to become a developer, go to <a th:href="@{/users/__${#authentication.name}__/settings}">settings</a>.</div>
     </div>
 
     <div sec:authorize="hasRole('DEVELOPER')">
-        <h2>Create an app</h2>
+        <h2 class="mb-4">Create an app</h2>
 
-        <form method="post" th:action="@{/create}" th:object="${formApp}">
+        <form method="post" th:action="@{/create/app}" th:object="${formApp}">
 
             <div class="col-4 mb-4">
                 <div th:replace="fragments/inputs/app :: appName"></div>

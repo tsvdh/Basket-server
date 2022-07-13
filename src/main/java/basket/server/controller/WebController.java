@@ -117,7 +117,7 @@ public class WebController {
             // ignore as app cannot have a database entry at this point and no exception should be thrown
         }
 
-        response.sendRedirect("/apps/%s/releases".formatted(formApp.getAppName()));
+        response.sendRedirect("/apps/%s".formatted(formApp.getAppName()));
 
         return ok().build();
     }

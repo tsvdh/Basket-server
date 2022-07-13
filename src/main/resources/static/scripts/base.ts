@@ -1,9 +1,10 @@
 import {AlertQueue, AlertType} from "./util/alerts.js";
-import {autoFillInputs} from "./util/utils.js";
+import {autoFillInputs, getChildren} from "./util/utils.js";
 
 /*--- Fill fields automatically ---*/
 
 window.addEventListener("load", autoFillInputs);
+document.addEventListener("htmx:afterSwap", autoFillInputs);
 
 /*--- Password toggle ---*/
 
@@ -94,3 +95,19 @@ function addListeners() {
 // Add listeners, and to fragments swapped in later
 addListeners();
 document.addEventListener("htmx:afterSwap", addListeners);
+
+/*--- Form submit ---*/
+
+document.addEventListener("submit", event => {
+    let invalids = getChildren(event.target as Element,
+        (element) => element.classList.contains("is-invalid"));
+
+    if (invalids.length == 0) {
+        return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    AlertQueue.addAlert("All fields must be valid!", AlertType.Warning);
+});

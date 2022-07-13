@@ -1,33 +1,18 @@
-import {AlertQueue, AlertType} from "../util/alerts.js";
-import {autoFillInputs} from "../util/utils.js";
-
 export {}
 
-let formSwappedIn = false;
+function addEnterListener() {
+    let input = document.getElementById("currentPasswordInput");
 
-document.addEventListener("htmx:afterSwap", event => {
-
-    if (formSwappedIn || !document.getElementById("userInfoForm")) {
-        // swap actions completed or main content not loaded yet
+    if (input == null) {
         return;
-    } else {
-        formSwappedIn = true;
     }
 
-    autoFillInputs();
-
-    /*--- Form submit ---*/
-
-    document.getElementById("userInfoForm").onsubmit = event => {
-        let invalids = document.getElementsByClassName("is-invalid");
-
-        if (invalids.length == 0) {
-            return;
+    input.onkeydown = (event) => {
+        if (event.key.toLowerCase() == "enter") {
+            (document.getElementById("currentPasswordButton") as HTMLButtonElement).click();
         }
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        AlertQueue.addAlert("All fields must be valid!", AlertType.Warning);
     };
-});
+}
+
+window.addEventListener("load", addEnterListener);
+document.addEventListener("htmx:afterSwap", addEnterListener);

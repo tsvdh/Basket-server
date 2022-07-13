@@ -28,3 +28,17 @@ export function autoFillInputs () {
         }
     }
 }
+
+export function getChildren(element: Element, filter: (element: Element) => boolean): Array<Element> {
+    let list: Array<Element> = [];
+
+    if (filter(element)) {
+        list.push(element);
+    }
+
+    for (let child of element.children) {
+        list.push(...getChildren(child, filter));
+    }
+
+    return list;
+}
