@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.servlet.ModelAndView;
 
+import static org.springframework.http.ResponseEntity.internalServerError;
 import static org.springframework.http.ResponseEntity.ok;
 
 @Controller
@@ -103,9 +104,30 @@ public class WebController {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
 
+        var optionalUser = userService.getByUsername(request.getRemoteUser());
+        if (optionalUser.isEmpty()) {
+            // should not be possible as user is already authenticated
+            return internalServerError().build();
+        }
+
+        var user = optionalUser.get();
+
+        user.getDeveloperInfo().getDeveloperOf()
+                .add(newApp.getId());
+
+        user.getDeveloperInfo().getAdminOf()
+                .add(newApp.getId());
+
+        try {
+            userService.update(user);
+        } catch (IllegalActionException e) {
+            // should not be possible as user is valid
+            return internalServerError().build();
+        }
+
         List<GrantedAuthority> authorities = new ArrayList<>(auth.getAuthorities());
-        authorities.add(new SimpleGrantedAuthority("ROLE_DEVELOPER/" + formApp.getAppName()));
-        authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN/" + formApp.getAppName()));
+        authorities.add(new SimpleGrantedAuthority("ROLE_DEVELOPER/" + newApp.getId()));
+        authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN/" + newApp.getId()));
 
         Authentication newAuth = new UsernamePasswordAuthenticationToken(auth.getPrincipal(), auth.getCredentials(), authorities);
 
@@ -114,7 +136,8 @@ public class WebController {
         try {
             storageService.create(newApp.getId());
         } catch (IllegalActionException e) {
-            // ignore as app cannot have a database entry at this point and no exception should be thrown
+            // should not be possible as database entry was just created
+            return internalServerError().build();
         }
 
         response.sendRedirect("/apps/%s".formatted(formApp.getAppName()));

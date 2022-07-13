@@ -52,7 +52,7 @@ public class BasketServerApplication {
 
             User user2 = new User("b@b.com", "userB", pwd, new HashSet<>(), true,
                     new DeveloperInfo("B", "B", PhoneNumberUtil.getInstance().getExampleNumberForType("NL", PhoneNumberUtil.PhoneNumberType.MOBILE),
-                            Set.of("app1ID", "app2ID"), Set.of("app1ID", "app2ID")));
+                            new HashSet<>(Set.of("app1ID", "app2ID")), new HashSet<>(Set.of("app1ID", "app2ID"))));
 
             userService.add(user1);
             user1.setId("user1ID");
@@ -64,7 +64,7 @@ public class BasketServerApplication {
                     "app1",
                     "description of app 1",
                     "user2ID",
-                    Set.of("user2ID"),
+                    new HashSet<>(Set.of("user2ID")),
                     new AppStats(25234, new Rating(3.8f, Map.of("user1ID", 4))),
                     true,
                     new Release("1.0.0", LocalDate.EPOCH),
@@ -75,7 +75,7 @@ public class BasketServerApplication {
                     "app2",
                     "description of app 2",
                     "user2ID",
-                    Set.of("user2ID"),
+                    new HashSet<>(Set.of("user2ID")),
                     new AppStats(0, new Rating(null, new HashMap<>())),
                     false,
                     null,

@@ -2,7 +2,7 @@ package basket.server.model.app;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Set;
+import java.util.HashSet;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonProperty;
@@ -29,7 +29,7 @@ public class App implements Serializable {
 
     private String admin;
 
-    private Set<String> developers;
+    private HashSet<String> developers;
 
     private AppStats appStats;
 
@@ -42,7 +42,7 @@ public class App implements Serializable {
     public App(@BsonProperty String name,
                @BsonProperty String description,
                @BsonProperty String admin,
-               @BsonProperty Set<String> developers,
+               @BsonProperty HashSet<String> developers,
                @BsonProperty AppStats appStats,
                @BsonProperty boolean available,
                @BsonProperty Release stable,

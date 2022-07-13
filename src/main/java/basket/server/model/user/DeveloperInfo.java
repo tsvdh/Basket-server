@@ -3,7 +3,7 @@ package basket.server.model.user;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Set;
+import java.util.HashSet;
 import lombok.Data;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -21,15 +21,15 @@ public class DeveloperInfo implements Serializable {
     @Indexed(unique = true)
     private PhoneNumber phoneNumber;
 
-    private Set<String> developerOf;
+    private HashSet<String> developerOf;
 
-    private Set<String> adminOf;
+    private HashSet<String> adminOf;
 
     public DeveloperInfo(@BsonProperty String firstName,
                          @BsonProperty String lastName,
                          @BsonProperty PhoneNumber phoneNumber,
-                         @BsonProperty Set<String> developerOf,
-                         @BsonProperty Set<String> adminOf) {
+                         @BsonProperty HashSet<String> developerOf,
+                         @BsonProperty HashSet<String> adminOf) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;

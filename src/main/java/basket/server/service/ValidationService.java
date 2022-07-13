@@ -67,7 +67,7 @@ public class ValidationService {
                 formApp.getAppName(),
                 formApp.getDescription(),
                 oldApp != null ? oldApp.getAdmin() : creator.getId(),
-                oldApp != null ? oldApp.getDevelopers() : Set.of(creator.getId()),
+                oldApp != null ? oldApp.getDevelopers() : new HashSet<>(Set.of(creator.getId())),
                 oldApp != null ? oldApp.getAppStats()
                         : new AppStats(
                         0,

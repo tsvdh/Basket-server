@@ -2,7 +2,7 @@ package basket.server.model.user;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Set;
+import java.util.HashSet;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.codecs.pojo.annotations.BsonProperty;
@@ -29,7 +29,7 @@ public class User implements Serializable {
 
     private String encodedPassword;
 
-    private Set<String> userOf;
+    private HashSet<String> userOf;
 
     private boolean developer;
 
@@ -38,7 +38,7 @@ public class User implements Serializable {
     public User(@BsonProperty String email,
                 @BsonProperty String username,
                 @BsonProperty String encodedPassword,
-                @BsonProperty Set<String> userOf,
+                @BsonProperty HashSet<String> userOf,
                 @BsonProperty boolean developer,
                 @BsonProperty DeveloperInfo developerInfo) {
         this.email = email;
