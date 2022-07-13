@@ -62,7 +62,7 @@ public class BasketServerApplication {
 
             App app1 = new App(
                     "app1",
-                    "an app 1",
+                    "description of app 1",
                     "user2ID",
                     Set.of("user2ID"),
                     new AppStats(25234, new Rating(3.8f, Map.of("user1ID", 4))),
@@ -73,7 +73,7 @@ public class BasketServerApplication {
 
             App app2 = new App(
                     "app2",
-                    "an app 2",
+                    "description of app 2",
                     "user2ID",
                     Set.of("user2ID"),
                     new AppStats(0, new Rating(null, new HashMap<>())),

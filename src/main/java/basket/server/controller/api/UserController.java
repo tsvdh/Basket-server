@@ -2,7 +2,7 @@ package basket.server.controller.api;
 
 import basket.server.model.expiring.VerificationCode;
 import basket.server.model.input.FormDeveloperInfo;
-import basket.server.model.input.SecureFormUser;
+import basket.server.model.input.ReplaceFormUser;
 import basket.server.model.user.User;
 import basket.server.service.EmailService;
 import basket.server.service.PhoneService;
@@ -77,8 +77,8 @@ public class UserController {
     private final AuthenticationManager authManager;
     private final ControllerUtil controllerUtil;
 
-    private void checkTaken(Optional<User> takenBy, HttpServletRequest request, List<String> faults) {
-        if (takenBy.isEmpty()) {
+    private void checkTaken(Optional<User> newUser, HttpServletRequest request, List<String> faults) {
+        if (newUser.isEmpty()) {
             return;
         }
 
@@ -86,7 +86,7 @@ public class UserController {
             return;
         }
 
-        if (request.getRemoteUser().equals(takenBy.get().getUsername())) {
+        if (request.getRemoteUser().equals(newUser.get().getUsername())) {
             return;
         }
 
@@ -302,7 +302,7 @@ public class UserController {
         }
 
         model.addAttribute("pageUser", pageUser);
-        model.addAttribute("formUser", new SecureFormUser());
+        model.addAttribute("formUser", new ReplaceFormUser());
         model.addAttribute("countryCodeList", HTMLUtil.getCountryList());
         model.addAttribute("emailCode", emailCode);
         model.addAttribute("phoneCode", phoneCode);
@@ -314,7 +314,7 @@ public class UserController {
 
     @PostMapping("info/change")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Void> changeInfo(@ModelAttribute SecureFormUser formUser, Principal principal,
+    public ResponseEntity<Void> changeInfo(@ModelAttribute ReplaceFormUser formUser, Principal principal,
                                            HttpServletResponse response) throws IOException {
 
         var optionalUser = userService.getByUsername(principal.getName());
@@ -323,11 +323,11 @@ public class UserController {
             return internalServerError().build();
         }
 
-        var user = optionalUser.get();
+        var oldUser = optionalUser.get();
 
         UserType userType;
 
-        if (user.isDeveloper()) {
+        if (oldUser.isDeveloper()) {
             userType = UserType.DEVELOPER;
         } else {
             userType = UserType.USER;
@@ -341,7 +341,7 @@ public class UserController {
             Authentication oldAuth = new UsernamePasswordAuthenticationToken(principal.getName(), formUser.getCurrentPassword());
             authManager.authenticate(oldAuth);
 
-            userService.update(formUser, user);
+            userService.update(formUser, oldUser);
         }
         catch (BadCredentialsException | IllegalActionException e) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());

@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!--suppress HtmlFormInputWithoutLabel -->
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -37,6 +36,7 @@
                    hx-trigger="input delay:500ms"
                    hx-target="#passwordFragment" hx-swap="outerHTML"
             >
+            <!-- TODO: fix state after typing-->
             <button id="passwordToggle" class="input-group-text" type="button" data-toggle-text hx-preserve="true">
                 <i class="bi-eye-fill"></i>
             </button>

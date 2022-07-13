@@ -74,15 +74,10 @@ public class AppService {
         appDAO.add(app);
     }
 
-    public App update(FormApp formApp, App oldApp, String creatorName) throws IllegalActionException {
+    public App update(FormApp formApp, App oldApp) throws IllegalActionException {
         log.info("Validating updated app");
 
-        var optionalCreator = userService.getByUsername(creatorName);
-        if (optionalCreator.isEmpty()) {
-            throw new IllegalActionException("Creator does not exist");
-        }
-
-        App updatedApp = validationService.validate(formApp, optionalCreator.get(), oldApp);
+        App updatedApp = validationService.validate(formApp, oldApp);
         updatedApp.setId(oldApp.getId());
 
         update(updatedApp);

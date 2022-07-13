@@ -45,6 +45,7 @@ public class HTMLUtil {
 
         var templateContext = new Context();
         templateContext.setVariable(SpringContextVariableNames.THYMELEAF_REQUEST_CONTEXT, requestContext);
+        templateContext.setVariables(model);
 
         return templateEngine.process(viewName, templateContext);
     }
@@ -86,31 +87,36 @@ public class HTMLUtil {
         APP
     }
 
-    public static final Map<String, Object> USER_INPUT_MODEL = getUserInputModel();
-    public static final Map<String, Object> APP_INPUT_MODEL = getAppInputModel();
-
-    private static Map<String, Object> getUserInputModel() {
-        var model = new HashMap<String, Object>();
-        model.put("formUser", new FormUser());
-        model.put("countryCodeList", HTMLUtil.getCountryList());
-        return model;
-    }
-
-    private static Map<String, Object> getAppInputModel() {
-        var model = new HashMap<String, Object>();
-        model.put("formApp", new FormApp());
-        return model;
+    public String getInputFragment(HttpServletRequest request, HttpServletResponse response,
+                                   String fragmentAttribute, String inputValue,
+                                   @Nullable List<String> faults, InputType inputType) {
+        return getInputFragment(request, response, fragmentAttribute, inputValue, faults, inputType, null, null);
     }
 
     public String getInputFragment(HttpServletRequest request, HttpServletResponse response,
-                                    String fragmentAttribute, String inputValue,
-                                    @Nullable List<String> faults, InputType inputType) {
+                                   String fragmentAttribute, String inputValue,
+                                   @Nullable List<String> faults, InputType inputType,
+                                   String extraKey, Object extraValue) {
 
         String templateName = "fragments/inputs/" + inputType.toString().toLowerCase();
+
         var model = switch (inputType) {
-            case APP -> APP_INPUT_MODEL;
-            case USER -> USER_INPUT_MODEL;
+            case APP -> {
+                var appModel = new HashMap<String, Object>();
+                appModel.put("formApp", new FormApp());
+                yield appModel;
+            }
+            case USER -> {
+                var userModel = new HashMap<String, Object>();
+                userModel.put("formUser", new FormUser());
+                userModel.put("countryCodeList", HTMLUtil.getCountryList());
+                yield userModel;
+            }
         };
+
+        if (extraKey != null && extraValue != null) {
+            model.put(extraKey, extraValue);
+        }
 
         String html = thymeleafProcess(request, response, templateName, model);
 

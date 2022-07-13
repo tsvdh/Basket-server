@@ -32,6 +32,8 @@
 
 <main class="container pt-4" style="width: 800px">
 
+    <!-- TODO: fix for USER role -->
+
     <div sec:authorize="!isAuthenticated()">
         <div>You must be a developer to create apps. Please <a th:href="@{/login}">login</a>, or <a th:href="@{/register}">register</a> if you don't have an account yet!</div>
         <div></div>

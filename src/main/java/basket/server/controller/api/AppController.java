@@ -1,6 +1,7 @@
 package basket.server.controller.api;
 
 import basket.server.model.app.App;
+import basket.server.model.input.ReplaceFormApp;
 import basket.server.service.AppService;
 import basket.server.service.StorageService;
 import basket.server.service.UserService;
@@ -12,18 +13,23 @@ import basket.server.validation.validators.DescriptionValidator;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.ResponseEntity.badRequest;
@@ -72,26 +78,38 @@ public class AppController {
     }
 
 
+    private void checkTaken(Optional<App> newApp, String oldAppName, List<String> faults) {
+        if (newApp.isEmpty()) {
+            return;
+        }
+
+        if (oldAppName.equals(newApp.get().getName())) {
+            return;
+        }
+
+        faults.add("Already taken");
+    }
+
     @ResponseBody
     @GetMapping(path = "html/valid/name", produces = TEXT_HTML_VALUE)
-    public String getAppNameHTMLResponse(@RequestParam String appName, AppNameValidator appNameValidator,
+    public String getAppNameHTMLResponse(@RequestParam(name = "appName") String newAppName, @RequestParam String oldAppName,
+                                         AppNameValidator appNameValidator,
                                          HttpServletRequest request, HttpServletResponse response) {
         List<String> faults;
-        if (appName.equals("")) {
+        if (newAppName.equals("")) {
             faults = null;
         } else {
-            faults = appNameValidator.getFaults(appName);
-            if (appService.getByName(appName).isPresent()) {
-                faults.add("Already taken");
-            }
+            faults = appNameValidator.getFaults(newAppName);
+            checkTaken(appService.getByName(newAppName), oldAppName, faults);
         }
 
         return htmlUtil.getInputFragment(
                 request, response,
                 "appName",
-                appName,
+                newAppName,
                 faults,
-                InputType.APP
+                InputType.APP,
+                "oldAppName", oldAppName
         );
     }
 
@@ -137,6 +155,30 @@ public class AppController {
         } catch (IllegalActionException e) {
             return internalServerError().build();
         }
+
+        return ok().build();
+    }
+
+    @PostMapping("info/change")
+    @PreAuthorize("hasRole('DEVELOPER/' + #formApp.id)")
+    public ResponseEntity<Void> changeInfo(@ModelAttribute ReplaceFormApp formApp,
+                                           HttpServletResponse response) throws IOException {
+
+        var optionalApp = appService.getById(formApp.getId());
+
+        if (optionalApp.isEmpty()) {
+            return badRequest().build();
+        }
+
+        App oldApp = optionalApp.get();
+
+        try {
+            appService.update(formApp, oldApp);
+        } catch (IllegalActionException e) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+
+        response.sendRedirect("/apps/%s/manage".formatted(formApp.getAppName()));
 
         return ok().build();
     }

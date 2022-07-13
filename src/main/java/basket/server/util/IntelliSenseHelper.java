@@ -5,7 +5,7 @@ import basket.server.model.app.App;
 import basket.server.model.input.FormApp;
 import basket.server.model.input.FormPendingUpload;
 import basket.server.model.input.FormUser;
-import basket.server.model.input.SecureFormUser;
+import basket.server.model.input.ReplaceFormUser;
 import basket.server.model.user.User;
 import basket.server.service.StorageService;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -19,6 +19,8 @@ public class IntelliSenseHelper {
     @GetMapping("1")
     private String method1(Model model) {
         model.addAttribute("formApp", new FormApp());
+        model.addAttribute("pageApp", new App());
+        model.addAttribute("oldAppName", "");
         return "fragments/inputs/app";
     }
 
@@ -53,7 +55,7 @@ public class IntelliSenseHelper {
     @GetMapping("5")
     private String method5(Model model) {
         model.addAttribute("pageUser", new User());
-        model.addAttribute("formUser", new SecureFormUser());
+        model.addAttribute("formUser", new ReplaceFormUser());
         model.addAttribute("currentPassword", "");
 
         return "fragments/elements/user/settings";

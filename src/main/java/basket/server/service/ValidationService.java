@@ -1,9 +1,9 @@
 package basket.server.service;
 
-import basket.server.model.expiring.PendingUpload;
 import basket.server.model.app.App;
 import basket.server.model.app.AppStats;
 import basket.server.model.app.Rating;
+import basket.server.model.expiring.PendingUpload;
 import basket.server.model.input.FormApp;
 import basket.server.model.input.FormDeveloperInfo;
 import basket.server.model.input.FormPendingUpload;
@@ -45,28 +45,36 @@ public class ValidationService {
     }
 
     public App validate(FormApp formApp, User creator) throws ConstraintViolationException {
-        return validate(formApp, creator, null);
+        return validate(formApp, null, creator);
     }
 
-    public App validate(FormApp formApp, User creator, App oldApp) throws ConstraintViolationException {
+    public App validate(FormApp formApp, App oldApp) throws ConstraintViolationException {
+        return validate(formApp, oldApp, null);
+    }
+
+    private App validate(FormApp formApp, App oldApp, User creator) {
         validateConstraints(formApp);
 
-        if (!creator.isDeveloper()) {
+        if (oldApp == null &&  creator == null ) {
+            throw new ValidationException("App and creator are both null");
+        }
+
+        if (creator != null && !creator.isDeveloper()) {
             throw new ValidationException("Creator must be a developer");
         }
 
         return new App(
                 formApp.getAppName(),
                 formApp.getDescription(),
-                creator.getId(),
-                Set.of(creator.getId()),
+                oldApp != null ? oldApp.getAdmin() : creator.getId(),
+                oldApp != null ? oldApp.getDevelopers() : Set.of(creator.getId()),
                 oldApp != null ? oldApp.getAppStats()
                         : new AppStats(
-                                0,
-                                new Rating(
-                                        null,
-                                        new HashMap<>()
-                                )
+                        0,
+                        new Rating(
+                                null,
+                                new HashMap<>()
+                        )
 
                 ),
                 oldApp != null && oldApp.isAvailable(),

@@ -1,14 +1,14 @@
 package basket.server.model.input;
 
-import basket.server.validation.annotations.Password;
+import basket.server.validation.annotations.AppName;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SecureFormUser extends FormUser {
+public class ReplaceFormApp extends FormApp {
 
-    @NotNull @Password
-    private String currentPassword;
+    @NotNull @AppName
+    private String id;
 }

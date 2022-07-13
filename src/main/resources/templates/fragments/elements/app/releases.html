@@ -81,7 +81,7 @@
             hx-get="/api/v1/storage/html/status"
             hx-target="#storageStatusFragment"
             hx-swap="outerHTML"
-            th:hx-vals="${'{&quot;appId&quot; : &quot;' + pageApp.getId() + '&quot;}'}"
+            th:hx-vals="${'{&quot;appId&quot; : &quot;' + pageApp.id + '&quot;}'}"
     ></button>
 
     <table class="table align-middle">
@@ -117,7 +117,7 @@
 
                 hx-patch="/api/v1/app/release"
                 hx-swap="none"
-                th:hx-vals="${'{&quot;appId&quot; : &quot;' + pageApp.getId() + '&quot;}'}"
+                th:hx-vals="${'{&quot;appId&quot; : &quot;' + pageApp.id + '&quot;}'}"
                 hx-sync="#storageStatusRefreshButton:queue"
         >
             Release <span class="spinner-border spinner-border-sm ms-1 htmx-indicator" role="status"></span>

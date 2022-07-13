@@ -4,6 +4,7 @@ import basket.server.model.app.App;
 import basket.server.model.input.FormApp;
 import basket.server.model.input.FormPendingUpload;
 import basket.server.model.input.FormUser;
+import basket.server.model.input.ReplaceFormApp;
 import basket.server.model.user.User;
 import basket.server.service.AppService;
 import basket.server.service.StorageService;
@@ -79,6 +80,12 @@ public class WebController {
         return ok().build();
     }
 
+    @GetMapping("create/user")
+    public ResponseEntity<Void> redirectToRegister(HttpServletResponse response) throws IOException {
+        response.sendRedirect("/register");
+        return ok().build();
+    }
+
     @GetMapping("create/app")
     public String getNewPage(Model model) {
         model.addAttribute("formApp", new FormApp());
@@ -140,6 +147,7 @@ public class WebController {
         App pageApp = controllerUtil.getApp(appName);
 
         modelAndView.addObject("pageApp", pageApp);
+        modelAndView.addObject("formApp", new ReplaceFormApp());
 
         return modelAndView;
     }
