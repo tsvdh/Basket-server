@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <link rel="icon" th:href="@{/images/icon.ico}">
@@ -20,8 +19,8 @@
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/dist/css/bootstrap.min.css}">
     <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/font/bootstrap-icons.css}">
     <script type="module">
-        import 'bootstrap'
-        import 'htmx'
+        import 'bootstrap';
+        import 'htmx';
     </script>
     <link rel="stylesheet" th:href="@{/style/base.css}">
     <script type="module" th:src="@{/scripts/base.js}"></script>
@@ -31,6 +30,8 @@
 <div th:replace="fragments/page-components :: user-sidebar"></div>
 
 <div th:replace="fragments/page-components :: header"></div>
+
+<div th:replace="fragments/page-components :: toast-container"></div>
 
 <main class="p-4 m-auto" style="width: 1000px;">
     <div class="display-3 mb-5" th:text="${pageUser.getUsername()}">Username</div>

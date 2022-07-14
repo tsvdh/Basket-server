@@ -1,17 +1,57 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Basket</title>
     <link rel="icon" th:href="@{/images/icon.ico}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-<div>Hello world with Thymeleaf!</div>
+    <meta name="author" content="Tobias van den Hurk">
+    <title>Register · Basket</title>
 
-<a th:href="@{/login}" class="btn btn-secondary btn-sm">Login</a>
-<a th:href="@{/register}" class="btn btn-secondary btn-sm">Register</a>
+    <script type="importmap">
+	{
+		"imports": {
+			"bootstrap": "/webjars/bootstrap/dist/js/bootstrap.esm.min.js",
+			"@popperjs/core": "/webjars/popperjs__core/lib/index.js",
+			"htmx": "/webjars/htmx.org/dist/htmx.min.js"
+		}
+	}
+    </script>
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/dist/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/font/bootstrap-icons.css}">
+    <script type="module">
+        import 'bootstrap'
+        import 'htmx'
+    </script>
+    <link rel="stylesheet" th:href="@{/style/base.css}">
+    <script type="module" th:src="@{/scripts/base.js}"></script>
+</head>
+<body class="with-header">
+
+<div th:replace="fragments/page-components :: header"></div>
+
+<div th:replace="fragments/page-components :: toast-container"></div>
+
+<main class="container-lg p-4 m-auto" style="width: 700px;">
+
+    <div class="d-flex flex-column align-items-center">
+
+        <img class="mb-4" th:src="@{/images/icon.ico}" alt="Basket icon" width="100" >
+
+        <div class="display-3 mb-5">Welcome to Basket IO</div>
+
+        <div class="d-flex align-items-center mb-5 mt-5">
+            <a th:href="@{/login}" class="btn btn-lg btn-primary me-3" style="width: 106px">Login</a>
+            <div class="fs-4 mb-1">or</div>
+            <a th:href="@{/register}" class="btn btn-lg btn-primary ms-3" style="width: 106px">Register</a>
+        </div>
+
+        <hr class="w-75">
+
+        <a class="btn btn-lg btn-outline-primary mt-5"
+           href="https://github.com/tsvdh/Basket/releases/download/0.1.0/Basket-0.1.0.exe">Download</a>
+    </div>
+
+</main>
 
 </body>
 </html>
