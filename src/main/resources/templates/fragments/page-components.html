@@ -62,17 +62,17 @@
         <a sec:authorize="${#vars.pageUser.isDeveloper()}"
            th:with="linkUri = ${baseUri} + '/projects'" th:href="@{__${linkUri}__}" class="nav-link"
            th:classappend="${pageUri.equals(linkUri)} ? active : ''">
-            <i class="bi-person-workspace"></i>
+            <i class="bi-list-ul"></i>
             Projects
         </a>
         <a  th:with="linkUri = ${baseUri} + '/profile'" th:href="@{__${linkUri}__}" class="nav-link"
             th:classappend="${pageUri.equals(linkUri)} ? active : (${!isPageUser} ? disabled : '')">
-            <i class="bi-pencil-fill"></i>
+            <i class="bi-people-fill"></i>
             Profile
         </a>
         <a th:with="linkUri = ${baseUri} + '/settings'" th:href="@{__${linkUri}__}" class="nav-link"
            th:classappend="${pageUri.equals(linkUri)} ? active : (${!isPageUser} ? disabled : '')">
-            <i class="bi-gear-fill"></i>
+            <i class="bi-pencil-fill"></i>
             Settings
         </a>
     </nav>

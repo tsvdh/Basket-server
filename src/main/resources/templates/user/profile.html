@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <link rel="icon" th:href="@{/images/icon.ico}">
@@ -31,10 +32,39 @@
 
 <div th:replace="fragments/page-components :: header"></div>
 
+<div th:replace="fragments/page-components :: toast-container"></div>
+
 <main class="p-4 m-auto" style="width: 1000px;">
     <div class="display-3 mb-5" th:text="${pageUser.getUsername()}">Username</div>
 
-    <div>Nothing to see here yet</div>
+    <div sec:authorize="hasRole('DEVELOPER')">Nothing to see here yet</div>
+
+    <div sec:authorize="!hasRole('DEVELOPER')">
+        <div class="h4 mb-4">Register as a developer</div>
+        <form method="post" th:action="@{/api/v1/user/info/new/developer}" th:object="${formUser}">
+
+            <div class="row mb-4">
+                <div class="col-5">
+                    <div th:replace="fragments/inputs/user :: firstName"></div>
+                </div>
+                <div class="col-7">
+                    <div th:replace="fragments/inputs/user :: lastName"></div>
+                </div>
+            </div>
+
+            <div class="row mb-4 d-flex">
+                <div class="col-10">
+                    <div th:replace="fragments/inputs/user :: phoneNumber"></div>
+                </div>
+                <div class="col-2">
+                    <div th:replace="fragments/inputs/user :: phoneNumberCode"></div>
+                </div>
+            </div>
+
+            <div th:replace="fragments/page-components :: form-submit ('Register')"></div>
+
+        </form>
+    </div>
 </main>
 
 </body>

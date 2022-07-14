@@ -68,15 +68,17 @@ public class WebController {
 
     @PostMapping("register")
     public ResponseEntity<Void> register(@ModelAttribute FormUser formUser,
-                                         HttpServletRequest request) throws ServletException {
+                                         HttpServletResponse response) throws ServletException, IOException {
         try {
             userService.add(formUser);
         } catch (IllegalActionException e) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
 
-        request.logout();
-        request.login(formUser.getUsername(), formUser.getPassword());
+        var auth = new UsernamePasswordAuthenticationToken(formUser.getUsername(), formUser.getPassword());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        response.sendRedirect("/users/%s".formatted(formUser.getUsername()));
 
         return ok().build();
     }
@@ -236,6 +238,8 @@ public class WebController {
         var modelAndView = new ModelAndView("user/profile");
 
         modelAndView.addObject("pageUser", controllerUtil.getUser(pageUsername));
+        modelAndView.addObject("formUser", new FormUser());
+        modelAndView.addObject("countryCodeList", HTMLUtil.getCountryList());
 
         return modelAndView;
     }

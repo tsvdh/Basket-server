@@ -42,3 +42,17 @@ export function getChildren(element: Element, filter: (element: Element) => bool
 
     return list;
 }
+
+export function setRequiredInputs(required: boolean) {
+    const optionalInputs = [
+        <HTMLInputElement>document.getElementById("firstNameInput"),
+        <HTMLInputElement>document.getElementById("lastNameInput"),
+        <HTMLInputElement>document.getElementById("countryCodeInput"),
+        <HTMLInputElement>document.getElementById("phoneNumberInput"),
+        <HTMLInputElement>document.getElementById("phoneNumberCodeInput")
+    ];
+
+    for (let input of optionalInputs) {
+        input.required = required;
+    }
+}

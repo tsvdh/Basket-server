@@ -1,7 +1,7 @@
 package basket.server.controller.api;
 
 import basket.server.model.expiring.VerificationCode;
-import basket.server.model.input.FormDeveloperInfo;
+import basket.server.model.input.FormUser;
 import basket.server.model.input.ReplaceFormUser;
 import basket.server.model.user.User;
 import basket.server.service.EmailService;
@@ -357,10 +357,28 @@ public class UserController {
     }
 
     @PostMapping("info/new/developer")
-    public ResponseEntity<Void> newDeveloper(@ModelAttribute FormDeveloperInfo formDeveloperInfo, Authentication auth,
+    @PreAuthorize("hasRole('USER') && !hasRole('DEVELOPER')")
+    public ResponseEntity<Void> newDeveloper(@ModelAttribute FormUser formUser, Authentication auth,
                                              HttpServletResponse response) throws IOException {
 
+        var optionalUser = userService.getByUsername(auth.getName());
+        if (optionalUser.isEmpty()) {
+            // should not be possible as
+            return internalServerError().build();
+        }
 
+        var user = optionalUser.get();
+        var developerInfo = validationService.validate(formUser.getFormDeveloperInfo());
+
+        user.setDeveloper(true);
+        user.setDeveloperInfo(developerInfo);
+
+        try {
+            userService.update(user);
+        } catch (IllegalActionException e) {
+            // should not be possible as user is valid
+            return internalServerError().build();
+        }
 
         List<GrantedAuthority> authorities = new ArrayList<>(auth.getAuthorities());
         authorities.add(new SimpleGrantedAuthority("ROLE_DEVELOPER"));
@@ -369,7 +387,7 @@ public class UserController {
 
         SecurityContextHolder.getContext().setAuthentication(newAuth);
 
-        response.sendRedirect("/users/%s/settings".formatted(auth.getName()));
+        response.sendRedirect("/users/%s/profile".formatted(auth.getName()));
 
         return ok().build();
     }

@@ -44,7 +44,7 @@
     </div>
 
     <div th:fragment="email" id="emailFragment">
-        <label class="form-label">Email</label>
+        <label for="emailInput" class="form-label">Email</label>
 
         <div class="input-group">
             <input type="text" spellcheck="false" class="form-control" id="emailInput" th:field="*{email}" required
@@ -66,7 +66,7 @@
     </div>
 
     <div th:fragment="emailCode" id="emailCodeFragment">
-        <label class="form-label invisible">padding</label>
+        <label for="emailCodeInput" class="form-label invisible">padding</label>
 
         <input type="text" spellcheck="false" class="form-control" id="emailCodeInput" placeholder="Code" th:field="*{emailCode}" required
                th:data-auto-fill="${emailCode?.getCode()}"
@@ -80,23 +80,24 @@
 
     <div th:fragment="firstName" id="firstNameFragment">
         <label for="firstNameInput" class="form-label">First name</label>
-        <input type="text" class="form-control" id="firstNameInput" th:field="*{formDeveloperInfo.firstName}"
+        <input type="text" class="form-control" id="firstNameInput" th:field="*{formDeveloperInfo.firstName}" required
                th:data-auto-fill="${pageUser?.getDeveloperInfo()?.getFirstName()}"
         >
     </div>
 
     <div th:fragment="lastName" id="lastNameFragment">
         <label for="lastNameInput" class="form-label">Last name</label>
-        <input type="text" class="form-control" id="lastNameInput" th:field="*{formDeveloperInfo.lastName}"
+        <input type="text" class="form-control" id="lastNameInput" th:field="*{formDeveloperInfo.lastName}" required
                th:data-auto-fill="${pageUser?.getDeveloperInfo()?.getLastName()}"
         >
     </div>
 
     <div th:fragment="phoneNumber" id="phoneNumberFragment">
-        <label class="form-label">Phone number</label>
+        <label for="phoneNumberInput" class="form-label">Phone number</label>
 
         <div class="input-group">
-            <select class="form-select" id="countryCodeInput" th:field="*{formDeveloperInfo.formPhoneNumber.regionCode}"
+            <!--suppress HtmlFormInputWithoutLabel -->
+            <select class="form-select" id="countryCodeInput" th:field="*{formDeveloperInfo.formPhoneNumber.regionCode}" required
                     th:data-auto-fill="${pageUser != null && pageUser.isDeveloper()
                         ? phoneNumberUtil.getRegionCodeForNumber(pageUser.getDeveloperInfo().getPhoneNumber())
                         : ''}"
@@ -108,7 +109,7 @@
                         th:value="${countryCode.getAlpha2()}"
                         th:text="${countryCode.getName()}"></option>
             </select>
-            <input type="text" class="form-control" id="phoneNumberInput" placeholder="Number" th:field="*{formDeveloperInfo.formPhoneNumber.number}"
+            <input type="text" class="form-control" id="phoneNumberInput" placeholder="Number" th:field="*{formDeveloperInfo.formPhoneNumber.number}" required
                    th:data-auto-fill="${pageUser != null && pageUser.isDeveloper()
                         ? phoneNumberUtil.getNationalSignificantNumber(pageUser.getDeveloperInfo().getPhoneNumber())
                         : ''}"
@@ -130,9 +131,9 @@
     </div>
 
     <div th:fragment="phoneNumberCode" id="phoneNumberCodeFragment">
-        <label class="form-label invisible">padding</label>
+        <label for="phoneNumberCodeInput" class="form-label invisible">padding</label>
 
-        <input type="text" class="form-control" id="phoneNumberCodeInput" placeholder="Code" th:field="*{formDeveloperInfo.phoneCode}"
+        <input type="text" class="form-control" id="phoneNumberCodeInput" placeholder="Code" th:field="*{formDeveloperInfo.phoneCode}" required
                th:data-auto-fill="${phoneCode?.getCode()}"
 
                hx-get="/api/v1/user/html/verify-code/phone"

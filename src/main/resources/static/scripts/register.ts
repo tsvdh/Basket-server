@@ -1,25 +1,21 @@
-import {AlertQueue, AlertType} from "./util/alerts.js";
+import {setRequiredInputs} from "./util/utils.js";
 
 export {}
 
 /*--- Nav tabs ---*/
 
-const userTypeInput = <HTMLSelectElement>document.getElementById("userTypeInput");
+window.addEventListener("load", event => {
+    setRequiredInputs(false);
+});
 
-const optionalInputs = [
-    <HTMLInputElement>document.getElementById("firstNameInput"),
-    <HTMLInputElement>document.getElementById("lastNameInput"),
-    <HTMLInputElement>document.getElementById("countryCodeInput"),
-    <HTMLInputElement>document.getElementById("phoneNumberInput"),
-    <HTMLInputElement>document.getElementById("phoneNumberCodeInput")
-];
+const userTypeInput = <HTMLSelectElement>document.getElementById("userTypeInput");
 
 document.getElementById("nav-user").onclick = function () {
     userTypeInput.value = "USER";
-    optionalInputs.forEach(input => input.required = false);
+    setRequiredInputs(false);
 };
 
 document.getElementById("nav-developer").onclick = function () {
     userTypeInput.value = "DEVELOPER";
-    optionalInputs.forEach(input => input.required = true);
+    setRequiredInputs(true);
 };
