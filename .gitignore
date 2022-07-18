@@ -35,7 +35,6 @@ build/
 ### Other ###
 package-lock.json
 node_modules
-*.js
 
 testing
 
