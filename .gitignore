@@ -36,6 +36,5 @@ build/
 package-lock.json
 node_modules
 
-testing
 certificate
 drive
