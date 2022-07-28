@@ -11,6 +11,7 @@ import basket.server.util.IllegalActionException;
 import basket.server.validation.validators.AppNameValidator;
 import basket.server.validation.validators.DescriptionValidator;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -61,14 +62,10 @@ public class AppController {
         return ok(appService.getAll());
     }
 
-    @GetMapping("get/available")
-    public ResponseEntity<Collection<App>> getAvailable() {
-        return ok(appService.getAvailable());
-    }
-
     @GetMapping("get/user-library")
-    public ResponseEntity<Collection<App>> getUserLibrary(@RequestParam String userName) {
-        var optionalUser = userService.getByUsername(userName);
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Collection<App>> getUserLibrary(Principal principal) {
+        var optionalUser = userService.getByUsername(principal.getName());
         if (optionalUser.isEmpty()) {
             return badRequest().build();
         }

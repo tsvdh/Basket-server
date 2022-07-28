@@ -42,14 +42,6 @@ public class AppService {
         return appDAO.getAll();
     }
 
-    public Collection<App> getAvailable() {
-        log.info("Getting available apps");
-
-        return appDAO.getAll().stream()
-                .filter(App::isAvailable)
-                .toList();
-    }
-
     public Collection<App> getByIds(Collection<String> ids) {
         log.info("Getting apps '{}'", ids);
         return appDAO.getByIds(ids);

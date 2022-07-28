@@ -1,7 +1,5 @@
 package basket.server;
 
-import basket.server.dao.storage.DriveStorageDAO;
-import basket.server.dao.storage.LocalStorageDAO;
 import basket.server.model.app.App;
 import basket.server.model.app.AppStats;
 import basket.server.model.app.Rating;
@@ -11,6 +9,8 @@ import basket.server.model.user.User;
 import basket.server.service.AppService;
 import basket.server.service.StorageService;
 import basket.server.service.UserService;
+import basket.server.util.types.storage.FileName;
+import basket.server.util.types.storage.FileType;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -21,6 +21,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,17 +41,16 @@ public class BasketServerApplication {
 
     @Bean
     CommandLineRunner run(UserService userService, PasswordEncoder passwordEncoder,
-                          AppService appService, DriveStorageDAO storageDAO, StorageService storageService,
-                          LocalStorageDAO localStorageDAO) {
+                          AppService appService, StorageService storageService) {
         return args -> {
 
             /*--- Mutation of objects in database through reference. Can only use local database. ---*/
 
             String pwd = passwordEncoder.encode("a12341234");
 
-            User user1 = new User("a@a.com", "userA", pwd, new HashSet<>(), false, null);
+            User user1 = new User("a@a.com", "userA", pwd, new HashSet<>(Set.of("app1ID", "app2ID")), false, null);
 
-            User user2 = new User("b@b.com", "userB", pwd, new HashSet<>(), true,
+            User user2 = new User("b@b.com", "userB", pwd, new HashSet<>(Set.of("app2ID")), true,
                     new DeveloperInfo("B", "B", PhoneNumberUtil.getInstance().getExampleNumberForType("NL", PhoneNumberUtil.PhoneNumberType.MOBILE),
                             new HashSet<>(Set.of("app1ID", "app2ID")), new HashSet<>(Set.of("app1ID", "app2ID"))));
 
@@ -90,6 +90,14 @@ public class BasketServerApplication {
 
             storageService.create("app1ID");
             storageService.create("app2ID");
+
+            var icon = new ClassPathResource("testing/random.png").getInputStream();
+            var stable = new ClassPathResource("testing/test.zip").getInputStream();
+            var experimental = new ClassPathResource("testing/test.zip").getInputStream();
+
+            storageService.upload("app1ID", icon, FileName.ICON, FileType.PNG);
+            storageService.upload("app1ID", stable, FileName.STABLE, FileType.TEXT);
+            storageService.upload("app1ID", experimental, FileName.EXPERIMENTAL, FileType.ZIP);
 
             // for (File file : storageDAO.getDrive().files().list().execute().getFiles()) {
             //     storageDAO.getDrive().files().delete(file.getId()).execute();

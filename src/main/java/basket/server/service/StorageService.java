@@ -27,6 +27,7 @@ public class StorageService {
     @Autowired
     public StorageService(@Qualifier("localStorageDAO") StorageDAO storageDAO) {
         this.storageDAO = storageDAO;
+        // TODO: auto clean pending
         this.busyMap = new HashMap<>();
         this.pendingSet = new HashSet<>();
     }

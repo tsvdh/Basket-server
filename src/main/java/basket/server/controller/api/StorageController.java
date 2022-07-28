@@ -18,8 +18,6 @@ import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +33,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import static org.springframework.http.ResponseEntity.badRequest;
 import static org.springframework.http.ResponseEntity.ok;
@@ -141,7 +140,7 @@ public class StorageController {
     }
 
     @GetMapping("download")
-    public ResponseEntity<Resource> download(@RequestParam String appId, @RequestParam String fileName) throws IOException {
+    public ResponseEntity<StreamingResponseBody> download(@RequestParam String appId, @RequestParam String fileName) throws IOException {
         Optional<InputStream> optionalStream;
         try {
             optionalStream = storageService.download(appId, fileName);
@@ -156,15 +155,14 @@ public class StorageController {
         }
 
         InputStream inputStream = optionalStream.get();
-        var resource = new InputStreamResource(inputStream);
-
-        // var headers = new HttpHeaders();
-        // headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=image.zip");
+        StreamingResponseBody responseBody = outputStream -> {
+            inputStream.transferTo(outputStream);
+            inputStream.close();
+        };
 
         return ResponseEntity.ok()
-                // .contentLength(resource.contentLength())
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resource);
+                .body(responseBody);
     }
 
     @PatchMapping("download/end") // TODO: secure access
