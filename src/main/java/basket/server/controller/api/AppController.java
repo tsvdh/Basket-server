@@ -24,7 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -131,7 +130,7 @@ public class AppController {
         );
     }
 
-    @PatchMapping("release")
+    @PostMapping("release")
     @PreAuthorize("hasRole('DEVELOPER/' + #appId)")
     public ResponseEntity<Void> release(@RequestParam String appId) throws IOException {
         var optionalApp = appService.getById(appId);

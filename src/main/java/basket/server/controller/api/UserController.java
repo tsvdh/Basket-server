@@ -1,9 +1,11 @@
 package basket.server.controller.api;
 
+import basket.server.model.app.App;
 import basket.server.model.expiring.VerificationCode;
 import basket.server.model.input.FormUser;
 import basket.server.model.input.ReplaceFormUser;
 import basket.server.model.user.User;
+import basket.server.service.AppService;
 import basket.server.service.EmailService;
 import basket.server.service.PhoneService;
 import basket.server.service.StorageService;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ValidationException;
@@ -76,6 +79,7 @@ public class UserController {
     private final ValidationService validationService;
     private final AuthenticationManager authManager;
     private final ControllerUtil controllerUtil;
+    private final AppService appService;
 
     private void checkTaken(Optional<User> newUser, HttpServletRequest request, List<String> faults) {
         if (newUser.isEmpty()) {
@@ -363,7 +367,7 @@ public class UserController {
 
         var optionalUser = userService.getByUsername(auth.getName());
         if (optionalUser.isEmpty()) {
-            // should not be possible as
+            // should not be possible as user is authenticated
             return internalServerError().build();
         }
 
@@ -390,5 +394,56 @@ public class UserController {
         response.sendRedirect("/users/%s/profile".formatted(auth.getName()));
 
         return ok().build();
+    }
+
+    private enum LibraryAction {
+        ADD, REMOVE
+    }
+
+    private ResponseEntity<Void> modifyUserOf(String appId, Principal principal, LibraryAction action) {
+        var optionalUser = userService.getByUsername(principal.getName());
+        if (optionalUser.isEmpty()) {
+            // should not be possible as user is authenticated
+            return internalServerError().build();
+        }
+
+        var user = optionalUser.get();
+        Set<String> userOf = user.getUserOf();
+
+        Optional<App> optionalApp = appService.getById(appId);
+
+        if (optionalApp.isEmpty() || !optionalApp.get().isAvailable()) {
+            return badRequest().build();
+        }
+
+        if (action == LibraryAction.ADD && !userOf.contains(appId)) {
+            userOf.add(appId);
+        }
+        else if (action == LibraryAction.REMOVE && userOf.add(appId)) {
+            userOf.remove(appId);
+        }
+        else {
+            return badRequest().build();
+        }
+
+        try {
+            userService.update(user);
+        } catch (IllegalActionException e) {
+            return internalServerError().build();
+        }
+
+        return ok().build();
+    }
+
+    @PostMapping("library/add")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> addApp(@RequestParam String appId, Principal principal) {
+        return modifyUserOf(appId, principal, LibraryAction.ADD);
+    }
+
+    @PostMapping("library/remove")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> removeApp(@RequestParam String appId, Principal principal) {
+        return modifyUserOf(appId, principal, LibraryAction.REMOVE);
     }
 }

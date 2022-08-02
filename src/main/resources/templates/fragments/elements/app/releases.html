@@ -115,7 +115,7 @@
 
         <button th:if="${readyToRelease && !pageApp.isAvailable()}" type="button" id="releaseButton" class="btn btn-primary"
 
-                hx-patch="/api/v1/app/release"
+                hx-post="/api/v1/app/release"
                 hx-swap="none"
                 th:hx-vals="${'{&quot;appId&quot; : &quot;' + pageApp.id + '&quot;}'}"
                 hx-sync="#storageStatusRefreshButton:queue"

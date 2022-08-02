@@ -27,7 +27,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -165,7 +164,7 @@ public class StorageController {
                 .body(responseBody);
     }
 
-    @PatchMapping("download/end") // TODO: secure access
+    @PostMapping("download/end") // TODO: secure access
     public ResponseEntity<Void> endDownload(@RequestParam String appId, @RequestParam String fileName) throws IOException {
         storageService.endDownload(appId, fileName);
         return ok().build();
