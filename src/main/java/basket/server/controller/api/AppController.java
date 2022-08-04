@@ -62,7 +62,7 @@ public class AppController {
     }
 
     @GetMapping("get/user-library")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Collection<App>> getUserLibrary(Principal principal) {
         var optionalUser = userService.getByUsername(principal.getName());
         if (optionalUser.isEmpty()) {

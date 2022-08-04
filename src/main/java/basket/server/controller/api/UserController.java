@@ -51,6 +51,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -283,7 +284,7 @@ public class UserController {
     }
 
     @GetMapping("html/settings/verify")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("isAuthenticated()")
     public String verifyPassword(@RequestParam String currentPassword, Principal principal, Model model) {
         try {
             Authentication auth = new UsernamePasswordAuthenticationToken(principal.getName(), currentPassword);
@@ -316,8 +317,20 @@ public class UserController {
         return "fragments/elements/user/settings :: correct-password";
     }
 
+    @GetMapping("info")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<User> getInfo(Principal principal) {
+        var optionalUser = userService.getByUsername(principal.getName());
+        if (optionalUser.isEmpty()) {
+            // should not be possible as user is authenticated
+            return internalServerError().build();
+        }
+
+        return ok(optionalUser.get());
+    }
+
     @PostMapping("info/change")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> changeInfo(@ModelAttribute ReplaceFormUser formUser, Principal principal,
                                            HttpServletResponse response) throws IOException {
 
@@ -397,7 +410,7 @@ public class UserController {
     }
 
     private enum LibraryAction {
-        ADD, REMOVE
+        add, remove
     }
 
     private ResponseEntity<Void> modifyUserOf(String appId, Principal principal, LibraryAction action) {
@@ -416,10 +429,10 @@ public class UserController {
             return badRequest().build();
         }
 
-        if (action == LibraryAction.ADD && !userOf.contains(appId)) {
+        if (action == LibraryAction.add && !userOf.contains(appId)) {
             userOf.add(appId);
         }
-        else if (action == LibraryAction.REMOVE && userOf.add(appId)) {
+        else if (action == LibraryAction.remove && userOf.add(appId)) {
             userOf.remove(appId);
         }
         else {
@@ -435,15 +448,9 @@ public class UserController {
         return ok().build();
     }
 
-    @PostMapping("library/add")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Void> addApp(@RequestParam String appId, Principal principal) {
-        return modifyUserOf(appId, principal, LibraryAction.ADD);
-    }
-
-    @PostMapping("library/remove")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<Void> removeApp(@RequestParam String appId, Principal principal) {
-        return modifyUserOf(appId, principal, LibraryAction.REMOVE);
+    @PostMapping("library/{action}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> addApp(@RequestParam String appId, Principal principal, @PathVariable LibraryAction action) {
+        return modifyUserOf(appId, principal, action);
     }
 }
