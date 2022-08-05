@@ -121,6 +121,17 @@ public class DriveStorageDAO implements StorageDAO {
     }
 
     @Override
+    public long getSize(String appId, String fileName) throws IOException, IllegalActionException {
+        Optional<File> optionalFile = getFile(appId, fileName);
+
+        if (optionalFile.isEmpty()) {
+            throw new IllegalActionException("File does not exist");
+        }
+
+        return optionalFile.get().getSize();
+    }
+
+    @Override
     public void create(String appId) throws IOException, IllegalActionException {
         var newFolder = new File()
                 .setName(appId)

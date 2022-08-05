@@ -116,11 +116,17 @@ public class StorageController {
         }
 
         var app = optionalApp.get();
-        var release = new Release(pendingUpload);
 
         switch (pendingUpload.getType()) {
-            case "stable" -> app.setStable(release);
-            case "experimental" -> app.setExperimental(release);
+            case "stable" -> {
+                var release = new Release(pendingUpload);
+                app.setStable(release);
+            }
+            case "experimental" -> {
+                var release = new Release(pendingUpload);
+                app.setExperimental(release);
+            }
+            // ignore case "icon"
         }
 
         return ok().build();
@@ -140,8 +146,10 @@ public class StorageController {
 
     @GetMapping("download")
     public ResponseEntity<StreamingResponseBody> download(@RequestParam String appId, @RequestParam String fileName) throws IOException {
+        long contentLength;
         Optional<InputStream> optionalStream;
         try {
+            contentLength = storageService.getSize(appId, fileName);
             optionalStream = storageService.download(appId, fileName);
         } catch (IllegalActionException e) {
             return badRequest().build();
@@ -160,6 +168,7 @@ public class StorageController {
         };
 
         return ResponseEntity.ok()
+                .contentLength(contentLength)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(responseBody);
     }

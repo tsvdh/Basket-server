@@ -76,6 +76,11 @@ public class StorageService {
         }
     }
 
+    public long getSize(String appId, String fileName) throws IOException, IllegalActionException {
+        log.info("Getting size of {} of {}", fileName, appId);
+        return storageDAO.getSize(appId, fileName);
+    }
+
     public boolean isReleasable(String appId) throws IOException {
         log.info("Checking if '{}' is complete", appId);
 

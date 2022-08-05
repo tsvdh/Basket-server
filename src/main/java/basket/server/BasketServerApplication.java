@@ -4,6 +4,7 @@ import basket.server.model.app.App;
 import basket.server.model.app.AppStats;
 import basket.server.model.app.Rating;
 import basket.server.model.app.Release;
+import basket.server.model.app.Release.Type;
 import basket.server.model.user.DeveloperInfo;
 import basket.server.model.user.User;
 import basket.server.service.AppService;
@@ -67,8 +68,8 @@ public class BasketServerApplication {
                     new HashSet<>(Set.of("user2ID")),
                     new AppStats(25234, new Rating(3.8f, Map.of("user1ID", 4))),
                     true,
-                    new Release("1.0.0", LocalDate.EPOCH),
-                    new Release("1.0.1", LocalDate.of(2018, 5, 2))
+                    new Release("1.0.0", LocalDate.EPOCH, Type.STABLE),
+                    new Release("1.0.1", LocalDate.of(2018, 5, 2), Type.EXPERIMENTAL)
             );
 
             App app2 = new App(

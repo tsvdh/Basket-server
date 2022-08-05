@@ -8,6 +8,8 @@ public interface StorageDAO {
 
     InputStream download(String appId, String fileName) throws IOException, IllegalActionException;
 
+    long getSize(String appId, String fileName) throws IOException, IllegalActionException;
+
     void create(String appId) throws IOException, IllegalActionException;
 
     void upload(String appId, InputStream inputStream, String fileName, String fileType) throws IOException, IllegalActionException, InterruptedException;

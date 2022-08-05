@@ -50,6 +50,15 @@ public class LocalStorageDAO implements StorageDAO {
     }
 
     @Override
+    public long getSize(String appId, String fileName) throws IOException, IllegalActionException {
+        var optionalFile = getFile(appId, fileName);
+        if (optionalFile.isEmpty()) {
+            throw new IllegalActionException("App or file does not exist");
+        }
+        return optionalFile.get().content.length;
+    }
+
+    @Override
     public void create(String appId) throws IOException, IllegalActionException {
         if (files.containsKey(appId)) {
             throw new IllegalActionException("App already exists");
