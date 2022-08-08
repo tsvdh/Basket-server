@@ -4,6 +4,7 @@ import basket.server.model.app.App;
 import basket.server.model.expiring.VerificationCode;
 import basket.server.model.input.FormUser;
 import basket.server.model.input.ReplaceFormUser;
+import basket.server.model.user.AppUsage;
 import basket.server.model.user.User;
 import basket.server.service.AppService;
 import basket.server.service.EmailService;
@@ -25,11 +26,13 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.io.IOException;
 import java.security.Principal;
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ValidationException;
@@ -57,6 +60,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 import static basket.server.service.PhoneService.phoneToString;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
@@ -81,6 +85,15 @@ public class UserController {
     private final AuthenticationManager authManager;
     private final ControllerUtil controllerUtil;
     private final AppService appService;
+
+    private User getUser(Principal principal) {
+        var optionalUser = userService.getByUsername(principal.getName());
+        if (optionalUser.isEmpty()) {
+            // should not be possible as user is authenticated
+            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return optionalUser.get();
+    }
 
     private void checkTaken(Optional<User> newUser, HttpServletRequest request, List<String> faults) {
         if (newUser.isEmpty()) {
@@ -320,27 +333,14 @@ public class UserController {
     @GetMapping("info")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<User> getInfo(Principal principal) {
-        var optionalUser = userService.getByUsername(principal.getName());
-        if (optionalUser.isEmpty()) {
-            // should not be possible as user is authenticated
-            return internalServerError().build();
-        }
-
-        return ok(optionalUser.get());
+        return ok(getUser(principal));
     }
 
     @PostMapping("info/change")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> changeInfo(@ModelAttribute ReplaceFormUser formUser, Principal principal,
                                            HttpServletResponse response) throws IOException {
-
-        var optionalUser = userService.getByUsername(principal.getName());
-        if (optionalUser.isEmpty()) {
-            // should not be possible as user is authenticated
-            return internalServerError().build();
-        }
-
-        var oldUser = optionalUser.get();
+        var oldUser = getUser(principal);
 
         UserType userType;
 
@@ -377,14 +377,7 @@ public class UserController {
     @PreAuthorize("hasRole('USER') && !hasRole('DEVELOPER')")
     public ResponseEntity<Void> newDeveloper(@ModelAttribute FormUser formUser, Authentication auth,
                                              HttpServletResponse response) throws IOException {
-
-        var optionalUser = userService.getByUsername(auth.getName());
-        if (optionalUser.isEmpty()) {
-            // should not be possible as user is authenticated
-            return internalServerError().build();
-        }
-
-        var user = optionalUser.get();
+        var user = getUser((Principal) auth.getPrincipal());
         var developerInfo = validationService.validate(formUser.getFormDeveloperInfo());
 
         user.setDeveloper(true);
@@ -409,19 +402,42 @@ public class UserController {
         return ok().build();
     }
 
+    @PostMapping("info/session")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<AppUsage> addSession(@RequestParam String appId, Principal principal,
+                                               @RequestParam OffsetDateTime start, @RequestParam OffsetDateTime end) {
+        var user = getUser(principal);
+
+        AppUsage appUsage = user.getUsageInfo().get(appId);
+
+        if (appUsage == null) {
+            return badRequest().build();
+        }
+
+        var sessionTime = Duration.between(start, end);
+
+        appUsage.setTimeUsed(appUsage.getTimeUsed().plus(sessionTime));
+        appUsage.setLastUsed(end);
+
+        try {
+            userService.update(user);
+        } catch (IllegalActionException e) {
+            return internalServerError().build();
+        }
+        
+        return ok(appUsage);
+    }
+
     private enum LibraryAction {
         add, remove
     }
 
-    private ResponseEntity<Void> modifyUserOf(String appId, Principal principal, LibraryAction action) {
-        var optionalUser = userService.getByUsername(principal.getName());
-        if (optionalUser.isEmpty()) {
-            // should not be possible as user is authenticated
-            return internalServerError().build();
-        }
+    @PostMapping("library/{action}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> editLibrary(@RequestParam String appId, Principal principal, @PathVariable LibraryAction action) {
+        var user = getUser(principal);
 
-        var user = optionalUser.get();
-        Set<String> userOf = user.getUserOf();
+        Map<String, AppUsage> usageInfo = user.getUsageInfo();
 
         Optional<App> optionalApp = appService.getById(appId);
 
@@ -429,11 +445,11 @@ public class UserController {
             return badRequest().build();
         }
 
-        if (action == LibraryAction.add && !userOf.contains(appId)) {
-            userOf.add(appId);
+        if (action == LibraryAction.add && !usageInfo.containsKey(appId)) {
+            usageInfo.put(appId, new AppUsage(null, null));
         }
-        else if (action == LibraryAction.remove && userOf.add(appId)) {
-            userOf.remove(appId);
+        else if (action == LibraryAction.remove && usageInfo.containsKey(appId)) {
+            usageInfo.remove(appId);
         }
         else {
             return badRequest().build();
@@ -446,11 +462,5 @@ public class UserController {
         }
 
         return ok().build();
-    }
-
-    @PostMapping("library/{action}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Void> addApp(@RequestParam String appId, Principal principal, @PathVariable LibraryAction action) {
-        return modifyUserOf(appId, principal, action);
     }
 }

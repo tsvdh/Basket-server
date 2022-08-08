@@ -5,6 +5,7 @@ import basket.server.model.app.AppStats;
 import basket.server.model.app.Rating;
 import basket.server.model.app.Release;
 import basket.server.model.app.Release.Type;
+import basket.server.model.user.AppUsage;
 import basket.server.model.user.DeveloperInfo;
 import basket.server.model.user.User;
 import basket.server.service.AppService;
@@ -13,7 +14,9 @@ import basket.server.service.UserService;
 import basket.server.util.types.storage.FileName;
 import basket.server.util.types.storage.FileType;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -49,9 +52,12 @@ public class BasketServerApplication {
 
             String pwd = passwordEncoder.encode("a12341234");
 
-            User user1 = new User("a@a.com", "userA", pwd, new HashSet<>(Set.of("app1ID", "app2ID")), false, null);
+            User user1 = new User("a@a.com", "userA", pwd,
+                    new HashMap<>(Map.of("app1ID", new AppUsage(Duration.ofMinutes(12), OffsetDateTime.now()),
+                            "app2ID", new AppUsage(null, null))), false, null);
 
-            User user2 = new User("b@b.com", "userB", pwd, new HashSet<>(Set.of("app2ID")), true,
+            User user2 = new User("b@b.com", "userB", pwd,
+                    new HashMap<>(Map.of("app2ID", new AppUsage(null, null))), true,
                     new DeveloperInfo("B", "B", PhoneNumberUtil.getInstance().getExampleNumberForType("NL", PhoneNumberUtil.PhoneNumberType.MOBILE),
                             new HashSet<>(Set.of("app1ID", "app2ID")), new HashSet<>(Set.of("app1ID", "app2ID"))));
 

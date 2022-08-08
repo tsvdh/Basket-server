@@ -101,7 +101,7 @@ public class ValidationService {
                 formUser.getEmail(),
                 formUser.getUsername(),
                 passwordEncoder.encode(formUser.getPassword()),
-                oldUser != null ? oldUser.getUserOf() : new HashSet<>(),
+                oldUser != null ? oldUser.getUsageInfo() : new HashMap<>(),
                 developer,
                 null
         );

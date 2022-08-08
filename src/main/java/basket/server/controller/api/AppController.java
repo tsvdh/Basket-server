@@ -69,7 +69,7 @@ public class AppController {
             return badRequest().build();
         }
 
-        Set<String> appIds = optionalUser.get().getUserOf();
+        Set<String> appIds = optionalUser.get().getUsageInfo().keySet();
         return ok(appService.getByIds(appIds));
     }
 
