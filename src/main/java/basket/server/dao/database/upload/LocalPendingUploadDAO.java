@@ -1,7 +1,7 @@
 package basket.server.dao.database.upload;
 
 import basket.server.model.expiring.PendingUpload;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,7 +43,7 @@ public class LocalPendingUploadDAO implements PendingUploadDAO {
      */
     @Scheduled(fixedRate = 15, timeUnit = TimeUnit.MINUTES)
     void removeExpired() {
-        var now = LocalDateTime.now();
+        var now = OffsetDateTime.now();
         localDB.removeIf(pendingUpload -> pendingUpload.getCreatedAt().plusMinutes(15).isBefore(now));
     }
 }

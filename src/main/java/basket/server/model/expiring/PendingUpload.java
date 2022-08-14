@@ -2,7 +2,7 @@ package basket.server.model.expiring;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import lombok.Data;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.bson.codecs.pojo.annotations.BsonProperty;
@@ -32,7 +32,7 @@ public class PendingUpload implements Serializable {
 
     private final String version;
 
-    private final LocalDateTime createdAt;
+    private final OffsetDateTime createdAt;
 
     public PendingUpload(String appId, String type, String version) {
         this(
@@ -41,7 +41,7 @@ public class PendingUpload implements Serializable {
                 appId,
                 type,
                 version,
-                LocalDateTime.now()
+                OffsetDateTime.now()
         );
     }
 
@@ -50,7 +50,7 @@ public class PendingUpload implements Serializable {
                          @BsonProperty String appId,
                          @BsonProperty String type,
                          @BsonProperty String version,
-                         @BsonProperty LocalDateTime createdAt) {
+                         @BsonProperty OffsetDateTime createdAt) {
         this.token = token;
         this.destination = destination;
         this.appId = appId;

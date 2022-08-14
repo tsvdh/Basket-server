@@ -404,8 +404,8 @@ public class UserController {
 
     @PostMapping("info/session")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<AppUsage> addSession(@RequestParam String appId, Principal principal,
-                                               @RequestParam OffsetDateTime start, @RequestParam OffsetDateTime end) {
+    public ResponseEntity<AppUsage> addAppSession(@RequestParam String appId, Principal principal,
+                                                  @RequestParam OffsetDateTime start, @RequestParam OffsetDateTime end) {
         var user = getUser(principal);
 
         AppUsage appUsage = user.getUsageInfo().get(appId);
@@ -424,7 +424,7 @@ public class UserController {
         } catch (IllegalActionException e) {
             return internalServerError().build();
         }
-        
+
         return ok(appUsage);
     }
 
@@ -446,7 +446,7 @@ public class UserController {
         }
 
         if (action == LibraryAction.add && !usageInfo.containsKey(appId)) {
-            usageInfo.put(appId, new AppUsage(null, null));
+            usageInfo.put(appId, new AppUsage(Duration.ZERO, null));
         }
         else if (action == LibraryAction.remove && usageInfo.containsKey(appId)) {
             usageInfo.remove(appId);

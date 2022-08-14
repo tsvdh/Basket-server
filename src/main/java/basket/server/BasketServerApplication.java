@@ -16,7 +16,9 @@ import basket.server.util.types.storage.FileType;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -54,10 +56,10 @@ public class BasketServerApplication {
 
             User user1 = new User("a@a.com", "userA", pwd,
                     new HashMap<>(Map.of("app1ID", new AppUsage(Duration.ofMinutes(12), OffsetDateTime.now()),
-                            "app2ID", new AppUsage(null, null))), false, null);
+                            "app2ID", new AppUsage(Duration.ZERO, null))), false, null);
 
             User user2 = new User("b@b.com", "userB", pwd,
-                    new HashMap<>(Map.of("app2ID", new AppUsage(null, null))), true,
+                    new HashMap<>(), true,
                     new DeveloperInfo("B", "B", PhoneNumberUtil.getInstance().getExampleNumberForType("NL", PhoneNumberUtil.PhoneNumberType.MOBILE),
                             new HashSet<>(Set.of("app1ID", "app2ID")), new HashSet<>(Set.of("app1ID", "app2ID"))));
 
@@ -74,8 +76,8 @@ public class BasketServerApplication {
                     new HashSet<>(Set.of("user2ID")),
                     new AppStats(25234, new Rating(3.8f, Map.of("user1ID", 4))),
                     true,
-                    new Release("1.0.0", LocalDate.EPOCH, Type.STABLE),
-                    new Release("1.0.1", LocalDate.of(2018, 5, 2), Type.EXPERIMENTAL)
+                    new Release("1.0.0", OffsetDateTime.of(LocalDate.EPOCH, LocalTime.NOON, ZoneOffset.UTC), Type.STABLE),
+                    new Release("1.0.1", OffsetDateTime.of(2018, 11, 23, 1, 1, 1, 1, ZoneOffset.UTC), Type.EXPERIMENTAL)
             );
 
             App app2 = new App(
@@ -98,13 +100,17 @@ public class BasketServerApplication {
             storageService.create("app1ID");
             storageService.create("app2ID");
 
-            var icon = new ClassPathResource("testing/random.png").getInputStream();
-            var stable = new ClassPathResource("testing/test.zip").getInputStream();
-            var experimental = new ClassPathResource("testing/test.zip").getInputStream();
+            var icon = new ClassPathResource("testing/random.png");
+            var stable = new ClassPathResource("testing/test.zip");
+            var experimental = new ClassPathResource("testing/test.zip");
 
-            storageService.upload("app1ID", icon, FileName.ICON, FileType.PNG);
-            storageService.upload("app1ID", stable, FileName.STABLE, FileType.TEXT);
-            storageService.upload("app1ID", experimental, FileName.EXPERIMENTAL, FileType.ZIP);
+            storageService.upload("app1ID", icon.getInputStream(), FileName.ICON, FileType.PNG);
+            storageService.upload("app1ID", stable.getInputStream(), FileName.STABLE, FileType.ZIP);
+            storageService.upload("app1ID", experimental.getInputStream(), FileName.EXPERIMENTAL, FileType.ZIP);
+
+            storageService.upload("app2ID", icon.getInputStream(), FileName.ICON, FileType.PNG);
+            storageService.upload("app2ID", stable.getInputStream(), FileName.STABLE, FileType.ZIP);
+            storageService.upload("app2ID", experimental.getInputStream(), FileName.EXPERIMENTAL, FileType.ZIP);
 
             // for (File file : storageDAO.getDrive().files().list().execute().getFiles()) {
             //     storageDAO.getDrive().files().delete(file.getId()).execute();
