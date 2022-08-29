@@ -2,6 +2,7 @@ package basket.server.controller.api;
 
 import basket.server.model.app.App;
 import basket.server.model.expiring.VerificationCode;
+import basket.server.model.input.AppSession;
 import basket.server.model.input.FormUser;
 import basket.server.model.input.ReplaceFormUser;
 import basket.server.model.user.AppUsage;
@@ -22,17 +23,20 @@ import basket.server.validation.annotations.Email;
 import basket.server.validation.validators.EmailValidator;
 import basket.server.validation.validators.PasswordValidator;
 import basket.server.validation.validators.UsernameValidator;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.io.IOException;
 import java.security.Principal;
 import java.time.Duration;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ValidationException;
@@ -56,6 +60,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -402,10 +407,10 @@ public class UserController {
         return ok().build();
     }
 
-    @PostMapping("info/session")
+    @PostMapping(path = "info/session")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<AppUsage> addAppSession(@RequestParam String appId, Principal principal,
-                                                  @RequestParam OffsetDateTime start, @RequestParam OffsetDateTime end) {
+                                                  @RequestBody List<AppSession> sessions) {
         var user = getUser(principal);
 
         AppUsage appUsage = user.getUsageInfo().get(appId);
@@ -414,10 +419,14 @@ public class UserController {
             return badRequest().build();
         }
 
-        var sessionTime = Duration.between(start, end);
+        for (AppSession session : sessions) {
+            var sessionTime = Duration.between(session.getStart(), session.getEnd());
+            appUsage.setTimeUsed(appUsage.getTimeUsed().plus(sessionTime));
 
-        appUsage.setTimeUsed(appUsage.getTimeUsed().plus(sessionTime));
-        appUsage.setLastUsed(end);
+            if (appUsage.getLastUsed().isBefore(session.getEnd())) {
+                appUsage.setLastUsed(session.getEnd());
+            }
+        }
 
         try {
             userService.update(user);

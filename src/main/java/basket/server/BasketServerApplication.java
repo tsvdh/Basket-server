@@ -55,8 +55,7 @@ public class BasketServerApplication {
             String pwd = passwordEncoder.encode("a12341234");
 
             User user1 = new User("a@a.com", "userA", pwd,
-                    new HashMap<>(Map.of("app1ID", new AppUsage(Duration.ofMinutes(12), OffsetDateTime.now()),
-                            "app2ID", new AppUsage(Duration.ZERO, null))), false, null);
+                    new HashMap<>(Map.of("app1ID", new AppUsage(Duration.ofMinutes(12), OffsetDateTime.now().minusDays(3)))), false, null);
 
             User user2 = new User("b@b.com", "userB", pwd,
                     new HashMap<>(), true,
