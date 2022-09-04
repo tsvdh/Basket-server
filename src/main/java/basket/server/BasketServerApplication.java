@@ -100,7 +100,7 @@ public class BasketServerApplication {
             storageService.create("app2ID");
 
             var icon = new ClassPathResource("testing/random.png");
-            var stable = new ClassPathResource("testing/test.zip");
+            var stable = new ClassPathResource("testing/image.zip");
             var experimental = new ClassPathResource("testing/test.zip");
 
             storageService.upload("app1ID", icon.getInputStream(), FileName.ICON, FileType.PNG);

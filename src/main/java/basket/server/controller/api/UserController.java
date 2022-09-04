@@ -1,6 +1,7 @@
 package basket.server.controller.api;
 
 import basket.server.model.app.App;
+import basket.server.model.app.Rating;
 import basket.server.model.expiring.VerificationCode;
 import basket.server.model.input.AppSession;
 import basket.server.model.input.FormUser;
@@ -23,8 +24,6 @@ import basket.server.validation.annotations.Email;
 import basket.server.validation.validators.EmailValidator;
 import basket.server.validation.validators.PasswordValidator;
 import basket.server.validation.validators.UsernameValidator;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.io.IOException;
@@ -32,11 +31,9 @@ import java.security.Principal;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ValidationException;
@@ -407,7 +404,11 @@ public class UserController {
         return ok().build();
     }
 
-    @PostMapping(path = "info/session")
+    ///////////////////////////////////////////////////////////////////////////
+    // app-data
+    ///////////////////////////////////////////////////////////////////////////
+
+    @PostMapping(path = "app-data/session")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<AppUsage> addAppSession(@RequestParam String appId, Principal principal,
                                                   @RequestBody List<AppSession> sessions) {
@@ -441,9 +442,9 @@ public class UserController {
         add, remove
     }
 
-    @PostMapping("library/{action}")
+    @PostMapping("app-data/library/{action}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Void> editLibrary(@RequestParam String appId, Principal principal, @PathVariable LibraryAction action) {
+    public ResponseEntity<User> editLibrary(@RequestParam String appId, Principal principal, @PathVariable LibraryAction action) {
         var user = getUser(principal);
 
         Map<String, AppUsage> usageInfo = user.getUsageInfo();
@@ -454,11 +455,16 @@ public class UserController {
             return badRequest().build();
         }
 
+        var app = optionalApp.get();
+        var appStats = app.getAppStats();
+
         if (action == LibraryAction.add && !usageInfo.containsKey(appId)) {
             usageInfo.put(appId, new AppUsage(Duration.ZERO, null));
+            appStats.setAmountOfUsers(appStats.getAmountOfUsers() + 1);
         }
         else if (action == LibraryAction.remove && usageInfo.containsKey(appId)) {
             usageInfo.remove(appId);
+            appStats.setAmountOfUsers(appStats.getAmountOfUsers() - 1);
         }
         else {
             return badRequest().build();
@@ -466,10 +472,47 @@ public class UserController {
 
         try {
             userService.update(user);
+            appService.update(app);
         } catch (IllegalActionException e) {
             return internalServerError().build();
         }
 
-        return ok().build();
+        return ok(user);
+    }
+
+    @PostMapping("app-data/rating")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Rating> rateApp(@RequestParam String appId, Principal principal, @RequestParam Integer userGrade) {
+        var user = getUser(principal);
+
+        Optional<App> optionalApp = appService.getById(appId);
+
+        if (optionalApp.isEmpty() || !optionalApp.get().isAvailable()) {
+            return badRequest().build();
+        }
+
+        var app = optionalApp.get();
+        var rating = app.getAppStats().getRating();
+        var reviews = rating.getReviews();
+
+        if (reviews.containsKey(user.getId())) {
+            return badRequest().build();
+        }
+
+        reviews.put(user.getId(), userGrade);
+
+        float newGrade = reviews.values().stream()
+                .reduce(Integer::sum).get()
+                / (float) reviews.values().size();
+
+        rating.setGrade(newGrade);
+
+        try {
+            appService.update(app);
+        } catch (IllegalActionException e) {
+            return internalServerError().build();
+        }
+
+        return ok(rating);
     }
 }
