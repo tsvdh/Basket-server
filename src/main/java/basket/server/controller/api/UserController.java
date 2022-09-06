@@ -480,9 +480,13 @@ public class UserController {
         return ok(user);
     }
 
-    @PostMapping("app-data/rating")
+    @PostMapping("app-data/review")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Rating> rateApp(@RequestParam String appId, Principal principal, @RequestParam Integer userGrade) {
+    public ResponseEntity<Rating> reviewApp(@RequestParam String appId, Principal principal, @RequestParam Integer grade) {
+        if (grade < 1 || grade > 5) {
+            return badRequest().build();
+        }
+
         var user = getUser(principal);
 
         Optional<App> optionalApp = appService.getById(appId);
@@ -499,7 +503,7 @@ public class UserController {
             return badRequest().build();
         }
 
-        reviews.put(user.getId(), userGrade);
+        reviews.put(user.getId(), grade);
 
         float newGrade = reviews.values().stream()
                 .reduce(Integer::sum).get()

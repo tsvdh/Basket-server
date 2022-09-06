@@ -2,6 +2,7 @@ package basket.server.model.app;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 import lombok.Data;
 import org.bson.codecs.pojo.annotations.BsonProperty;
@@ -14,10 +15,10 @@ public class Rating implements Serializable {
 
     private Float grade;
 
-    private Map<String, Integer> reviews;
+    private HashMap<String, Integer> reviews;
 
     public Rating(@BsonProperty Float grade,
-                  @BsonProperty Map<String, Integer> reviews) {
+                  @BsonProperty HashMap<String, Integer> reviews) {
         this.grade = grade;
         this.reviews = reviews;
     }

@@ -62,18 +62,24 @@ public class BasketServerApplication {
                     new DeveloperInfo("B", "B", PhoneNumberUtil.getInstance().getExampleNumberForType("NL", PhoneNumberUtil.PhoneNumberType.MOBILE),
                             new HashSet<>(Set.of("app1ID", "app2ID")), new HashSet<>(Set.of("app1ID", "app2ID"))));
 
+            User user3 = new User("c@c.com", "userC", pwd,
+                    new HashMap<>(Map.of("app1ID", new AppUsage(Duration.ZERO, null))), false, null);
+
             userService.add(user1);
             user1.setId("user1ID");
 
             userService.add(user2);
             user2.setId("user2ID");
 
+            userService.add(user3);
+            user3.setId("user3ID");
+
             App app1 = new App(
                     "app1",
                     "description of app 1",
                     "user2ID",
                     new HashSet<>(Set.of("user2ID")),
-                    new AppStats(25234, new Rating(3.8f, Map.of("user1ID", 4))),
+                    new AppStats(25234, new Rating(4.0f, new HashMap<>(Map.of("user1ID", 4)))),
                     true,
                     new Release("1.0.0", OffsetDateTime.of(LocalDate.EPOCH, LocalTime.NOON, ZoneOffset.UTC), Type.STABLE),
                     new Release("1.0.1", OffsetDateTime.of(2018, 11, 23, 1, 1, 1, 1, ZoneOffset.UTC), Type.EXPERIMENTAL)
